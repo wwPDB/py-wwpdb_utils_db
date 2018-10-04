@@ -29,11 +29,15 @@ import pprint
 import sys
 import os
 import json
+import platform
 
 from wwpdb.utils.db.PdbxSchemaMapReader import PdbxSchemaMapReader
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
+TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
+if not os.path.exists(TESTOUTPUT):
+    os.makedirs(TESTOUTPUT)
 
 class PdbxSchemaMapReaderTests(unittest.TestCase):
 
@@ -50,13 +54,13 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
         pass
 
     def testReadPrdMap(self):
-        self.__readMap(self.__pathPrdSchemaMapFile, os.path.join(HERE, "prd-def.out"))
+        self.__readMap(self.__pathPrdSchemaMapFile, os.path.join(TESTOUTPUT, "prd-def.out"))
 
     def testReadCcMap(self):
-        self.__readMap(self.__pathCcSchemaMapFile, os.path.join(HERE, "cc-def.out"))
+        self.__readMap(self.__pathCcSchemaMapFile, os.path.join(TESTOUTPUT, "cc-def.out"))
 
     def testReadPdbxMap(self):
-        self.__readMap(self.__pathPdbxSchemaMapFile, os.path.join(HERE, "pdbx-def.out"))
+        self.__readMap(self.__pathPdbxSchemaMapFile, os.path.join(TESTOUTPUT, "pdbx-def.out"))
 
     def __readMap(self, mapFilePath, defFilePath):
         """Test case -  read input schema map file and write python schema def data structure -

@@ -104,5 +104,4 @@ venv.bak/
 .mypy_cache/
 
 # From tests
-wwpdb/utils/tests-db/*.tdd
-wwpdb/utils/tests-db/*.out
+wwpdb/utils/tests-db/test-output/*

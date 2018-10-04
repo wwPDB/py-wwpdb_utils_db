@@ -17,6 +17,7 @@ __version__ = "V0.01"
 
 import os
 import sys
+import platform
 import unittest
 import traceback
 import time
@@ -28,6 +29,9 @@ from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
+if not os.path.exists(TESTOUTPUT):
+    os.makedirs(TESTOUTPUT)
 
 class MyDbSqlGenTests(unittest.TestCase):
 
@@ -83,7 +87,7 @@ class MyDbSqlGenTests(unittest.TestCase):
 
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
-                exportPath = os.path.join(HERE, tableDefObj.getName() + ".tdd")
+                exportPath = os.path.join(TESTOUTPUT, tableDefObj.getName() + ".tdd")
                 sqlExport = myAd.exportTable(databaseName, tableDefObj, exportPath=exportPath)
                 if (self.__verbose):
                     self.__lfh.write("\n\n+MyDbSqlGenTests table export SQL string\n %s\n\n" % sqlExport)
@@ -147,7 +151,7 @@ class MyDbSqlGenTests(unittest.TestCase):
 
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
-                exportPath = os.path.join(HERE, tableDefObj.getName() + ".tdd")
+                exportPath = os.path.join(TESTOUTPUT, tableDefObj.getName() + ".tdd")
                 sqlExport = myAd.exportTable(databaseName, tableDefObj, exportPath=exportPath)
                 if (self.__verbose):
                     self.__lfh.write("\n\n+MyDbSqlGenTests table export SQL string\n %s\n\n" % sqlExport)
