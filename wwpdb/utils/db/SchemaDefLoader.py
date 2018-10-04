@@ -579,7 +579,7 @@ class SchemaDefLoader(object):
             vList = []
             aList = []
             for id, nm in zip(tableAttributeIdList, tableAttributeNameList):
-                if len(row[id]) > 0 and row[id] != '\N':
+                if len(row[id]) > 0 and row[id] != r'\N':
                     vList.append(row[id])
                     aList.append(nm)
             sqlInsertList.append((sqlGen.insertTemplateSQL(databaseName, tableName, aList), vList))

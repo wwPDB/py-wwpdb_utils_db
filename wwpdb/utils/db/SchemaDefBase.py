@@ -375,11 +375,11 @@ class TableDef(object):
             if self.__isStringType(self.__tD['ATTRIBUTE_INFO'][attributeId]['SQL_TYPE'].upper()):
                 return ''
             elif self.__isDateType(self.__tD['ATTRIBUTE_INFO'][attributeId]['SQL_TYPE'].upper()):
-                return '\N'
+                return r'\N'
             else:
-                return '\N'
+                return r'\N'
         except:
-            return '\N'
+            return r'\N'
 
     def getSqlNullValueDict(self):
         """ Return a dictionary containing appropriate NULL value for each attribute.
@@ -390,9 +390,9 @@ class TableDef(object):
             if self.__isStringType(atInfo['SQL_TYPE'].upper()):
                 d[atId] = ''
             elif self.__isDateType(atInfo['SQL_TYPE'].upper()):
-                d[atId] = '\N'
+                d[atId] = r'\N'
             else:
-                d[atId] = '\N'
+                d[atId] = r'\N'
         #
         return d
 
