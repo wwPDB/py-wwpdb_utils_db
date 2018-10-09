@@ -38,9 +38,11 @@ from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 
-from pdbx_v2.bird.PdbxPrdIo import PdbxPrdIo
+from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
 
+from wwpdb.utils.testing.Features import Features
 
+@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment' )
 class BirdLoaderTests(unittest.TestCase):
 
     def __init__(self, methodName='runTest'):

@@ -30,7 +30,11 @@ from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
 from wwpdb.utils.db.MyQueryDirectives import MyQueryDirectives
 
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
+from wwpdb.utils.testing.Features import Features
+
+@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment')
 class MyQueryDirectivesTests(unittest.TestCase):
 
     def setUp(self):

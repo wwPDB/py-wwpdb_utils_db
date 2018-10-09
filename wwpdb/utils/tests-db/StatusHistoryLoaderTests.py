@@ -27,13 +27,17 @@ import sys
 import time
 import unittest
 import traceback
+
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
-from pdbx_v2.adapter.IoAdapterPy import IoAdapterPy
+from mmcif.io.IoAdapterPy import IoAdapterPy
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
+from wwpdb.utils.testing.Features import Features
 
+
+@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment' )
 class StatusHistoryLoaderTests(unittest.TestCase):
 
     def __init__(self, methodName='runTest'):

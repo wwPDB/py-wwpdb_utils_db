@@ -30,12 +30,14 @@ from wwpdb.utils.db.MyDbUtil import MyDbConnect
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
 
-from wwpdb.utils.rcsb.MultiProcUtil import MultiProcUtil
+from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
 
 # from pdbx_v2.adapter.IoAdapterPy       import IoAdapterPy
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
+from wwpdb.utils.testing.Features import Features
 
+@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment' )
 class ChemCompLoaderTests(unittest.TestCase):
 
     def setUp(self):

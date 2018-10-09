@@ -53,7 +53,8 @@ setup(
     #
     # These basic tests require no database services -
     test_suite="wwpdb.utils.tests-db",
-    tests_require=['tox'],
+    tests_require=['tox', 'wwpdb.utils.testing', 'mmcif.utils', 'scandir',
+                   'rcsb.utils.multiproc'],
     #
     # Not configured ...
     extras_require={

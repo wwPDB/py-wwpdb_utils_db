@@ -28,7 +28,11 @@ import time
 from wwpdb.utils.db.MyDbUtil import MyDbConnect
 from wwpdb.utils.db.MyDbUtil import MyDbQuery
 
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
+from wwpdb.utils.testing.Features import Features
+
+@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment')
 class MyDbUtilTests(unittest.TestCase):
 
     def setUp(self):

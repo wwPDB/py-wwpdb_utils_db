@@ -40,14 +40,15 @@ from wwpdb.utils.db.PdbxSchemaDef import PdbxSchemaDef
 from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
 
 #from pdbx_v2.adapter.IoAdapterPy       import IoAdapterPy
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
-from pdbx_v2.bird.PdbxPrdIo import PdbxPrdIo
-from pdbx_v2.bird.PdbxFamilyIo import PdbxFamilyIo
-from pdbx_v2.bird.PdbxPrdUtils import PdbxPrdUtils
-from pdbx_v2.chemcomp.PdbxChemCompIo import PdbxChemCompIo
+from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
+from mmcif_utils.bird.PdbxFamilyIo import PdbxFamilyIo
+from mmcif_utils.bird.PdbxPrdUtils import PdbxPrdUtils
+from mmcif_utils.chemcomp.PdbxChemCompIo import PdbxChemCompIo
 
-
+from wwpdb.utils.testing.Features import Features
+@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment')
 class SchemaDefLoaderDbTests(unittest.TestCase):
 
     def __init__(self, methodName='runTest'):
