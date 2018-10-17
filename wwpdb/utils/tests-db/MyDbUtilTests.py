@@ -27,6 +27,7 @@ import time
 
 from wwpdb.utils.db.MyDbUtil import MyDbConnect
 from wwpdb.utils.db.MyDbUtil import MyDbQuery
+from wwpdb.utils.db.MyDbAdapter import MyDbAdapter
 
 from mmcif.io.IoAdapterCore import IoAdapterCore
 

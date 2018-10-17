@@ -35,7 +35,7 @@ import sys
 import time
 import traceback
 import copy
-from wwpdb.api.facade.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbQuerySqlGen, MyDbConditionSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 
