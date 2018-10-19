@@ -182,7 +182,7 @@ class MyDbUtilTests(unittest.TestCase):
             dbUserPwd = os.getenv("TEST_DB_PASSWORD")
             dbName = os.getenv("TEST_DB_NAME")
             dbHost = os.getenv("TEST_DB_HOST")
-            for ii in xrange(5000):
+            for ii in range(5000):
                 ok = self.open(dbUserId=dbUserId, dbUserPwd=dbUserPwd, dbHost=dbHost, dbName=dbName)
                 self.assertTrue(ok)
                 ok = self.close()
@@ -215,10 +215,10 @@ class MyDbUtilTests(unittest.TestCase):
             dbUserPwd = os.getenv("TEST_DB_PASSWORD")
             dbName = os.getenv("TEST_DB_NAME")
             dbHost = os.getenv("TEST_DB_HOST")
-            for ii in xrange(5000):
+            for ii in range(5000):
                 ok = self.open(dbUserId=dbUserId, dbUserPwd=dbUserPwd, dbHost=dbHost, dbName=dbName)
                 self.assertTrue(ok)
-                for jj in xrange(100):
+                for jj in range(100):
                     my = MyDbQuery(dbcon=self.__dbCon)
                     ok = my.testSelectQuery(count=ii + jj)
                     self.assertTrue(ok)

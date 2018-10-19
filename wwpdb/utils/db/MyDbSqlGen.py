@@ -688,7 +688,7 @@ class MyDbConditionSqlGen(object):
         """ Auto add equi-join contraints between tables in the current table list -
         """
         self.__KeyJoinDone = True
-        if self.__tableIdList < 2:
+        if len(self.__tableIdList) < 2:
             return 0
         cList = copy.deepcopy(self.__cList)
         self.__cList = []

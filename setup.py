@@ -44,7 +44,7 @@ setup(
         'console_scripts': []
     },
     #
-    install_requires=['mmcif', 'mysqlclient', 'wwpdb.utils.config'],
+    install_requires=['mmcif', 'scandir', 'mysqlclient', 'wwpdb.utils.config'],
     packages=find_packages(exclude=['wwpdb.utils.tests-db', 'examples', 'tests.*']),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:

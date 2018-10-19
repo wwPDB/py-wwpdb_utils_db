@@ -45,7 +45,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         self.__verbose = False
         self.__loadPathList = []
         self.__ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
-        self.__topCachePath = '../../../../../../reference/components/ligand-dict-v3'
+        self.__topCachePath = "/data/components/ligand-dict-v3"
         #
 
     def tearDown(self):
@@ -187,7 +187,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         try:
             dataS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
             dataList = [a for a in dataS]
-            mpu = MultiProcUtil(verbose=True, log=self.__lfh)
+            mpu = MultiProcUtil(verbose=True)
             mpu.set(workerObj=self, workerMethod="makeComponentPathListMulti")
             ok, failList, retLists, diagList = mpu.runMulti(dataList=dataList, numProc=numProc, numResults=1)
             pathList = retLists[0]
@@ -202,7 +202,7 @@ class ChemCompLoaderTests(unittest.TestCase):
                                   warnings='default', verbose=self.__verbose, log=self.__lfh)
 
             #
-            mpu = MultiProcUtil(verbose=True, log=self.__lfh)
+            mpu = MultiProcUtil(verbose=True)
             mpu.set(workerObj=sml, workerMethod="makeLoadFilesMulti")
             ok, failList, retLists, diagList = mpu.runMulti(dataList=pathList, numProc=numProc, numResults=2)
             #
@@ -223,7 +223,7 @@ class ChemCompLoaderTests(unittest.TestCase):
                 sdl.delete(tId, containerNameList=containerNameList, deleteOpt='all')
             self.close()
             #
-            mpu = MultiProcUtil(verbose=True, log=self.__lfh)
+            mpu = MultiProcUtil(verbose=True)
             mpu.set(workerObj=self, workerMethod="loadBatchFilesMulti")
             ok, failList, retLists, diagList = mpu.runMulti(dataList=tList, numProc=numProc, numResults=1)
 
