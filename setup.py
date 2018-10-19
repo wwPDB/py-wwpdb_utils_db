@@ -45,7 +45,7 @@ setup(
     },
     #
     install_requires=['mmcif', 'scandir', 'mysqlclient', 'wwpdb.utils.config'],
-    packages=find_packages(exclude=['wwpdb.utils.tests-db', 'examples', 'tests.*']),
+    packages=find_packages(exclude=['wwpdb.utils.tests-db', 'examples', 'mock-data', 'tests.*']),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
         '': ['*.md', '*.rst', "*.txt", "*.cfg"],
