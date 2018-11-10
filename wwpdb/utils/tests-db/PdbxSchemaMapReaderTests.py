@@ -30,6 +30,7 @@ import sys
 import os
 import json
 import platform
+import shutil
 
 from wwpdb.utils.db.PdbxSchemaMapReader import PdbxSchemaMapReader
 

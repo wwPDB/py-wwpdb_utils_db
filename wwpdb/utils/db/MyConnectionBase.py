@@ -36,7 +36,7 @@ if True:
         logger.exception("Creating MYSQL connection pool failing")
 
 
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 
 
 class MyConnectionBase(object):
