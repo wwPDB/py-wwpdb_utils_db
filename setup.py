@@ -44,7 +44,8 @@ setup(
         'console_scripts': []
     },
     #
-    install_requires=['mmcif', 'scandir', 'mysqlclient', 'wwpdb.utils.config', 'wwpdb.io', 'rcsb.utils.multiproc'],
+    install_requires=['mmcif', 'scandir', 'mysqlclient', 'wwpdb.utils.config',
+                      'wwpdb.io', 'rcsb.utils.multiproc', 'sqlalchemy'],
     packages=find_packages(exclude=['wwpdb.utils.tests-db', 'examples', 'mock-data', 'tests.*']),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
