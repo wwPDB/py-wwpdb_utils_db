@@ -27,7 +27,7 @@ import time
 import os
 import os.path
 import shutil
-
+import platform
 
 from wwpdb.utils.db.StatusHistory import StatusHistory
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
