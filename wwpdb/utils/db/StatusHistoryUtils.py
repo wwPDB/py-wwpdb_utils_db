@@ -26,7 +26,10 @@ import time
 import copy
 import scandir
 import traceback
-from itertools import izip_longest
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
 
 from wwpdb.utils.db.StatusHistory import StatusHistory
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
@@ -388,7 +391,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
     def __makeSubLists(self, n, iterable):
         args = [iter(iterable)] * n
-        return ([e for e in t if e is not None] for t in izip_longest(*args))
+        return ([e for e in t if e is not None] for t in zip_longest(*args))
 
     def loadBatchFilesWorker(self, dataList, procName, optionsD, workingDir):
         """ Load tabular batch files created for the chemical component definitions into the database server.
