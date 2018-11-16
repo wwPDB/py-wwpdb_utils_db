@@ -36,6 +36,7 @@ class DbLoadingApi(object):
         self.__pyPath      = cI.get("SITE_PYTHON_SOURCE_PATH")
         self.__pkgPath     = cI.get("SITE_PACKAGES_PATH")
         self.__resrcPath   = cI.get("SITE_RESOURCE_DIRECTORY_PATH")
+        self.__schemaPath  = cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
         self.__dbServer    = cI.get("SITE_DB_SERVER")
         #self.__dbHost      = "pdb-b-linux-6.rutgers.edu"
         self.__dbHost      = cI.get("SITE_DB_HOST_NAME")
@@ -50,7 +51,7 @@ class DbLoadingApi(object):
         self.__mysql  = "/usr/bin/mysql "
         self.__dbLoader  = os.path.join(self.__pkgPath,"dbloader","bin","db-loader") 
         
-        self.__mapping   = os.path.join(self.__resrcPath,"status_rcsb_schema_da.cif")
+        self.__mapping   = self.__schemaPath
         
         self.__workDir   = "dbdata"                                 
     
@@ -246,6 +247,8 @@ class DbLoadingApi(object):
            Similar as doDataLoading(), Run db-loader with the option to
            get bcp data files using the giving mapping file and dbname.
 
+           Note: mappingFile is the full path
+
         """
         """
           If a sequence of commands appears in a pipeline, and one of the
@@ -257,7 +260,7 @@ class DbLoadingApi(object):
         #print self.__dbHost
         
         depId = depId.upper()
-        myMappingFile = os.path.join(self.__resrcPath, mappingFile)
+        myMappingFile = mappingFile
         cifPath = self.__workPath+"/"+depId+"/"
         ## test if there is any cif file if yes do ...
         

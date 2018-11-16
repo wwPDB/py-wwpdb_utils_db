@@ -95,7 +95,7 @@ class DBLoadUtil(object):
         dbUser    = self.__cI.get("SITE_DB_USER_NAME")
         dbPw      = self.__cI.get("SITE_DB_PASSWORD")
         dbPort    = self.__cI.get("SITE_DB_PORT_NUMBER")
-        mapping   = os.path.join(self.__cI.get("SITE_RESOURCE_DIRECTORY_PATH"), "status_rcsb_schema_da.cif")
+        mapping   = self.__cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
         dbLoader  = os.path.join(self.__cI.get("SITE_PACKAGES_PATH"), "dbloader", "bin", "db-loader")
         #
         script = os.path.join(self.__sessionPath, scriptfile)
