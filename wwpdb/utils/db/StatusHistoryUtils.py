@@ -153,7 +153,7 @@ class StatusHistoryUtils(MyConnectionBase):
                                                      time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         oD = {}
         oD['overWrite'] = overWrite
-        mpu = MultiProcUtil(verbose=True, log=self.__lfh)
+        mpu = MultiProcUtil(verbose=True)
         mpu.set(workerObj=self, workerMethod="createHistoryWorker")
         mpu.setOptions(optionsD=oD)
         mpu.setWorkingDir(self.__sessionPath)
@@ -427,7 +427,7 @@ class StatusHistoryUtils(MyConnectionBase):
                                   warnings='default', verbose=self.__verbose, log=self.__lfh)
 
             #
-            mpu = MultiProcUtil(verbose=True, log=self.__lfh)
+            mpu = MultiProcUtil(verbose=True)
             mpu.set(workerObj=sml, workerMethod="makeLoadFilesMulti")
             mpu.setWorkingDir(self.__sessionPath)
             ok, failList, retLists, diagList = mpu.runMulti(dataList=pathList, numProc=numProc, numResults=2)
@@ -461,7 +461,7 @@ class StatusHistoryUtils(MyConnectionBase):
             if self.__debug:
                 self.__lfh.write("\nAuthentication dictionary %r\n" % authD.items())
             #
-            mpu = MultiProcUtil(verbose=True, log=self.__lfh)
+            mpu = MultiProcUtil(verbose=True)
             mpu.set(workerObj=self, workerMethod="loadBatchFilesWorker")
             mpu.setOptions(authD)
             mpu.setWorkingDir(self.__sessionPath)
