@@ -56,7 +56,7 @@ class DBLoadUtil(object):
         self.__genScriptFile(scriptfile, listfile, logfile)
         self.__RunScript(self.__sessionPath, scriptfile, clogfile)
 
-    def __getFileName(path, root, ext):
+    def __getFileName(self, path, root, ext):
         """Create unique file name.
         """
         count = 1
@@ -70,7 +70,7 @@ class DBLoadUtil(object):
             #
             return root + '_1.' + ext
         
-    def __RunScript(path, script, log):
+    def __RunScript(self, path, script, log):
         """Run script command
         """
         cmd = 'cd ' + path + '; chmod 755 ' + script \
