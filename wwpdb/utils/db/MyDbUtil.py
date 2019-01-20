@@ -32,7 +32,6 @@ __version__ = "V0.001"
 #
 
 import MySQLdb
-import _mysql_exceptions
 
 import sys
 import os

@@ -22,7 +22,6 @@ __version__ = "V0.07"
 
 import sys
 import MySQLdb
-import _mysql_exceptions
 
 import logging
 logger = logging.getLogger(__name__)
