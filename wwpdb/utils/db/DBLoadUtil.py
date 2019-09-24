@@ -81,7 +81,7 @@ class DBLoadUtil(object):
         """
         """
         fn = os.path.join(self.__sessionPath, filename)
-        f = file(fn, 'w')
+        f = open(fn, 'w')
         for entryfile in list:
              f.write(entryfile + '\n')
         #
@@ -99,7 +99,7 @@ class DBLoadUtil(object):
         dbLoader  = os.path.join(self.__cI.get("SITE_PACKAGES_PATH"), "dbloader", "bin", "db-loader")
         #
         script = os.path.join(self.__sessionPath, scriptfile)
-        f = file(script, 'w')
+        f = open(script, 'w')
         f.write('#!/bin/tcsh -f\n')
         f.write('#\n')
         f.write('if ( -e DB_LOADER.sql ) then\n')
