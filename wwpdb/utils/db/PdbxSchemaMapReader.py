@@ -63,7 +63,7 @@ class PdbxSchemaMapReader(object):
                 ofh.write("Table %s - attribute %s  abbreviation %s\n" % (tN, k, v))
 
     def __convertDataType(self, type, width=0, precision=0):
-        if type.lower() == "char" or type.lower() == "varchar":
+        if type.lower() in ["char", "varchar", "text"]:
             if width < 65000:
                 retType = "VARCHAR"
             else:
