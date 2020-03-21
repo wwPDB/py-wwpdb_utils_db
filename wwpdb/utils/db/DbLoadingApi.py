@@ -17,8 +17,9 @@
 
 import os, sys, traceback
 #
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
-
+from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.db.SqlLoader import SqlLoader
 
 # import signal
 
@@ -34,6 +35,7 @@ class DbLoadingApi(object):
         self.__lfh = log
         self.__verbose = verbose
         self.__debug = True
+        self.__siteId = getSiteId()
         cI = ConfigInfo()
         self.__pyPath = cI.get("SITE_PYTHON_SOURCE_PATH")
         self.__pkgPath = cI.get("SITE_PACKAGES_PATH")
@@ -54,6 +56,7 @@ class DbLoadingApi(object):
         self.__mapping = self.__schemaPath
 
         self.__workDir = "dbdata"
+        self._dbCon = None
 
     def doDataLoading(self, depId, sessionDir):
         """
@@ -120,7 +123,80 @@ class DbLoadingApi(object):
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")
 
+
+    def __generateLoadDb(self, tmpPath, filePath, sql_file, logFile):
+        try:
+            dp = RcsbDpUtility(tmpPath=tmpPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(filePath)
+            dp.addInput(name = "mapping_file", value=self.__mapping, type="file")
+            dp.op("db-loader")
+            dp.expLog(logFile)
+            dp.exp(sql_file)
+            dp.cleanup()
+            return
+        except:
+            self.__lfh.write("DbLoadingApi::__generateLoadDb(): failing, with exception.\n")
+            traceback.print_exc(file=self.__lfh)
+
     def doLoadStatus(self, pdbxFilePath, sessionDir):
+        """
+           Load the input file into the status database and session directory as input
+
+        """
+        # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+        self.__lfh.write(
+            "DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
+        try:
+            if (os.path.exists(pdbxFilePath)):
+                dataDir = sessionDir + "/" + self.__workDir
+
+                if not os.path.exists(dataDir):
+                    print("Creating " + dataDir)
+                    os.makedirs(dataDir)
+
+                if self.__debug:
+                    self.__lfh.write("DbLoadingApi::doLoadStatus(): generating db-loader command\n")
+
+                sql_file = os.path.join(dataDir, "DB_LOADER.sql")
+                log1 = os.path.join(dataDir, "db-loader.log")
+                
+                self.__generateLoadDb(dataDir, pdbxFilePath, sql_file, log1)
+
+                log2 = os.path.join(dataDir, "status_load.log")
+                if os.path.exists(log2):
+                    os.unlink(log2)
+
+                if os.path.exists(sql_file):
+                    sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
+                    #self.__loadSql(sql_file, log2)
+                    sq.loadSql(sql_file, log2)
+                else:
+                    self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
+                    return False
+
+                if (os.path.exists(log2)):
+                    with open(log2, 'r') as fin:
+                        for line in fin:
+                            for word in line.split():
+                                if (word.upper() == "ERROR"):
+                                    self.__lfh.write(
+                                        "DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
+                                    return False
+
+                self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
+                return True
+
+            else:
+                self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
+                return False
+
+        except:
+            self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
+            traceback.print_exc(file=self.__lfh)
+            return False
+
+
+    def XXXdoLoadStatus(self, pdbxFilePath, sessionDir):
         """
            Load the input file into the status database and session directory as input
 
@@ -178,6 +254,7 @@ class DbLoadingApi(object):
         except:
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
+            return False
 
     def doDataLoadingBcp(self, depId, sessionDir):
         """

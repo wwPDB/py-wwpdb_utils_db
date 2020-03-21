@@ -42,7 +42,7 @@ setup(
     ],
     #
     install_requires=['mmcif', 'scandir', 'mysqlclient', 'wwpdb.utils.config',
-                      'wwpdb.io', 'rcsb.utils.multiproc', 'sqlalchemy'],
+                      'wwpdb.io', 'rcsb.utils.multiproc', 'sqlalchemy', 'sqlparse'],
     packages=find_packages(exclude=['wwpdb.utils.tests-db', 'examples', 'mock-data', 'tests.*']),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
