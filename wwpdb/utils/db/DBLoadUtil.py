@@ -21,9 +21,14 @@ __email__     = "zfeng@rcsb.rutgers.edu"
 __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.07"
 
-import os, sys, string, traceback
+import os
+import sys
+import traceback
 
-from wwpdb.utils.config.ConfigInfo                     import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.db.SqlLoader import SqlLoader
+
 
 class DBLoadUtil(object):
     """ Class responsible for loading model cif file(s) into da_internal database
@@ -47,14 +52,24 @@ class DBLoadUtil(object):
             return
         #
         #
-        scriptfile = self.__getFileName(self.__sessionPath, 'dbload', 'csh')
         listfile   = self.__getFileName(self.__sessionPath, 'filelist', 'txt')
-        logfile    = self.__getFileName(self.__sessionPath, 'dbload', 'log')
-        clogfile   = self.__getFileName(self.__sessionPath, 'dbload_command', 'log')
+        sqlfile = os.path.join(self.__sessionPath, 'dbload', 'DB_LOADER.sql')
+        logfile1 = os.path.join(self.__sessionPath, 'dbload', 'db-loader.log')
+        clogfile1 = os.path.join(self.__sessionPath, 'dbload', 'sqlload.log')
         #
         self.__genListFile(listfile, fileList)
-        self.__genScriptFile(scriptfile, listfile, logfile)
-        self.__RunScript(self.__sessionPath, scriptfile, clogfile)
+        self.__getLoadFile(self.__sessionPath, listfile, sqlfile, logfile1)
+        try:
+            if os.path.exists(sqlfile):
+                self.__lfh.write("DBLoadUtil::doLoading() about to load %s with log %s\n" % (sqlfile, clogfile1))
+                sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
+                sq.loadSql(sqlfile, clogfile1)
+            else:
+                self.__lfh.write("DBLoadUtil::doLoading() failed to produce load file\n");
+        except Exception as e:
+            self.__lfh.write("DbLoadiUtil::doLoading(): failing, with exception %s.\n" % str(e))
+            traceback.print_exc(file=self.__lfh)
+
 
     def __getFileName(self, path, root, ext):
         """Create unique file name.
@@ -70,13 +85,6 @@ class DBLoadUtil(object):
             #
             return root + '_1.' + ext
         
-    def __RunScript(self, path, script, log):
-        """Run script command
-        """
-        cmd = 'cd ' + path + '; chmod 755 ' + script \
-            + '; ./' + script + ' >& ' + log
-        os.system(cmd)
-
     def __genListFile(self, filename, list):
         """
         """
@@ -87,32 +95,29 @@ class DBLoadUtil(object):
         #
         f.close()
 
-    def __genScriptFile(self, scriptfile, listfile, logfile):
-        """
-        """
-        dbServer  = 'da_internal'
-        dbHost    = self.__cI.get("SITE_DB_HOST_NAME")
-        dbUser    = self.__cI.get("SITE_DB_USER_NAME")
-        dbPw      = self.__cI.get("SITE_DB_PASSWORD")
-        dbPort    = self.__cI.get("SITE_DB_PORT_NUMBER")
+    def __getLoadFile(self, sessionPath, listfile, sqlfile, logfile):
+
+        fn = os.path.join(self.__sessionPath, listfile)
+
         mapping   = self.__cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
-        dbLoader  = os.path.join(self.__cI.get("SITE_PACKAGES_PATH"), "dbloader", "bin", "db-loader")
-        #
-        script = os.path.join(self.__sessionPath, scriptfile)
-        f = open(script, 'w')
-        f.write('#!/bin/tcsh -f\n')
-        f.write('#\n')
-        f.write('if ( -e DB_LOADER.sql ) then\n')
-        f.write('    /bin/rm -f DB_LOADER.sql\n')
-        f.write('endif\n')
-        f.write('#\n')
-        f.write(dbLoader + ' -server mysql -list ' + listfile + ' -map ' + mapping + ' -db ' + dbServer + ' >& ' + logfile + '\n')
-        f.write('#\n')
-        f.write('if ( -e DB_LOADER.sql ) then\n')
-        f.write('    /usr/bin/mysql -u ' + dbUser + ' -p' + dbPw + ' -h ' + dbHost + ' -P ' + str(dbPort) + ' < DB_LOADER.sql >>& ' + logfile + '\n')  
-        f.write('endif\n')
-        f.write('#\n')
-        f.close()
+
+        self.__lfh.write("DbLoadUtil::__getLoadFile(): listfile %s sqlfile %s logfile %s\n" % (fn, sqlfile, logfile))
+        try:
+            dp = RcsbDpUtility(tmpPath=sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.setDebugMode()
+            dp.imp(fn)
+            dp.addInput(name = "mapping_file", value=mapping, type="file")
+            dp.addInput(name = "file_list", value=True)
+            dp.op("db-loader")
+            dp.expLog(logfile)
+            dp.exp(sqlfile)
+            dp.cleanup()
+            return
+        except:
+            self.__lfh.write("DbLoadUtil::__getLoadFile(): failing, with exception.\n")
+            traceback.print_exc(file=self.__lfh)
+
+
 
     def __getSession(self):
         """ Join existing session or create new session as required.
