@@ -106,7 +106,8 @@ class SqlLoader(object):
                 self.__logmsg(logFile, logstr)
 
             except Exception as e:
-                logstr = "ERROR: %s" % str(e)
+                # When line split, upstream looks for ERROR by itself
+                logstr = "ERROR %s" % str(e)
                 self.__logmsg(logFile, logstr)
 
 
