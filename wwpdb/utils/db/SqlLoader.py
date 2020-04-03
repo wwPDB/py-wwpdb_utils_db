@@ -15,6 +15,8 @@ __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
+import os
+import os.path
 import sys
 
 from wwpdb.utils.db.MyDbUtil import MyDbConnect
@@ -64,8 +66,11 @@ class SqlLoader(object):
         with open(logFile, "a") as fout:
             fout.write("%s\n" % msg)
 
-    def loadSql(self, sql_file, logFile):
+    def loadSql(self, sql_file, logFile, retry=0):
         """Load sqla data output from db-loader"""
+
+        # Max retries if server goes away
+        maxretry=3
 
         try:
             with open(sql_file, "r") as fin:
@@ -75,6 +80,11 @@ class SqlLoader(object):
         except Exception as e:
             self.__lfh.write("DbLoadingApi::__loadSql failure to pare sql file. %s\n" % str(e))
             return False
+
+        # Clear out old log file in case of retry.
+        if retry > 0:
+            if os.path.exists(logFile):
+                os.unlink(logFile)
 
         db = MyDbConnect(dbServer=self.__dbServer, dbHost=self.__dbHost, dbName=self.__dbName,
                          dbUser=self.__dbUser, dbPw=self.__dbPw, dbSocket=self.__dbSocket, dbPort=self.__dbPort,
@@ -104,6 +114,20 @@ class SqlLoader(object):
                 else:
                     logstr = "ERROR %s at cmd %s" %(str(e), cnt)
                 self.__logmsg(logFile, logstr)
+                # Continue
+
+            except dbcon.OperationalError as e:
+                logstr = "ERROR %s at cmd %s" %(str(e), cnt)
+                self.__logmsg(logFile, logstr)
+                
+                cursor.close()
+                dbcon.close()
+                if retry < maxretry:
+                    self.__lfh.write("Server issue rety %s\n" % (retry + 1))
+                    return self.loadSql(sql_file, logFile, retry=retry+1)
+                else:
+                    self.__lfh.write("Too many retry failures\n")
+                    return False
 
             except Exception as e:
                 # When line split, upstream looks for ERROR by itself
@@ -114,5 +138,6 @@ class SqlLoader(object):
         dbcon.commit()
         cursor.close()
         dbcon.close()
+        return True
 
     
