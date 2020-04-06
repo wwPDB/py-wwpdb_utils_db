@@ -19,9 +19,83 @@ import os
 import os.path
 import sys
 
-from wwpdb.utils.db.MyDbUtil import MyDbConnect
+import MySQLdb
+
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 import sqlparse
+
+
+class _DbConnection(object):
+    """Internal class for connecting to mysql server without connection pool present in MyDbUtil"""
+    def __init__(self, dbServer='mysql', dbHost='localhost', dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr):
+        self.__verbose = verbose
+        self.__lfh = log
+
+        self.__dbName = dbName
+        self.__dbUser = dbUser
+        self.__dbPw = dbPw
+        self.__dbHost = dbHost
+        self.__dbSocket = dbSocket
+
+        if dbPort is None:
+            self.__dbPort = 3306
+        else:
+            self.__dbPort = int(str(dbPort))
+        #
+        self.__dbServer = dbServer
+
+        if (dbServer != 'mysql'):
+            self.__lfh.write("+__DbOnnectiont. Unsupported server %s\n" % dbServer)
+            sys.exit(1)
+
+        self.__dbcon = None
+
+    def connect(self):
+        """ Create a database connection and return a connection object.
+
+            Returns None on failure
+        """
+        #
+        if self.__dbcon is not None:
+            # Close an open connection -
+            self.__lfh.write("__DbConnection.connect() WARNING Closing an existing connection.\n")
+            self.close()
+        try:
+            if self.__dbSocket is None:
+                dbcon = MySQLdb.connect(db="%s" % self.__dbName,
+                                        user="%s" % self.__dbUser,
+                                        passwd="%s" % self.__dbPw,
+                                        host="%s" % self.__dbHost,
+                                        port=self.__dbPort,
+                                        local_infile=1)
+            else:
+                dbcon = MySQLdb.connect(db="%s" % self.__dbName,
+                                        user="%s" % self.__dbUser,
+                                        passwd="%s" % self.__dbPw,
+                                        host="%s" % self.__dbHost,
+                                        port=self.__dbPort,
+                                        unix_socket="%s" % self.__dbSocket,
+                                        local_infile=1)
+
+            self.__dbcon = dbcon
+        except:
+            self.__lfh.write("+__DbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d \n" %
+                             (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort))
+            self.__dbcon = None
+
+        return self.__dbcon
+
+    def close(self):
+        """ Close any open database connection.
+        """
+        if self.__dbcon is not None:
+            try:
+                self.__dbcon.close()
+                self.__dbcon = None
+                return True
+            except:
+                pass
+        return False
 
 
 class SqlLoader(object):
@@ -86,7 +160,7 @@ class SqlLoader(object):
             if os.path.exists(logFile):
                 os.unlink(logFile)
 
-        db = MyDbConnect(dbServer=self.__dbServer, dbHost=self.__dbHost, dbName=self.__dbName,
+        db = _DbConnection(dbServer=self.__dbServer, dbHost=self.__dbHost, dbName=self.__dbName,
                          dbUser=self.__dbUser, dbPw=self.__dbPw, dbSocket=self.__dbSocket, dbPort=self.__dbPort,
                          verbose=self.__verbose, log=self.__lfh)
         
@@ -99,7 +173,7 @@ class SqlLoader(object):
             cursor = dbcon.cursor()
         except:
             self.__lfh.write("\nFailing to get cursor!!!\n")
-            dbcon.close()
+            db.close()
             return False
 
 
@@ -121,9 +195,9 @@ class SqlLoader(object):
                 self.__logmsg(logFile, logstr)
                 
                 cursor.close()
-                dbcon.close()
+                db.close()
                 if retry < maxretry:
-                    self.__lfh.write("Server issue rety %s\n" % (retry + 1))
+                    self.__lfh.write("Server issue retry %s\n" % (retry + 1))
                     return self.loadSql(sql_file, logFile, retry=retry+1)
                 else:
                     self.__lfh.write("Too many retry failures\n")
@@ -137,7 +211,7 @@ class SqlLoader(object):
 
         dbcon.commit()
         cursor.close()
-        dbcon.close()
+        db.close()
         return True
 
     
