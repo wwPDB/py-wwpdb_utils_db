@@ -37,10 +37,9 @@ from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.testing.Features import Features
 
 
-@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment' )
+@unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class StatusHistoryLoaderTests(unittest.TestCase):
-
-    def __init__(self, methodName='runTest'):
+    def __init__(self, methodName="runTest"):
         super(StatusHistoryLoaderTests, self).__init__(methodName)
         self.__loadPathList = []
         self.__tddFileList = []
@@ -53,7 +52,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         self.__verbose = True
         self.__msd = StatusHistorySchemaDef(verbose=self.__verbose, log=self.__lfh)
         # self.__databaseName = self.__msd.getDatabaseName()
-        self.__databaseName = 'da_internal'
+        self.__databaseName = "da_internal"
         self.open()
 
     def tearDown(self):
@@ -74,10 +73,8 @@ class StatusHistoryLoaderTests(unittest.TestCase):
     def testStatusHistorySchemaCreate(self):
         """Test case -  create table schema using status history schema definition
         """
-        startTime = time.clock()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        startTime = time.time()
+        self.__lfh.write("\nStarting StatusHistoryLoaderTests testStatusHistorySchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             msd = StatusHistorySchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = msd.getTableIdList()
@@ -87,66 +84,64 @@ class StatusHistoryLoaderTests(unittest.TestCase):
                 tableDefObj = msd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=self.__databaseName, tableDefObj=tableDefObj))
 
-            if (self.__verbose):
-                self.__lfh.write("\n\n+Status history  table creation SQL string\n %s\n\n" % '\n'.join(sqlL))
+            if self.__verbose:
+                self.__lfh.write("\n\n+Status history  table creation SQL string\n %s\n\n" % "\n".join(sqlL))
 
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
             ret = myQ.sqlCommand(sqlCommandList=sqlL)
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("\n\n+INFO mysql server returns %r\n" % ret)
 
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
-        self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
-                                                                       sys._getframe().f_code.co_name,
-                                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                       endTime - startTime))
+        endTime = time.time()
+        self.__lfh.write(
+            "\nCompleted StatusHistoryLoaderTests testStatusHistorySchemaCreate at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testFileInventorySchemaCreate(self):
         """Test case -  create table schema for file inventory table using status history schema definition
         """
-        startTime = time.clock()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        startTime = time.time()
+        self.__lfh.write("\nStarting StatusHistoryLoaderTests testFileInventorySchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             msd = StatusHistorySchemaDef(verbose=self.__verbose, log=self.__lfh)
-            tableIdList = ['PDBX_ARCHIVE_FILE_INVENTORY']
+            tableIdList = ["PDBX_ARCHIVE_FILE_INVENTORY"]
             myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
             sqlL = []
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=self.__databaseName, tableDefObj=tableDefObj))
 
-            if (self.__verbose):
-                self.__lfh.write("\n\n+FileInventory table creation SQL string\n %s\n\n" % '\n'.join(sqlL))
+            if self.__verbose:
+                self.__lfh.write("\n\n+FileInventory table creation SQL string\n %s\n\n" % "\n".join(sqlL))
 
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
             ret = myQ.sqlCommand(sqlCommandList=sqlL)
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("\n\n+INFO mysql server returns %r\n" % ret)
 
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
-        self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
-                                                                       sys._getframe().f_code.co_name,
-                                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                       endTime - startTime))
+        endTime = time.time()
+        self.__lfh.write(
+            "\nCompleted StatusHistoryLoaderTests testFileInventorySchemaCreate at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testLoadInventoryFile(self):
         """Test case - create batch load files for all chemical component definition data files -
         """
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        self.__lfh.write("\nStarting StatusHistoryLoaderTests testLoadInventoryFile\n")
         startTime = time.time()
         try:
-            loadPathList = ['test_file_inventory.cif']
-            sml = SchemaDefLoader(schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=None, workPath='.', cleanUp=False, warnings='default', verbose=self.__verbose, log=self.__lfh)
+            loadPathList = ["test_file_inventory.cif"]
+            sml = SchemaDefLoader(schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
             containerNameList, tList = sml.makeLoadFiles(loadPathList)
             for tId, fn in tList:
                 self.__lfh.write("\nCreated table %s load file %s\n" % (tId, fn))
@@ -154,21 +149,21 @@ class StatusHistoryLoaderTests(unittest.TestCase):
             endTime1 = time.time()
             self.__lfh.write("\nBatch files created in %.2f seconds\n" % (endTime1 - startTime))
             self.open()
-            sdl = SchemaDefLoader(schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath='.', cleanUp=False,
-                                  warnings='default', verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
 
-            sdl.loadBatchFiles(loadList=tList, containerNameList=containerNameList, deleteOpt='all')
-            #self.close()
+            sdl.loadBatchFiles(loadList=tList, containerNameList=containerNameList, deleteOpt="all")
+            # self.close()
             endTime2 = time.time()
             self.__lfh.write("\nLoad completed in %.2f seconds\n" % (endTime2 - endTime1))
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
-                                                                       sys._getframe().f_code.co_name,
-                                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                       endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted StatusHistoryLoaderTests testLoadInventoryFile at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def createHistoryFullSchemaSuite():
@@ -184,11 +179,10 @@ def createFileInventoryLoadSuite():
     return suiteSelect
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     #
-    if False:
-        mySuite = createHistoryFullSchemaSuite()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+    mySuite = createHistoryFullSchemaSuite()
+    # unittest.TextTestRunner(verbosity=2).run(mySuite)
     #
     mySuite = createFileInventoryLoadSuite()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

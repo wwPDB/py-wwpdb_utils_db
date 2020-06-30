@@ -19,7 +19,6 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
 import logging
-import sys
 import unittest
 import traceback
 import platform
@@ -30,25 +29,23 @@ from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
-#from mmcif.io.IoAdapterCore     import IoAdapterCore
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 logger = logging.getLogger()
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
-if not os.path.exists(TESTOUTPUT):
+TESTOUTPUT = os.path.join(HERE, "test-output", platform.python_version())
+if not os.path.exists(TESTOUTPUT):  # pragma: no cover
     os.makedirs(TESTOUTPUT)
 
-class SchemaDefLoaderTests(unittest.TestCase):
 
+class SchemaDefLoaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stderr
         self.__verbose = False
-        mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
-        self.__loadPathList = [os.path.join(mockTopPath, 'PRD', 'PRD_000001.cif'),
-                               os.path.join(mockTopPath, 'PRD', 'PRD_000012.cif')]
+        mockTopPath = os.path.join(TOPDIR, "wwpdb", "mock-data")
+        self.__loadPathList = [os.path.join(mockTopPath, "PRD", "PRD_000001.cif"), os.path.join(mockTopPath, "PRD", "PRD_000012.cif")]
         self.__ioObj = IoAdapterPy(verbose=self.__verbose, log=self.__lfh)
 
     def tearDown(self):
@@ -57,12 +54,12 @@ class SchemaDefLoaderTests(unittest.TestCase):
     def testLoadFile(self):
         """Test case - for loading BIRD definition data files
         """
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        self.__lfh.write("\nStarting SchemaDefLoaderTests testLoadFile\n")
         try:
             bsd = BirdSchemaDef()
-            sml = SchemaDefLoader(schemaDefObj=bsd, ioObj=self.__ioObj, dbCon=None, workPath=TESTOUTPUT, cleanUp=False, warnings='default', verbose=self.__verbose, log=self.__lfh)
+            sml = SchemaDefLoader(schemaDefObj=bsd, ioObj=self.__ioObj, dbCon=None, workPath=TESTOUTPUT, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
             containerNameList, tList = sml.makeLoadFiles(self.__loadPathList)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except  # pragma: no cover
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
@@ -71,13 +68,13 @@ class SchemaDefLoaderTests(unittest.TestCase):
             self.__lfh.write("\nCreated table %s load file %s\n" % (tId, fn))
 
 
-
-def loadSuite():
+def loadSuite():  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderTests("testLoadFile"))
     return suiteSelect
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":  # pragma: no cover
     #
     mySuite = loadSuite()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

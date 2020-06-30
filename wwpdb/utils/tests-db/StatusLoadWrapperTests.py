@@ -21,30 +21,25 @@ import unittest
 import traceback
 import time
 import os
-import os.path
 
 if __package__ is None or __package__ == '':
-    import sys
-    from os import path
-
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    from mock_import import mocksetup
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from mock_import import mocksetup  # noqa: F401
 else:
-    from .mock_import import mocksetup
+    from .mock_import import mocksetup  # noqa: F401
 
-import mock_import
 from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
-from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfo import getSiteId
 from wwpdb.utils.testing.Features import Features
+
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "Needs MySql test server for testing")
 class StatusLoadWrapperTests(unittest.TestCase):
-
     def setUp(self):
         #
         self.__verbose = True
         self.__lfh = sys.stdout
-        self.__depId = 'D_1000000001'
+        self.__depId = "D_1000000001"
         self.__siteId = getSiteId(defaultSiteId="WWPDB_DEPLOY_TEST")
 
     def tearDown(self):
@@ -53,24 +48,19 @@ class StatusLoadWrapperTests(unittest.TestCase):
     def testLoad(self):
         """ Load da_internal database -
         """
-        startTime = time.clock()
+        startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__,
-                                                     sys._getframe().f_code.co_name,
-                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("Starting StatusLoadWrapperTests testLoad at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             self.__lfh.write("+testLoad- Using site id %r\n" % self.__siteId)
             slw = StatusLoadWrapper(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             slw.dbLoad(self.__depId)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
-        self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
-                                                                       sys._getframe().f_code.co_name,
-                                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                       endTime - startTime))
+        endTime = time.time()
+        self.__lfh.write("\nCompleted StatusLoadWrapperTests testLoad at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
 
 def suiteLoadTests():
@@ -78,8 +68,7 @@ def suiteLoadTests():
     suiteSelect.addTest(StatusLoadWrapperTests("testLoad"))
     return suiteSelect
 
-if __name__ == '__main__':
 
-    if (True):
-        mySuite = suiteLoadTests()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+if __name__ == "__main__":
+    mySuite = suiteLoadTests()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)

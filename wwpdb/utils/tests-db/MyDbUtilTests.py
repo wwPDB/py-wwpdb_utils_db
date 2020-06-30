@@ -27,17 +27,15 @@ import time
 
 from wwpdb.utils.db.MyDbUtil import MyDbConnect
 from wwpdb.utils.db.MyDbUtil import MyDbQuery
-from wwpdb.utils.db.MyDbAdapter import MyDbAdapter
-
-from mmcif.io.IoAdapterCore import IoAdapterCore
+from wwpdb.utils.db.MyDbAdapter import MyDbAdapter  # noqa: F401  pylint: disable=unused-import
 
 from wwpdb.utils.testing.Features import Features
 
-@unittest.skipUnless(Features().haveMySqlTestServer(), 'require MySql Test Environment')
-class MyDbUtilTests(unittest.TestCase):
 
+@unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
+class MyDbUtilTests(unittest.TestCase):
     def setUp(self):
-        self.__dbName = 'stat'
+        self.__dbName = "stat"
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__dbCon = None
@@ -46,13 +44,11 @@ class MyDbUtilTests(unittest.TestCase):
         self.close()
 
     def open(self, dbUserId=None, dbUserPwd=None, dbHost=None, dbName=None, dbSocket=None):
-        myC = MyDbConnect(dbServer='mysql', dbHost=dbHost, dbName=dbName, dbUser=dbUserId, dbPw=dbUserPwd, dbSocket=dbSocket, verbose=self.__verbose, log=self.__lfh)
+        myC = MyDbConnect(dbServer="mysql", dbHost=dbHost, dbName=dbName, dbUser=dbUserId, dbPw=dbUserPwd, dbSocket=dbSocket, verbose=self.__verbose, log=self.__lfh)
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             if self.__verbose:
-                self.__lfh.write("\nDatabase connection opened %s %s at %s\n" % (self.__class__.__name__,
-                                                                                 sys._getframe().f_code.co_name,
-                                                                                 time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+                self.__lfh.write("\nDatabase connection opened MyDbUtilTests open at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
             return True
         else:
             return False
@@ -60,9 +56,7 @@ class MyDbUtilTests(unittest.TestCase):
     def close(self):
         if self.__dbCon is not None:
             if self.__verbose:
-                self.__lfh.write("\nDatabase connection closed %s %s at %s\n" % (self.__class__.__name__,
-                                                                                 sys._getframe().f_code.co_name,
-                                                                                 time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+                self.__lfh.write("\nDatabase connection closed MyDbUtilTests close at %s\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
             self.__dbCon.close()
             self.__dbCon = None
             return True
@@ -78,9 +72,7 @@ class MyDbUtilTests(unittest.TestCase):
 
         """
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting MyDbUtilTests testOpen1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             dbUserId = os.getenv("TEST_DB_USER_NAME")
             dbUserPwd = os.getenv("TEST_DB_PASSWORD")
@@ -91,15 +83,12 @@ class MyDbUtilTests(unittest.TestCase):
             self.assertTrue(ok)
             ok = self.close()
             self.assertTrue(ok)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%f seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted MyDbUtilTests testOpen1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testOpen2(self):
         """Test case -  w/o socket
@@ -110,9 +99,7 @@ class MyDbUtilTests(unittest.TestCase):
 
         """
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting MyDbUtilTests testOpen2 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             dbUserId = os.getenv("TEST_DB_USER_NAME")
             dbUserPwd = os.getenv("TEST_DB_PASSWORD")
@@ -123,15 +110,12 @@ class MyDbUtilTests(unittest.TestCase):
             self.assertTrue(ok)
             ok = self.close()
             self.assertTrue(ok)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%f seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted MyDbUtilTests testOpen2 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testOpen3(self):
         """Test case -  w/o socket w/ localhost
@@ -142,28 +126,23 @@ class MyDbUtilTests(unittest.TestCase):
 
         """
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting MyDbUtilTests testOpen3 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             dbUserId = os.getenv("TEST_DB_USER_NAME")
             dbUserPwd = os.getenv("TEST_DB_PASSWORD")
             dbName = os.getenv("TEST_DB_NAME")
-            dbHost = 'localhost'
+            dbHost = "localhost"
 
             ok = self.open(dbUserId=dbUserId, dbUserPwd=dbUserPwd, dbHost=dbHost, dbName=dbName)
             self.assertTrue(ok)
             ok = self.close()
             self.assertTrue(ok)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%f seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted MyDbUtilTests testOpen3 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testPool1(self):
         """Test case -  connection pool management -
@@ -173,30 +152,25 @@ class MyDbUtilTests(unittest.TestCase):
 
         """
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting MyDbUtilTests testPool1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         self.__verbose = False
         try:
             dbUserId = os.getenv("TEST_DB_USER_NAME")
             dbUserPwd = os.getenv("TEST_DB_PASSWORD")
             dbName = os.getenv("TEST_DB_NAME")
             dbHost = os.getenv("TEST_DB_HOST")
-            for ii in range(5000):
+            for _ii in range(5000):
                 ok = self.open(dbUserId=dbUserId, dbUserPwd=dbUserPwd, dbHost=dbHost, dbName=dbName)
                 self.assertTrue(ok)
                 ok = self.close()
                 self.assertTrue(ok)
 
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%f seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted MyDbUtilTests testPool1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testPoolQuery(self):
         """Test case -  connection pool management -
@@ -206,9 +180,7 @@ class MyDbUtilTests(unittest.TestCase):
 
         """
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting MyDbUtilTests testPoolQuery at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         self.__verbose = False
         try:
             dbUserId = os.getenv("TEST_DB_USER_NAME")
@@ -225,15 +197,12 @@ class MyDbUtilTests(unittest.TestCase):
 
                 ok = self.close()
                 self.assertTrue(ok)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%f seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted MyDbUtilTests testPoolQuery at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
 
 def suiteOpen():
@@ -251,11 +220,9 @@ def suitePool():
     return suiteSelect
 
 
-if __name__ == '__main__':
-    if (True):
-        mySuite = suiteOpen()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+if __name__ == "__main__":
+    mySuite = suiteOpen()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)
 
-    if (True):
-        mySuite = suitePool()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+    mySuite = suitePool()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)
