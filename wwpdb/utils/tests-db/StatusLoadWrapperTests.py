@@ -23,7 +23,16 @@ import time
 import os
 import os.path
 
+if __package__ is None or __package__ == '':
+    import sys
+    from os import path
 
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from mock_import import mocksetup
+else:
+    from .mock_import import mocksetup
+
+import mock_import
 from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.testing.Features import Features
