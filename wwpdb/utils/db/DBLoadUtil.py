@@ -15,12 +15,6 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
-__docformat__ = "restructuredtext en"
-__author__    = "Zukang Feng"
-__email__     = "zfeng@rcsb.rutgers.edu"
-__license__   = "Creative Commons Attribution 3.0 Unported"
-__version__   = "V0.07"
-
 import os
 import sys
 import traceback
@@ -29,19 +23,25 @@ from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.db.SqlLoader import SqlLoader
 
+__docformat__ = "restructuredtext en"
+__author__ = "Zukang Feng"
+__email__ = "zfeng@rcsb.rutgers.edu"
+__license__ = "Creative Commons Attribution 3.0 Unported"
+__version__ = "V0.07"
+
 
 class DBLoadUtil(object):
     """ Class responsible for loading model cif file(s) into da_internal database
     """
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
-        self.__verbose=verbose
-        self.__lfh=log
-        self.__reqObj=reqObj
-        self.__sObj=None
-        self.__sessionId=None
-        self.__sessionPath=None
-        self.__siteId  = str(self.__reqObj.getValue("WWPDB_SITE_ID"))
-        self.__cI=ConfigInfo(self.__siteId)
+        self.__verbose = verbose
+        self.__lfh = log
+        self.__reqObj = reqObj
+        self.__sObj = None
+        self.__sessionId = None
+        self.__sessionPath = None
+        self.__siteId = str(self.__reqObj.getValue("WWPDB_SITE_ID"))
+        self.__cI = ConfigInfo(self.__siteId)
         #
         self.__getSession()
 
@@ -52,7 +52,7 @@ class DBLoadUtil(object):
             return
         #
         #
-        listfile   = self.__getFileName(self.__sessionPath, 'filelist', 'txt')
+        listfile = self.__getFileName(self.__sessionPath, 'filelist', 'txt')
         sqlfile = os.path.join(self.__sessionPath, 'dbload', 'DB_LOADER.sql')
         logfile1 = os.path.join(self.__sessionPath, 'dbload', 'db-loader.log')
         clogfile1 = os.path.join(self.__sessionPath, 'dbload', 'sqlload.log')
@@ -65,11 +65,10 @@ class DBLoadUtil(object):
                 sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
                 sq.loadSql(sqlfile, clogfile1)
             else:
-                self.__lfh.write("DBLoadUtil::doLoading() failed to produce load file\n");
+                self.__lfh.write("DBLoadUtil::doLoading() failed to produce load file\n")
         except Exception as e:
             self.__lfh.write("DbLoadiUtil::doLoading(): failing, with exception %s.\n" % str(e))
             traceback.print_exc(file=self.__lfh)
-
 
     def __getFileName(self, path, root, ext):
         """Create unique file name.
@@ -84,14 +83,14 @@ class DBLoadUtil(object):
             count += 1
             #
             return root + '_1.' + ext
-        
+
     def __genListFile(self, filename, list):
         """
         """
         fn = os.path.join(self.__sessionPath, filename)
         f = open(fn, 'w')
         for entryfile in list:
-             f.write(entryfile + '\n')
+            f.write(entryfile + '\n')
         #
         f.close()
 
@@ -99,34 +98,32 @@ class DBLoadUtil(object):
 
         fn = os.path.join(self.__sessionPath, listfile)
 
-        mapping   = self.__cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
+        mapping = self.__cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
 
         self.__lfh.write("DbLoadUtil::__getLoadFile(): listfile %s sqlfile %s logfile %s\n" % (fn, sqlfile, logfile))
         try:
             dp = RcsbDpUtility(tmpPath=sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.setDebugMode()
             dp.imp(fn)
-            dp.addInput(name = "mapping_file", value=mapping, type="file")
-            dp.addInput(name = "file_list", value=True)
+            dp.addInput(name="mapping_file", value=mapping, type="file")
+            dp.addInput(name="file_list", value=True)
             dp.op("db-loader")
             dp.expLog(logfile)
             dp.exp(sqlfile)
             dp.cleanup()
             return
-        except:
+        except:  # noqa: E722
             self.__lfh.write("DbLoadUtil::__getLoadFile(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
-
-
 
     def __getSession(self):
         """ Join existing session or create new session as required.
         """
         #
-        self.__sObj=self.__reqObj.newSessionObj()
-        self.__sessionId=self.__sObj.getId()
-        self.__sessionPath=self.__sObj.getPath()
+        self.__sObj = self.__reqObj.newSessionObj()
+        self.__sessionId = self.__sObj.getId()
+        self.__sessionPath = self.__sObj.getPath()
         if (self.__verbose):
-            self.__lfh.write("------------------------------------------------------\n")                    
+            self.__lfh.write("------------------------------------------------------\n")
             self.__lfh.write("+DBLoadUtil.__getSession() - creating/joining session %s\n" % self.__sessionId)
-            self.__lfh.write("+DBLoadUtil.__getSession() - session path %s\n" % self.__sessionPath)            
+            self.__lfh.write("+DBLoadUtil.__getSession() - session path %s\n" % self.__sessionPath)

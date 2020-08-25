@@ -29,14 +29,11 @@ __version__ = "V0.001"
 
 import sys
 import traceback
-import sys
 import os
 import time
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbQuery
-from mmcif.api.PdbxContainers import *
-#from pdbx_v2.adapter.IoAdapterPy     import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
 
 
@@ -134,7 +131,7 @@ class SchemaDefLoader(object):
     def __cleanUpFile(self, filePath):
         try:
             os.remove(filePath)
-        except:
+        except:  # noqa: E722
             pass
 
     def makeLoadFilesMulti(self, dataList, procName, optionsD, workingDir):
@@ -364,7 +361,7 @@ class SchemaDefLoader(object):
                         d[atId] = val[:maxW] if ((val != '?') and (val != '.')) else nullValueDict[atId]
                     else:
                         d[atId] = val if ((val != '?') and (val != '.')) else nullValueDict[atId]
-                except:
+                except:  # noqa: E722
                     if (self.__verbose):
                         self.__lfh.write("\n+ERROR - processing table %s attribute %s row %r\n" % (schemaTableId, atId, row))
                         traceback.print_exc(file=self.__lfh)
@@ -395,6 +392,7 @@ class SchemaDefLoader(object):
             schemaAttributeMapDict = tObj.getMapAttributeDict()
             schemaAttributeIdList = tObj.getAttributeIdList()
             nullValueDict = tObj.getSqlNullValueDict()
+            maxWidthDict = tObj.getStringWidthDict()
             curAttributeIdList = tObj.getMapInstanceAttributeIdList(categoryName)
             #
             # dictionary of merging indices for each attribute in this category -
@@ -412,7 +410,7 @@ class SchemaDefLoader(object):
                 for atName in indL:
                     try:
                         mK.append(row[attributeIndexDict[atName]])
-                    except:
+                    except:  # noqa: E722
                         # would reflect a serious issue of missing key-
                         if (self.__debug):
                             traceback.print_exc(file=self.__lfh)
@@ -429,7 +427,7 @@ class SchemaDefLoader(object):
                             d[atId] = val[:maxW] if ((val != '?') and (val != '.')) else nullValueDict[atId]
                         else:
                             d[atId] = val if ((val != '?') and (val != '.')) else nullValueDict[atId]
-                    except:
+                    except:  # noqa: E722
                         # only for testing -
                         if (self.__debug):
                             traceback.print_exc(file=self.__lfh)
@@ -501,7 +499,7 @@ class SchemaDefLoader(object):
 
         databaseName = self.__sD.getDatabaseName()
         tableDefObj = self.__sD.getTable(tableId)
-        tableName = tableDefObj.getName()
+        # tableName = tableDefObj.getName()
 
         #
         if deleteOpt:
@@ -523,7 +521,7 @@ class SchemaDefLoader(object):
                 ofh = open(sqlFilePath, 'w')
                 ofh.write("%s" % '\n'.join(sqlCommandList))
                 ofh.close()
-            except:
+            except:  # noqa: E722
                 pass
         #
         myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
@@ -597,22 +595,6 @@ class SchemaDefLoader(object):
                              (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
         return ret
-
-    def __deleteFromTable(self, tableIdList, deleteValue):
-        """  Delete data from the input table list where the schema table delete attribute
-             has the input value "deleteValue".
-
-        """
-        sqlList = []
-        sqlGen = MyDbAdminSqlGen(self.__verbose, self.__lfh)
-        for tableId in tableIdList:
-            tableName = self.__sD.getTableName(tableId)
-            tableDefObj = self.__sD.getTable(tableId)
-            atName = tableDefObj.getDeleteAttributeName()
-            sqlTemp = sqlGen.deleteTemplate(tableName, [atName])
-            sqlList.append(sqlTemp % keyId)
-        #
-        return sqlList
 
 
 if __name__ == '__main__':

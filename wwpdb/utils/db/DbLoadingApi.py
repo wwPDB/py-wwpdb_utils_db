@@ -3,7 +3,7 @@
     File:    DbLoadingApi.py
 
     Providing an API for WFM to parse the cif file and run MYSQL commands to load data to the database 'da_internal'.
- 
+
    __author__    = "Li Chen"
    __email__     = "lchen@rcsb.rutgers.edu"
    __version__   = "V0.01"
@@ -15,7 +15,9 @@
    21-May-2015  LC Add function doDataLoadingBcp()
 """
 
-import os, sys, traceback
+import os
+import sys
+import traceback
 #
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
@@ -30,7 +32,6 @@ class DbLoadingApi(object):
 
     def __init__(self, log=sys.stderr, verbose=False):
         """
-           
         """
         self.__lfh = log
         self.__verbose = verbose
@@ -73,8 +74,8 @@ class DbLoadingApi(object):
 
         depId = depId.upper()
         cifPath = self.__workPath + "/" + depId + "/"
-        ## test if there is any cif file if yes do ...
 
+        # test if there is any cif file if yes do ...
         if (os.path.exists(cifPath + depId + '_model_P1.cif.V1')):
             dataDir = sessionDir + "/" + self.__workDir
             log1 = "db-loader.log"
@@ -100,7 +101,7 @@ class DbLoadingApi(object):
                     if self.__dbSocket is None:
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + " >&" + log2
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + " >&" + log2
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + " >&" + log2  # noqa: E501
 
                     os.system(cmd)
                     if (os.path.exists(log2)):
@@ -119,22 +120,20 @@ class DbLoadingApi(object):
             else:
                 print("DbLoadingApi::doDataLoading(): No cif file found. Please check if the cif file exists.")
 
-
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")
-
 
     def __generateLoadDb(self, tmpPath, filePath, sql_file, logFile):
         try:
             dp = RcsbDpUtility(tmpPath=tmpPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(filePath)
-            dp.addInput(name = "mapping_file", value=self.__mapping, type="file")
+            dp.addInput(name="mapping_file", value=self.__mapping, type="file")
             dp.op("db-loader")
             dp.expLog(logFile)
             dp.exp(sql_file)
             dp.cleanup()
             return
-        except:
+        except:  # noqa: E722
             self.__lfh.write("DbLoadingApi::__generateLoadDb(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
 
@@ -159,7 +158,7 @@ class DbLoadingApi(object):
 
                 sql_file = os.path.join(dataDir, "DB_LOADER.sql")
                 log1 = os.path.join(dataDir, "db-loader.log")
-                
+
                 self.__generateLoadDb(dataDir, pdbxFilePath, sql_file, log1)
 
                 log2 = os.path.join(dataDir, "status_load.log")
@@ -168,7 +167,6 @@ class DbLoadingApi(object):
 
                 if os.path.exists(sql_file):
                     sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
-                    #self.__loadSql(sql_file, log2)
                     sq.loadSql(sql_file, log2)
                 else:
                     self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
@@ -190,11 +188,10 @@ class DbLoadingApi(object):
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
 
-        except:
+        except:  # noqa: E722
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
-
 
     def XXXdoLoadStatus(self, pdbxFilePath, sessionDir):
         """
@@ -225,7 +222,7 @@ class DbLoadingApi(object):
                     if self.__dbSocket is None:
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + " >& " + log2
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + " >& " + log2
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + " >& " + log2  # noqa: E501
                     if self.__debug:
                         self.__lfh.write("DbLoadingApi::doLoadStatus(): database server command %s\n" % cmd)
                     os.system(cmd)
@@ -251,7 +248,7 @@ class DbLoadingApi(object):
             else:
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
-        except:
+        except:  # noqa: E722
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
@@ -273,7 +270,7 @@ class DbLoadingApi(object):
 
         depId = depId.upper()
         cifPath = self.__workPath + "/" + depId + "/"
-        ## test if there is any cif file if yes do ...
+        # test if there is any cif file if yes do ...
 
         if (os.path.exists(cifPath + depId + '_model_P1.cif.V1')):
             dataDir = sessionDir + "/" + self.__workDir
@@ -305,8 +302,8 @@ class DbLoadingApi(object):
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file2 + ">& " + log2
 
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + ">& " + log3
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file2 + ">& " + log2
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + ">& " + log3  # noqa: E501
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file2 + ">& " + log2  # noqa: E501
                     # print cmd
                     os.system(cmd)
                     if (os.path.exists(log2)):
@@ -324,7 +321,6 @@ class DbLoadingApi(object):
                             dataDir, log1) + " for details.")
             else:
                 print("DbLoadingApi::doDataLoading(): No cif file found. Please check if the cif file exists.")
-
 
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")
@@ -349,7 +345,7 @@ class DbLoadingApi(object):
         depId = depId.upper()
         myMappingFile = mappingFile
         cifPath = self.__workPath + "/" + depId + "/"
-        ## test if there is any cif file if yes do ...
+        # test if there is any cif file if yes do ...
 
         if (os.path.exists(cifPath + depId + '_model_P1.cif.V1')):
             dataDir = sessionDir + "/" + self.__workDir
@@ -381,8 +377,8 @@ class DbLoadingApi(object):
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file2 + ">& " + log2
 
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + ">& " + log3
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file2 + ">& " + log2
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + ">& " + log3  # noqa: E501
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file2 + ">& " + log2  # noqa: E501
                     # print cmd
                     os.system(cmd)
                     if (os.path.exists(log2)):
@@ -400,7 +396,6 @@ class DbLoadingApi(object):
                             dataDir, log1) + " for details.")
             else:
                 print("DbLoadingApi::doDataLoading(): No cif file found. Please check if the cif file exists.")
-
 
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")

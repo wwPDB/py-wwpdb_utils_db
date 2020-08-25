@@ -25,18 +25,15 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-import os
-import traceback
 import itertools
 import copy
-from operator import itemgetter, attrgetter
+
 try:
     # Python 3
     from itertools import zip_longest
-except ImportError:
+except ImportError:  # pragma: no cover
     # Python 2
     from itertools import izip_longest as zip_longest
-
 
 
 class MyDbAdminSqlGen(object):
@@ -56,7 +53,7 @@ class MyDbAdminSqlGen(object):
         """
         return "TRUNCATE TABLE %s.%s; " % (databaseName, tableName)
 
-    def idUpdateTemplateSQL(self, databaseName, tableDefObj, updateAttributeIdList=[], conditionAttributeIdList=[]):
+    def idUpdateTemplateSQL(self, databaseName, tableDefObj, updateAttributeIdList=None, conditionAttributeIdList=None):
         """ Return the SQL string template for updating the input attributes into the named table subject
             to the constraining attributes.
 
@@ -65,32 +62,36 @@ class MyDbAdminSqlGen(object):
             The input table object is used to adjust the value quoting in the returned template string.
 
         """
+        if updateAttributeIdList is None:
+            updateAttributeIdList = []
+        if conditionAttributeIdList is None:
+            conditionAttributeIdList = []
         tableName = tableDefObj.getName()
         fL = []
         for atId in updateAttributeIdList:
             if tableDefObj.isAttributeStringType(atId):
-                fL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
             elif tableDefObj.isAttributeFloatType(atId):
-                fL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
             elif tableDefObj.isAttributeIntegerType(atId):
-                fL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
             else:
-                fL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
         #
         if len(conditionAttributeIdList) > 0:
             cL = []
             for atId in conditionAttributeIdList:
                 if tableDefObj.isAttributeStringType(atId):
-                    cL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                    cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
                 else:
-                    cL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
-            tS = "UPDATE %s.%s SET %s WHERE (%s);" % (databaseName, tableName, ','.join(fL), ','.join(cL))
+                    cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
+            tS = "UPDATE %s.%s SET %s WHERE (%s);" % (databaseName, tableName, ",".join(fL), ",".join(cL))
         else:
-            tS = "UPDATE %s.%s SET %s;" % (databaseName, tableName, ','.join(fL))
+            tS = "UPDATE %s.%s SET %s;" % (databaseName, tableName, ",".join(fL))
         #
         return tS
 
-    def idInsertTemplateSQL(self, databaseName, tableDefObj, insertAttributeIdList=[]):
+    def idInsertTemplateSQL(self, databaseName, tableDefObj, insertAttributeIdList=None):
         """  Return the SQL string template for inserting the input attributes into the named table.
 
             The string provides formatting placeholders for updated values  as well as for constraining values.
@@ -98,6 +99,8 @@ class MyDbAdminSqlGen(object):
             The input table object is used to adjust the value quoting in the returned template string.
 
         """
+        if insertAttributeIdList is None:
+            insertAttributeIdList = []
         tableName = tableDefObj.getName()
         attributeNameList = []
         #
@@ -105,19 +108,19 @@ class MyDbAdminSqlGen(object):
         for atId in insertAttributeIdList:
             attributeNameList.append(tableDefObj.getAttributeName(atId))
             if tableDefObj.isAttributeStringType(atId):
-                fL.append('%s')
+                fL.append("%s")
             elif tableDefObj.isAttributeFloatType(atId):
-                fL.append('%s')
+                fL.append("%s")
             elif tableDefObj.isAttributeIntegerType(atId):
-                fL.append('%s')
+                fL.append("%s")
             else:
-                fL.append('%s')
+                fL.append("%s")
         #
-        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ','.join(attributeNameList), ','.join(fL))
+        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))
         #
         return tS
 
-    def idDeleteTemplateSQL(self, databaseName, tableDefObj, conditionAttributeIdList=[]):
+    def idDeleteTemplateSQL(self, databaseName, tableDefObj, conditionAttributeIdList=None):
         """ Return the SQL string template for deleting records in the named table subject
             to the constraining attributes.
 
@@ -126,48 +129,54 @@ class MyDbAdminSqlGen(object):
             The input table object is used to adjust the value quoting in the returned template string.
 
         """
+        if conditionAttributeIdList is None:
+            conditionAttributeIdList = []
         tableName = tableDefObj.getName()
         #
         if len(conditionAttributeIdList) > 0:
             cL = []
             for atId in conditionAttributeIdList:
                 if tableDefObj.isAttributeStringType(atId):
-                    cL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                    cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
                 else:
-                    cL.append(' %s=' % tableDefObj.getAttributeName(atId) + '%s')
+                    cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
 
-            tS = "DELETE FROM  %s.%s WHERE (%s);" % (databaseName, tableName, ' AND '.join(cL))
+            tS = "DELETE FROM  %s.%s WHERE (%s);" % (databaseName, tableName, " AND ".join(cL))
         else:
             tS = "DELETE FROM  %s.%s;" % (databaseName, tableName)
         #
         return tS
 
-    def insertTemplateSQL(self, databaseName, tableName, attributeNameList=[]):
+    def insertTemplateSQL(self, databaseName, tableName, attributeNameList=None):
         """ Return the SQL string template for inserting the input attributes into the named table.
 
             The string provides formatting placeholders for inserted values that are added when
             the SQL command is executed.
 
         """
+        if attributeNameList is None:
+            attributeNameList = []
         fL = []
-        for v in attributeNameList:
-            fL.append('%s')
+        for _v in attributeNameList:
+            fL.append("%s")
         #
-        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ','.join(attributeNameList), ','.join(fL))
+        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))
         return tS
 
-    def deleteTemplateSQL(self, databaseName, tableName, attributeNameList=[]):
+    def deleteTemplateSQL(self, databaseName, tableName, attributeNameList=None):
         """ Return the SQL string template for deleting table records constrained by the input attributes.
 
             The string provides formatting placeholders for the constraining values.
              delete from <tableName>  where at1=%s and at2=%s
 
         """
+        if attributeNameList is None:
+            attributeNameList = []
         fL = []
         for v in attributeNameList:
-            fL.append(' %s=' % v + '%s')
+            fL.append(" %s=" % v + "%s")
         #
-        tS = "DELETE FROM %s.%s WHERE %s;" % (databaseName, tableName, ' AND '.join(fL))
+        tS = "DELETE FROM %s.%s WHERE %s;" % (databaseName, tableName, " AND ".join(fL))
         return tS
 
     def deleteFromListSQL(self, databaseName, tableName, attributeName, valueList, chunkSize=10):
@@ -181,7 +190,7 @@ class MyDbAdminSqlGen(object):
         chunkLists = self.__makeSubLists(chunkSize, valueList)
         for chunk in chunkLists:
             fL = ["'%s'" % v for v in chunk]
-            sqlList.append("DELETE FROM %s.%s WHERE %s IN (%s); " % (databaseName, tableName, attributeName, ','.join(fL)))
+            sqlList.append("DELETE FROM %s.%s WHERE %s IN (%s); " % (databaseName, tableName, attributeName, ",".join(fL)))
 
         return sqlList
 
@@ -237,7 +246,7 @@ class MyDbAdminSqlGen(object):
         attributeIdList = tableDefObj.getAttributeIdList()
         #
         oL.append("CREATE TABLE %s (" % tableDefObj.getName())
-        for ii, attributeId in enumerate(attributeIdList):
+        for _ii, attributeId in enumerate(attributeIdList):
             #
             name = tableDefObj.getAttributeName(attributeId)
 
@@ -248,18 +257,18 @@ class MyDbAdminSqlGen(object):
             if tableDefObj.getAttributeIsPrimaryKey(attributeId):
                 pkL.append(name)
             #
-            if ((sqlType == "CHAR") or (sqlType == "VARCHAR")):
+            if (sqlType == "CHAR") or (sqlType == "VARCHAR"):
                 sW = "%-s(%d)" % (sqlType, width)
                 tS = "%-40s %-16s  %s" % (name, sW, notNull)
-            elif (sqlType.startswith("INT") or sqlType in ["INTEGER", "BIGINT", "SMALLINT"]):
+            elif sqlType.startswith("INT") or sqlType in ["INTEGER", "BIGINT", "SMALLINT"]:
                 tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif (sqlType in ["FLOAT", "REAL", "DOUBLE PRECISION"]):
+            elif sqlType in ["FLOAT", "REAL", "DOUBLE PRECISION"]:
                 tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif ((sqlType == "DATE") or (sqlType == "DATETIME")):
+            elif (sqlType == "DATE") or (sqlType == "DATETIME"):
                 tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif ((sqlType == "TEXT") or (sqlType == "MEDIUMTEXT") or (sqlType == "LONGTEXT")):
+            elif (sqlType == "TEXT") or (sqlType == "MEDIUMTEXT") or (sqlType == "LONGTEXT"):
                 tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif ((sqlType == "DECIMAL") or (sqlType == "NUMERIC")):
+            elif (sqlType == "DECIMAL") or (sqlType == "NUMERIC"):
                 sW = "%-s(%d,%d)" % (sqlType, width, precision)
                 tS = "%-40s %-16s  %s" % (name, sW, notNull)
             else:
@@ -272,15 +281,15 @@ class MyDbAdminSqlGen(object):
             oL.append(tS + ",")
 
         if len(pkL) > 0:
-            oL.append("PRIMARY KEY (%s)" % (','.join(pkL)))
+            oL.append("PRIMARY KEY (%s)" % (",".join(pkL)))
 
-        if (str(tableDefObj.getType()).upper() == "TRANSACTIONAL"):
+        if str(tableDefObj.getType()).upper() == "TRANSACTIONAL":
             oL.append(") ENGINE InnoDB;")
         else:
             oL.append(") ENGINE MyISAM;")
         #
         # return this as list containing a single string command.
-        return ['\n'.join(oL)]
+        return ["\n".join(oL)]
 
     def __createTableIndices(self, tableDefObj):
         """ Return a list of strings containing the SQL command to create any indices described in
@@ -305,9 +314,9 @@ class MyDbAdminSqlGen(object):
                 else:
                     tL.append(tS)
             tL.append(");")
-            oL.append(' '.join(tL))
+            oL.append(" ".join(tL))
 
-       #
+        #
         return oL
 
     def exportTable(self, databaseName, tableDefObj, exportPath, withDoubleQuotes=False):
@@ -317,15 +326,15 @@ class MyDbAdminSqlGen(object):
         aNames = tableDefObj.getAttributeNameList()
         #
         oL = []
-        oL.append("SELECT %s " % ','.join(aNames))
+        oL.append("SELECT %s " % ",".join(aNames))
         oL.append(" INTO OUTFILE %s " % exportPath)
         oL.append("FIELDS TERMINATED BY '&##&\\t' ")
-        if (withDoubleQuotes):
+        if withDoubleQuotes:
             oL.append(" OPTIONALLY ENCLOSED BY '\"' ")
         oL.append("LINES  TERMINATED BY '$##$\\n' ")
         oL.append("FROM %s.%s " % (databaseName, tableName))
         oL.append(";")
-        return '\n'.join(oL)
+        return "\n".join(oL)
 
     def importTable(self, databaseName, tableDefObj, importPath, withTruncate=False, withDoubleQuotes=False):
         """ Create the SQL commands to data files stored in charactore delimited data files into the
@@ -347,13 +356,13 @@ class MyDbAdminSqlGen(object):
         oL.append("INTO TABLE  %s.%s " % (databaseName, tableName))
         oL.append("FIELDS TERMINATED BY '&##&\\t' ")
 
-        if (withDoubleQuotes):
+        if withDoubleQuotes:
             oL.append("OPTIONALLY ENCLOSED BY '\"' ")
 
         oL.append("LINES  TERMINATED BY '$##$\\n' ")
-        oL.append(" (%s) " % ','.join(aNames))
+        oL.append(" (%s) " % ",".join(aNames))
         oL.append(";")
-        return ' '.join(oL)
+        return " ".join(oL)
 
 
 class MyDbQuerySqlGen(object):
@@ -370,6 +379,11 @@ class MyDbQuerySqlGen(object):
         self.__lfh = log
         self.__verbose = verbose
         #
+        self.__databaseName = None
+        self.__conditionObj = None
+        self.__sortOrder = "DESC"
+        self.__limitStart = None
+        self.__limitLength = None
         self.__setup()
 
     def __setup(self):
@@ -393,7 +407,7 @@ class MyDbQuerySqlGen(object):
             self.__limitStart = int(rowStart)
             self.__limitLength = int(rowLength)
             return True
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             return False
 
     def addSelectAttributeId(self, attributeTuple=(None, None)):
@@ -405,18 +419,18 @@ class MyDbQuerySqlGen(object):
         self.__selectList.append(attributeTuple)
         return True
 
-    def setOrderBySortOrder(self, dir="ASC"):
+    def setOrderBySortOrder(self, dir="ASC"):  # pylint: disable=redefined-builtin
         """  The default sort order applied to attributes in the ORDER BY clause. (ASC|DESC)
         """
         self.__sortOrder = dir
 
-    def addOrderByAttributeId(self, attributeTuple=(None, None), sortFlag='DEFAULT'):
+    def addOrderByAttributeId(self, attributeTuple=(None, None), sortFlag="DEFAULT"):
         """ Add the input attribute to the current orderBy list.
 
             where attributeTuple contains (tableId,attributeId)
 
         """
-        sf = self.__sortOrder if sortFlag == 'DEFAULT' else sortFlag
+        sf = self.__sortOrder if sortFlag == "DEFAULT" else sortFlag
         self.__orderList.append((attributeTuple, sf))
         return True
 
@@ -458,24 +472,24 @@ class MyDbQuerySqlGen(object):
             oNames = [self.__schemaDefObj.getQualifiedAttributeName(aTup) + " " + sortFlag for aTup, sortFlag in self.__orderList]
         #
         tIds = list(set(tIds))
-        tNames = [self.__databaseName + '.' + self.__schemaDefObj.getTableName(tId) for tId in tIds]
+        tNames = [self.__databaseName + "." + self.__schemaDefObj.getTableName(tId) for tId in tIds]
         #
         oL = []
-        oL.append("SELECT %s " % ','.join(aNames))
-        oL.append(" FROM %s " % ','.join(tNames))
+        oL.append("SELECT %s " % ",".join(aNames))
+        oL.append(" FROM %s " % ",".join(tNames))
         if conditionSql is not None and len(conditionSql) > 0:
             oL.append(" WHERE %s " % conditionSql)
         #
         if len(oNames) > 0:
-            oL.append(" ORDER BY %s " % (','.join(oNames)))
+            oL.append(" ORDER BY %s " % (",".join(oNames)))
 
-        if ((self.__limitStart is not None) and (self.__limitLength is not None)):
+        if (self.__limitStart is not None) and (self.__limitLength is not None):
             oL.append(" LIMIT %d, %d " % (self.__limitStart, self.__limitLength))
 
         oL.append(";")
         #
         #
-        return '\n'.join(oL)
+        return "\n".join(oL)
 
 
 class MyDbConditionSqlGen(object):
@@ -491,20 +505,10 @@ class MyDbConditionSqlGen(object):
         self.__schemaDefObj = schemaDefObj
         self.__lfh = log
         self.__verbose = verbose
-        self.__ops = ['EQ', 'NE', 'GE', 'GT', 'LT', 'LE', 'LIKE', 'NOT LIKE', 'IS', 'IS NOT']
-        self.__opDict = {'EQ': '=',
-                         'NE': '!=',
-                         'GE': '>=',
-                         'GT': '>',
-                         'LT': '<',
-                         'LE': '<=',
-                         'LIKE': 'LIKE',
-                         'NOT LIKE': 'NOT LIKE',
-                         'IS': 'IS',
-                         'IS NOT': 'IS NOT'
-                         }
-        self.__logOps = ['AND', 'OR', 'NOT']
-        self.__grpOps = ['BEGIN', 'END']
+        self.__ops = ["EQ", "NE", "GE", "GT", "LT", "LE", "LIKE", "NOT LIKE", "IS", "IS NOT"]
+        self.__opDict = {"EQ": "=", "NE": "!=", "GE": ">=", "GT": ">", "LT": "<", "LE": "<=", "LIKE": "LIKE", "NOT LIKE": "NOT LIKE", "IS": "IS", "IS NOT": "IS NOT"}
+        self.__logOps = ["AND", "OR", "NOT"]
+        self.__grpOps = ["BEGIN", "END"]
         #
         self.__cList = []
         self.__tableIdList = []
@@ -534,15 +538,15 @@ class MyDbConditionSqlGen(object):
         """  Add the tables included in the input condition to the internal table list.
         """
         cType = cObj[0]
-        if cType in ['VALUE_CONDITION', 'VALUE_LIST_CONDITION']:
-            cType, lhsTuple, opCode, rhsTuple = cObj
-            lTableId, lAttributeId = lhsTuple
+        if cType in ["VALUE_CONDITION", "VALUE_LIST_CONDITION"]:
+            cType, lhsTuple, _opCode, rhsTuple = cObj
+            lTableId, _lAttributeId = lhsTuple
             self.__addTable(lTableId)
             return True
-        elif cType in ['JOIN_CONDITION']:
-            cType, lhsTuple, opCode, rhsTuple = cObj
-            lTableId, lAttributeId = lhsTuple
-            rTableId, rAttributeId = rhsTuple
+        elif cType in ["JOIN_CONDITION"]:
+            cType, lhsTuple, _opCode, rhsTuple = cObj
+            lTableId, _lAttributeId = lhsTuple
+            rTableId, _rAttributeId = rhsTuple
             self.__addTable(lTableId)
             self.__addTable(rTableId)
             return True
@@ -568,16 +572,16 @@ class MyDbConditionSqlGen(object):
         return self.__tableIdList
 
     def addTables(self, tableIdList):
-        '''  Add the tables from the input tableIdList to the internal list of tables.
+        """  Add the tables from the input tableIdList to the internal list of tables.
 
              The internal list of tables is used to materialize join contraints between
              all tables based on primary keys defined in the schema definition.
-        '''
+        """
         for tableId in tableIdList:
             self.__addTable(tableId)
         return True
 
-    def addValueCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp='AND'):
+    def addValueCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp="AND"):
         """  Adds a condition to the current contraint list -
 
              lhsTuple = (TableId,AttributeId)
@@ -590,10 +594,10 @@ class MyDbConditionSqlGen(object):
             preOp = logical operator preceding this contraint in the current contraint list.
 
         """
-        cObj = ('VALUE_CONDITION', lhsTuple, opCode, rhsTuple)
+        cObj = ("VALUE_CONDITION", lhsTuple, opCode, rhsTuple)
         if cObj not in self.__cList:
             self.__updateTableList(cObj)
-            if preOp in ['AND', 'OR']:
+            if preOp in ["AND", "OR"]:
                 self.addLogicalOp(lOp=preOp)
             self.addBeginGroup()
             self.__cList.append(cObj)
@@ -601,7 +605,7 @@ class MyDbConditionSqlGen(object):
             self.__numConditions += 1
         return self.__numConditions
 
-    def addGroupValueConditionList(self, cDefList, preOp='AND'):
+    def addGroupValueConditionList(self, cDefList, preOp="AND"):
         """  Add a value alternative condition to the current contraint list
              using the input list of value condition definitions defined as -
 
@@ -620,13 +624,13 @@ class MyDbConditionSqlGen(object):
         """
         if len(cDefList) < 1:
             return self.__numConditions
-        if preOp in ['AND', 'OR']:
+        if preOp in ["AND", "OR"]:
             self.addLogicalOp(lOp=preOp)
         #
         self.addBeginGroup()
         for ii, cDef in enumerate(cDefList):
             (lPreOp, lhsTuple, opCode, rhsTuple) = cDef
-            cObj = ('VALUE_CONDITION', lhsTuple, opCode, rhsTuple)
+            cObj = ("VALUE_CONDITION", lhsTuple, opCode, rhsTuple)
             self.__updateTableList(cObj)
             if ii > 0:
                 self.addLogicalOp(lOp=lPreOp)
@@ -639,7 +643,7 @@ class MyDbConditionSqlGen(object):
         self.addEndGroup()
         return self.__numConditions
 
-    def addJoinCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp='AND'):
+    def addJoinCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp="AND"):
         """  Adds a join condition to the current contraint list -
 
             lhsTuple = (TableId,AttributeId)
@@ -656,10 +660,10 @@ class MyDbConditionSqlGen(object):
             preOp = logical operator preceding this contraint in the current contraint list.
 
         """
-        cObj = ('JOIN_CONDITION', lhsTuple, opCode, rhsTuple)
+        cObj = ("JOIN_CONDITION", lhsTuple, opCode, rhsTuple)
         if cObj not in self.__cList:
             self.__updateTableList(cObj)
-            if preOp in ['AND', 'OR']:
+            if preOp in ["AND", "OR"]:
                 self.addLogicalOp(lOp=preOp)
             self.addBeginGroup()
             self.__cList.append(cObj)
@@ -672,22 +676,21 @@ class MyDbConditionSqlGen(object):
 
              lOp  =  one of 'AND','OR', 'NOT'
         """
-        self.__cList.append(('LOG_OP', lOp))
+        self.__cList.append(("LOG_OP", lOp))
 
     def addBeginGroup(self):
         """ Inserts the beginning of a parenthetical group in the current condition list.
         """
-        self.__cList.append(('GROUPING', 'BEGIN'))
+        self.__cList.append(("GROUPING", "BEGIN"))
 
     def addEndGroup(self):
         """ Inserts the ending of a parenthetical group in the current condition list.
         """
-        self.__cList.append(('GROUPING', 'END'))
+        self.__cList.append(("GROUPING", "END"))
 
     def addKeyAttributeEquiJoinConditions(self):
         """ Auto add equi-join contraints between tables in the current table list -
         """
-        self.__KeyJoinDone = True
         if len(self.__tableIdList) < 2:
             return 0
         cList = copy.deepcopy(self.__cList)
@@ -696,7 +699,7 @@ class MyDbConditionSqlGen(object):
         for (t1, t2) in tablePairList:
             self.__addInterTableJoinContraints(t1, t2)
         for c in cList:
-            if c[0] in ['JOIN_CONDITION'] and c in self.__cList:
+            if c[0] in ["JOIN_CONDITION"] and c in self.__cList:
                 continue
             self.__cList.append(c)
 
@@ -725,65 +728,65 @@ class MyDbConditionSqlGen(object):
         cCount = 0
         for c in self.__cList:
             cType = (c[0]).upper()
-            if cType == 'VALUE_CONDITION':
+            if cType == "VALUE_CONDITION":
                 cCount += 1
-                (cT, lhsTuple, opId, rhsTuple) = c
-                (tableId, attributeId) = lhsTuple
+                (_cT, lhsTuple, opId, rhsTuple) = c
+                (_tableId, _attributeId) = lhsTuple
                 (value, vType) = rhsTuple
                 vType = vType.upper()
                 qAttributeName = self.__schemaDefObj.getQualifiedAttributeName(tableAttributeTuple=lhsTuple)
                 # jdw quote date and datetime
-                if (vType in ['CHAR', 'VARCHAR', 'DATE', 'DATETIME']):
+                if vType in ["CHAR", "VARCHAR", "DATE", "DATETIME"]:
                     cSqlL.append(" %s %s '%s' " % (qAttributeName, self.__opDict[opId], value))
                 else:
                     cSqlL.append(" %s %s %s " % (qAttributeName, self.__opDict[opId], value))
 
-            elif cType == 'VALUE_LIST_CONDITION':
+            elif cType == "VALUE_LIST_CONDITION":
                 cCount += 1
-                (cT, lhsTuple, opId, rhsTuple) = c
-                (tableId, attributeId) = lhsTuple
+                (_cT, lhsTuple, opId, rhsTuple) = c
+                # (_tableId, _attributeId) = lhsTuple
                 (valueList, vType) = rhsTuple
                 vType = vType.upper()
                 qAttributeName = self.__schemaDefObj.getQualifiedAttributeName(tableAttributeTuple=lhsTuple)
                 #
                 qVL = []
                 for value in valueList:
-                    if vType in ['CHAR', 'VARCHAR']:
+                    if vType in ["CHAR", "VARCHAR"]:
                         qV = "'%s'" % value
-                    elif vType in ['INT', 'INTEGER']:
+                    elif vType in ["INT", "INTEGER"]:
                         qV = "%i" % value
-                    elif vType in ['FLOAT', 'DOUBLE', 'DECIMAL']:
+                    elif vType in ["FLOAT", "DOUBLE", "DECIMAL"]:
                         qV = "%f" % value
                     else:
                         qV = value
                     qVL.append(qV)
-                vS = ','.join
+                vS = ",".join
                 cSqlL.append(" %s %s [ %s ] " % (qAttributeName, self.__opDict[opId], vS))
 
-            elif cType == 'JOIN_CONDITION':
+            elif cType == "JOIN_CONDITION":
                 cCount += 1
-                (cT, lhsTuple, opId, rhsTuple) = c
-                (lTableId, lAttributeId) = lhsTuple
-                (rTableId, rAttributeId) = rhsTuple
+                (_cT, lhsTuple, opId, rhsTuple) = c
+                # (_lTableId, _lAttributeId) = lhsTuple
+                # (_rTableId, _rAttributeId) = rhsTuple
                 lAttributeName = self.__schemaDefObj.getQualifiedAttributeName(tableAttributeTuple=lhsTuple)
                 rAttributeName = self.__schemaDefObj.getQualifiedAttributeName(tableAttributeTuple=rhsTuple)
                 #
                 cSqlL.append(" %s %s %s " % (lAttributeName, self.__opDict[opId], rAttributeName))
 
-            elif cType == 'LOG_OP':
-                (cT, logOp) = c
-                if logOp not in ['NOT'] and cCount > 0:
+            elif cType == "LOG_OP":
+                (_cT, logOp) = c
+                if logOp not in ["NOT"] and cCount > 0:
                     cSqlL.append(" %s " % logOp)
-            elif cType == 'GROUPING':
-                (cT, group) = c
-                if group == 'BEGIN':
+            elif cType == "GROUPING":
+                (_cT, group) = c
+                if group == "BEGIN":
                     cSqlL.append(" (  ")
-                elif group == 'END':
+                elif group == "END":
                     cSqlL.append(" ) ")
             else:
                 pass
 
-        return '\n'.join(cSqlL)
+        return "\n".join(cSqlL)
 
     def __addInterTableJoinContraints(self, lTableId, rTableId):
         """ The ...
@@ -794,13 +797,13 @@ class MyDbConditionSqlGen(object):
         rKeyAttributeIdL = rTdef.getPrimaryKeyAttributeIdList()
         #
         commonAttributeIdSet = set(lKeyAttributeIdL) & set(rKeyAttributeIdL)
-        if (self.__verbose):
+        if self.__verbose:
             self.__lfh.write("+MyDbConditionSqlGen.__addInterTableJoinConditions lTable %s rTable %s  common keys %r\n" % (lTableId, rTableId, commonAttributeIdSet))
         #
         for attributeId in commonAttributeIdSet:
             lhsTuple = (lTableId, attributeId)
-            opCode = 'EQ'
+            opCode = "EQ"
             rhsTuple = (rTableId, attributeId)
-            self.addJoinCondition(lhsTuple=lhsTuple, opCode=opCode, rhsTuple=rhsTuple, preOp='AND')
+            self.addJoinCondition(lhsTuple=lhsTuple, opCode=opCode, rhsTuple=rhsTuple, preOp="AND")
         #
         return len(commonAttributeIdSet)

@@ -30,7 +30,6 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import os
 import sys
 import time
 import traceback
@@ -237,7 +236,7 @@ class MyDbAdapter(object):
                 self._open()
                 iOpened = True
             #
-            tableName = self.__sd.getTableName(tableId)
+            # tableName = self.__sd.getTableName(tableId)
             tableDefObj = self.__sd.getTable(tableId)
             #
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
@@ -305,7 +304,7 @@ class MyDbAdapter(object):
                 self._open()
                 iOpened = True
             #
-            tableName = self.__sd.getTableName(tableId)
+            # tableName = self.__sd.getTableName(tableId)
             tableDefObj = self.__sd.getTable(tableId)
             #
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
@@ -447,7 +446,7 @@ class MyDbAdapter(object):
                 self._open()
                 iOpened = True
 
-            tableName = self.__sd.getTableName(tableId)
+            # tableName = self.__sd.getTableName(tableId)
             tableDefObj = self.__sd.getTable(tableId)
             #
             #

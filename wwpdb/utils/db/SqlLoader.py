@@ -78,9 +78,9 @@ class _DbConnection(object):
                                         local_infile=1)
 
             self.__dbcon = dbcon
-        except:
-            self.__lfh.write("+__DbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d \n" %
-                             (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort))
+        except Exception as e:
+            self.__lfh.write("+__DbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d err %s\n" %
+                             (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort, str(e)))
             self.__dbcon = None
 
         return self.__dbcon
@@ -93,7 +93,7 @@ class _DbConnection(object):
                 self.__dbcon.close()
                 self.__dbcon = None
                 return True
-            except:
+            except:  # noqa: E722  pylint: disable=bare-except
                 pass
         return False
 
@@ -107,7 +107,7 @@ class SqlLoader(object):
         self.__verbose = verbose
         self.__resources = resource
         self.__siteId = siteId
-        
+
         self.__dbServer = None
         self.__dbHost = None
         self.__dbUser = None
@@ -144,7 +144,7 @@ class SqlLoader(object):
         """Load sqla data output from db-loader"""
 
         # Max retries if server goes away
-        maxretry=3
+        maxretry = 3
 
         try:
             with open(sql_file, "r") as fin:
@@ -161,9 +161,9 @@ class SqlLoader(object):
                 os.unlink(logFile)
 
         db = _DbConnection(dbServer=self.__dbServer, dbHost=self.__dbHost, dbName=self.__dbName,
-                         dbUser=self.__dbUser, dbPw=self.__dbPw, dbSocket=self.__dbSocket, dbPort=self.__dbPort,
-                         verbose=self.__verbose, log=self.__lfh)
-        
+                           dbUser=self.__dbUser, dbPw=self.__dbPw, dbSocket=self.__dbSocket, dbPort=self.__dbPort,
+                           verbose=self.__verbose, log=self.__lfh)
+
         dbcon = db.connect()
         if dbcon is None:
             self.__lfh.write("DbLoadingApi::__loadSql failure to connect to db\n")
@@ -171,34 +171,33 @@ class SqlLoader(object):
 
         try:
             cursor = dbcon.cursor()
-        except:
-            self.__lfh.write("\nFailing to get cursor!!!\n")
+        except Exception as e:
+            self.__lfh.write("\nFailing to get cursor err: %s!!!\n" % str(e))
             db.close()
             return False
-
 
         cnt = 0
         for s in sq:
             cnt += 1
             try:
-                ret = cursor.execute(s)
+                cursor.execute(s)
             except dbcon.IntegrityError as e:
                 if len(e.args) > 1:
                     logstr = "ERROR %s at cmd %s: %s" % (e.args[0], cnt, e.args[1])
                 else:
-                    logstr = "ERROR %s at cmd %s" %(str(e), cnt)
+                    logstr = "ERROR %s at cmd %s" % (str(e), cnt)
                 self.__logmsg(logFile, logstr)
                 # Continue
 
             except dbcon.OperationalError as e:
-                logstr = "ERROR %s at cmd %s" %(str(e), cnt)
+                logstr = "ERROR %s at cmd %s" % (str(e), cnt)
                 self.__logmsg(logFile, logstr)
-                
+
                 cursor.close()
                 db.close()
                 if retry < maxretry:
                     self.__lfh.write("Server issue retry %s\n" % (retry + 1))
-                    return self.loadSql(sql_file, logFile, retry=retry+1)
+                    return self.loadSql(sql_file, logFile, retry=retry + 1)
                 else:
                     self.__lfh.write("Too many retry failures\n")
                     return False
@@ -208,10 +207,7 @@ class SqlLoader(object):
                 logstr = "ERROR %s" % str(e)
                 self.__logmsg(logFile, logstr)
 
-
         dbcon.commit()
         cursor.close()
         db.close()
         return True
-
-    

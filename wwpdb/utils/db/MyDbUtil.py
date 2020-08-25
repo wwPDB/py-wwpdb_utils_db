@@ -37,7 +37,7 @@ import sys
 import os
 import traceback
 import warnings
-from operator import itemgetter, attrgetter
+# from operator import itemgetter, attrgetter
 
 #
 #
@@ -45,7 +45,7 @@ if True:
     try:
         import sqlalchemy.pool as pool
         MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True)
-    except:
+    except:  # noqa: E722
         pass
 
 
@@ -119,8 +119,8 @@ class MyDbConnect(object):
                 self.__dbPort = authD["DB_PORT"]
             else:
                 self.__dbPort = 3306
-        except:
-            self.__lfh.write("+MyDbConnect.setAuth failing  %r\n" % authD.items())
+        except Exception as e:
+            self.__lfh.write("+MyDbConnect.setAuth failing  %r %s\n" % (authD.items(), str(e)))
             traceback.print_exc(file=self.__lfh)
 
     def connect(self):
@@ -154,9 +154,12 @@ class MyDbConnect(object):
                                         local_infile=1)
 
             self.__dbcon = dbcon
-        except:
-            self.__lfh.write("+MyDbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d \n" %
-                             (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort))
+        except Exception as e:
+            self.__lfh.write("+MyDbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d %s\n" %
+                             (self.__dbServer, self.__dbHost,
+                              self.__dbName, self.__dbUser,
+                              self.__dbPw, self.__dbSocket, self.__dbPort,
+                              str(e)))
             self.__dbcon = None
 
         return self.__dbcon
@@ -169,7 +172,7 @@ class MyDbConnect(object):
                 self.__dbcon.close()
                 self.__dbcon = None
                 return True
-            except:
+            except:  # noqa: E722
                 pass
         return False
 
@@ -205,7 +208,7 @@ class MyDbQuery(object):
 
              Errors and warnings that generate exceptions are caught by this method.
         """
-        #warnings.simplefilter("error", MySQLdb.Warning)
+        # warnings.simplefilter("error", MySQLdb.Warning)
         self.__setWarningHandler()
         try:
             t = ''
@@ -233,8 +236,7 @@ class MyDbQuery(object):
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (t % tuple(v)))
             self.__dbcon.rollback()
             curs.close()
-        except:
-
+        except:  # noqa: E722
             if (self.__verbose):
                 self.__lfh.write("MyDbQuery.sqlCommand generated exception for command:\n%s\n" % (t % tuple(v)))
                 traceback.print_exc(file=self.__lfh)
@@ -247,7 +249,7 @@ class MyDbQuery(object):
 
              Errors and warnings that generate exceptions are caught by this method.
         """
-        #warnings.simplefilter("error", MySQLdb.Warning)
+        # warnings.simplefilter("error", MySQLdb.Warning)
         self.__setWarningHandler()
         try:
             curs = self.__dbcon.cursor()
@@ -268,7 +270,7 @@ class MyDbQuery(object):
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
             self.__dbcon.rollback()
             curs.close()
-        except:
+        except:  # noqa: E722
             if (self.__verbose):
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
                 traceback.print_exc(file=self.__lfh)
@@ -322,7 +324,7 @@ class MyDbQuery(object):
                 traceback.print_exc(file=self.__lfh)
             # self.__dbcon.rollback()
             curs.close()
-        except:
+        except:  # noqa: E722
             if (self.__verbose):
                 self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % sqlCommand)
                 traceback.print_exc(file=self.__lfh)
@@ -336,8 +338,8 @@ class MyDbQuery(object):
         """
         with warnings.catch_warnings():
             warnings.simplefilter('error')
-            #warnings.simplefilter('error', MySQLdb.Warning)
-            #warnings.simplefilter('error', _mysql_exceptions.Warning)
+            # warnings.simplefilter('error', MySQLdb.Warning)
+            # warnings.simplefilter('error', _mysql_exceptions.Warning)
             try:
                 curs = self.__dbcon.cursor()
                 curs.execute(queryString)
@@ -357,7 +359,7 @@ class MyDbQuery(object):
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                     self.__lfh.write("MyDbQuery.sqlCommand MySQL warning is message is:\n%s\n" % e)
                 curs.close()
-            except:
+            except:  # noqa: E722
                 if (self.__verbose):
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                 curs.close()
@@ -407,7 +409,7 @@ class MyDbQuery(object):
                     self.__lfh.write("MyDbQuery.sqlCommand MySQL warning is message is:\n%s\n" % e)
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                 curs.close()
-            except:
+            except:  # noqa: E722
                 if (self.__verbose):
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                     traceback.print_exc(file=self.__lfh)
@@ -452,7 +454,7 @@ class MyDbQuery(object):
             rowL = self.selectRows(queryString=tSQL)
             tup = rowL[0]
             return int(str(tup[0])) == count
-        except:
+        except:  # noqa: E722
             return False
 
     #
@@ -505,8 +507,6 @@ class MyDbQuery(object):
             if (k not in returnRowDict):
                 returnRowDict[k] = v
 
-
-##
     def OldselectRows(self, tableDef, constraintDef, returnKeyAttribTuple=(None, None, None),
                       orderList=[], selectList=[], returnObj=None):
         """ Execute query on the table described by "tableDef"
@@ -647,7 +647,7 @@ class MyDbQuery(object):
         cType = str(type(constraintDef))
 
         if (cType.find('dict') > 0):
-            l = []
+            l = []  # noqa: E741
             for k, v in constraintDef.items():
                 c = " %s = '%s' " % (attribDict[k], v)
                 l.append(c)
@@ -685,14 +685,14 @@ class MyDbQuery(object):
                                       (attribDict[str(c[1]).upper()],
                                        self.__opDict[str(c[0]).upper()],
                                        str(c[2]))
-                    elif (len(c) == 2 and str(c[0]).upper() == 'GROUP' and
-                          str(c[1]).upper() in self.__grpOps):
+                    elif (len(c) == 2 and str(c[0]).upper() == 'GROUP'
+                          and str(c[1]).upper() in self.__grpOps):
                         if (str(c[1]).upper() == 'BEGIN'):
                             constraint += "("
                         else:
                             constraint += ")"
-                    elif (len(c) == 2 and str(c[0]).upper() == 'LOGOP' and
-                          str(c[1]).upper() in self.__logOps):
+                    elif (len(c) == 2 and str(c[0]).upper() == 'LOGOP'
+                          and str(c[1]).upper() in self.__logOps):
                         constraint += " %s " % str(c[1]).upper()
                     else:
                         if (self.__lfh):

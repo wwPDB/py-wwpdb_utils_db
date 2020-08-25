@@ -50,8 +50,8 @@ class StatusLoadWrapper(object):
             fD, fN = os.path.split(pdbxFilePath)
             dbLd = DbLoadingApi(log=self.__lfh, verbose=self.__verbose)
             return dbLd.doLoadStatus(pdbxFilePath, fD)
-        except:
+        except Exception as e:
             if (self.__verbose):
-                self.__lfh.write("+StatusLoadWrapper.dbload() dbload failed for %s\n" % depSetId)
+                self.__lfh.write("+StatusLoadWrapper.dbload() dbload failed for %s %s\n" % (depSetId, str(e)))
                 traceback.print_exc(file=self.__lfh)
             return False

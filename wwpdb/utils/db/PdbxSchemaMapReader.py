@@ -23,14 +23,14 @@ __version__ = "V0.01"
 
 import sys
 import traceback
-import sys
-import os
 
 from mmcif.io.PdbxReader import PdbxReader
-from mmcif.api.PdbxContainers import *
+
+# from mmcif.api.PdbxContainers import *
+from mmcif.api.PdbxContainers import CifName
+
 
 class PdbxSchemaMapReader(object):
-
     def __init__(self, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
@@ -62,26 +62,26 @@ class PdbxSchemaMapReader(object):
             for k, v in d.items():
                 ofh.write("Table %s - attribute %s  abbreviation %s\n" % (tN, k, v))
 
-    def __convertDataType(self, type, width=0, precision=0):
-        if type.lower() in ["char", "varchar", "text"]:
+    def __convertDataType(self, dtype, width=0, precision=0):  # pylint:  disable=unused-argument
+        if dtype.lower() in ["char", "varchar", "text"]:
             if width < 65000:
                 retType = "VARCHAR"
             else:
                 retType = "TEXT"
-        elif type.lower() == "int":
+        elif dtype.lower() == "int":
             retType = "INT"
-        elif type.lower() == "float":
+        elif dtype.lower() == "float":
             retType = "FLOAT"
-        elif type.lower() == "date" or type.lower() == "datetime":
-            retType = type.upper()
+        elif dtype.lower() == "date" or dtype.lower() == "datetime":
+            retType = dtype.upper()
         else:
             retType = None
-            self.__lfh.write("+ERROR - UNKNOWN DATA TYPE %s\n" % type)
+            self.__lfh.write("+ERROR - UNKNOWN DATA TYPE %s\n" % dtype)
 
         return retType
 
     def __toBool(self, flag):
-        if flag.lower() == 'y' or flag.lower() == 'yes' or flag == '1':
+        if flag.lower() == "y" or flag.lower() == "yes" or flag == "1":
             return True
         else:
             return False
@@ -95,37 +95,37 @@ class PdbxSchemaMapReader(object):
     def __getAttributeAbbrev(self, tableName, attributeName):
         try:
             return self.__attribAbbrev[tableName][attributeName]
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             return attributeName
 
     def makeSchemaDef(self):
         sD = {}
         for tableName in self.__tableNameList:
-            if (tableName in ['rcsb_columninfo', 'columninfo', 'tableinfo', 'rcsb_tableinfo']):
+            if tableName in ["rcsb_columninfo", "columninfo", "tableinfo", "rcsb_tableinfo"]:
                 continue
             d = {}
             tableAbbrev = self.__getTableAbbrev(tableName)
             tU = tableAbbrev.upper()
-            d['TABLE_ID'] = tU
-            d['TABLE_NAME'] = tableAbbrev
-            d['TABLE_TYPE'] = 'transactional'
-            d['ATTRIBUTES'] = {}
-            d['ATTRIBUTE_INFO'] = {}
-            d['ATTRIBUTE_MAP'] = {}
+            d["TABLE_ID"] = tU
+            d["TABLE_NAME"] = tableAbbrev
+            d["TABLE_TYPE"] = "transactional"
+            d["ATTRIBUTES"] = {}
+            d["ATTRIBUTE_INFO"] = {}
+            d["ATTRIBUTE_MAP"] = {}
             #
             # create a sub list for this table -
             infoL = []
             for atD in self.__atDefList:
-                if atD['table_name'] == tableName:
+                if atD["table_name"] == tableName:
                     infoL.append(atD)
             #
             mapD = {}
             for atD in self.__atMapList:
-                if atD['target_table_name'] == tableName:
-                    attributeName = atD['target_attribute_name']
+                if atD["target_table_name"] == tableName:
+                    attributeName = atD["target_attribute_name"]
                     attributeAbbrev = self.__getAttributeAbbrev(tableName, attributeName)
                     atU = attributeAbbrev.upper()
-                    itN = atD['source_item_name'] if atD['source_item_name'] not in ['?', '.'] else None
+                    itN = atD["source_item_name"] if atD["source_item_name"] not in ["?", "."] else None
                     if itN is not None:
                         catNameM = CifName.categoryPart(itN)
                         attNameM = CifName.attributePart(itN)
@@ -133,8 +133,8 @@ class PdbxSchemaMapReader(object):
                         catNameM = None
                         attNameM = None
 
-                    cId = atD['condition_id'] if atD['condition_id'] not in ['?', '.'] else None
-                    fId = atD['function_id'] if atD['function_id'] not in ['?', '.'] else None
+                    # cId = atD['condition_id'] if atD['condition_id'] not in ['?', '.'] else None
+                    fId = atD["function_id"] if atD["function_id"] not in ["?", "."] else None
                     if fId is not None and catNameM is None:
                         mapD[atU] = (catNameM, attNameM, fId, None)
                     else:
@@ -143,33 +143,33 @@ class PdbxSchemaMapReader(object):
             #
             indexList = []
             for (ii, atD) in enumerate(infoL):
-                attributeName = atD['attribute_name']
+                attributeName = atD["attribute_name"]
                 attributeAbbrev = self.__getAttributeAbbrev(tableName, attributeName)
                 atU = attributeAbbrev.upper()
                 #
                 td = {}
                 # 'data_type','index_flag','null_flag','width','precision','populated'
-                td['SQL_TYPE'] = self.__convertDataType(atD['data_type'], width=int(atD['width']))
-                td['WIDTH'] = int(atD['width'])
-                td['PRECISION'] = int(atD['precision'])
-                td['NULLABLE'] = not self.__toBool(atD['null_flag'])
-                td['PRIMARY_KEY'] = self.__toBool(atD['index_flag'])
-                td['ORDER'] = ii + 1
-                if td['PRIMARY_KEY']:
+                td["SQL_TYPE"] = self.__convertDataType(atD["data_type"], width=int(atD["width"]))
+                td["WIDTH"] = int(atD["width"])
+                td["PRECISION"] = int(atD["precision"])
+                td["NULLABLE"] = not self.__toBool(atD["null_flag"])
+                td["PRIMARY_KEY"] = self.__toBool(atD["index_flag"])
+                td["ORDER"] = ii + 1
+                if td["PRIMARY_KEY"]:
                     indexList.append(atU)
-                d['ATTRIBUTES'][atU] = attributeAbbrev
-                d['ATTRIBUTE_INFO'][atU] = td
-                d['ATTRIBUTE_MAP'][atU] = mapD[atU]
+                d["ATTRIBUTES"][atU] = attributeAbbrev
+                d["ATTRIBUTE_INFO"][atU] = td
+                d["ATTRIBUTE_MAP"][atU] = mapD[atU]
 
             #
-            if (self.__verbose and len(indexList) > 16):
+            if self.__verbose and len(indexList) > 16:
                 self.__lfh.write("+WARNING - %s index list exceeds max length %d\n" % (tableName, len(indexList)))
             mergeDict = {}
             deleteAttributeList = []
             for atU in indexList:
-                tN = d['ATTRIBUTE_MAP'][atU][0]
-                aN = d['ATTRIBUTE_MAP'][atU][1]
-                fN = d['ATTRIBUTE_MAP'][atU][2]
+                tN = d["ATTRIBUTE_MAP"][atU][0]
+                aN = d["ATTRIBUTE_MAP"][atU][1]
+                fN = d["ATTRIBUTE_MAP"][atU][2]
                 if aN is not None:
                     if tN not in mergeDict:
                         mergeDict[tN] = []
@@ -178,28 +178,23 @@ class PdbxSchemaMapReader(object):
                 # Using RCSB convention of including one attribute in each table corresponding to the datablockId()
                 #   this attributeId is used a key pre-insert deletions.
                 #
-                if fN in ['datablockid()']:
+                if fN in ["datablockid()"]:
                     deleteAttributeList.append(atU)
             #
             # Assign a merge index to this instance category
             #
             for k, v in mergeDict.items():
-                d['MAP_MERGE_INDICES'] = {k: {"TYPE": "EQUI-JOIN", "ATTRIBUTES": tuple(v)}}
+                d["MAP_MERGE_INDICES"] = {k: {"TYPE": "EQUI-JOIN", "ATTRIBUTES": tuple(v)}}
 
-            if (len(deleteAttributeList) > 0):
-                d['TABLE_DELETE_ATTRIBUTE'] = deleteAttributeList[0]
-                d['INDICES'] = {
-                    "p1": {"TYPE": "UNIQUE", "ATTRIBUTES": tuple(indexList)},
-                    "s1": {"TYPE": "SEARCH", "ATTRIBUTES": tuple(deleteAttributeList)}
-                }
+            if len(deleteAttributeList) > 0:
+                d["TABLE_DELETE_ATTRIBUTE"] = deleteAttributeList[0]
+                d["INDICES"] = {"p1": {"TYPE": "UNIQUE", "ATTRIBUTES": tuple(indexList)}, "s1": {"TYPE": "SEARCH", "ATTRIBUTES": tuple(deleteAttributeList)}}
             else:
-                d['INDICES'] = {
-                    "p1": {"TYPE": "UNIQUE", "ATTRIBUTES": tuple(indexList)}
-                }
-                if (self.__verbose):
+                d["INDICES"] = {"p1": {"TYPE": "UNIQUE", "ATTRIBUTES": tuple(indexList)}}
+                if self.__verbose:
                     self.__lfh.write("+WARNING - No delete attribute for table %s\n" % tableName)
 
-            if (self.__verbose and len(mergeDict) < 1):
+            if self.__verbose and len(mergeDict) < 1:
                 self.__lfh.write("+WARNING - No merge index possible for table %s\n" % tableName)
 
             sD[tU] = d
@@ -217,7 +212,7 @@ class PdbxSchemaMapReader(object):
         try:
             #
             myContainerList = []
-            ifh = open(schemaMapFile, 'r')
+            ifh = open(schemaMapFile, "r")
             pRd = PdbxReader(ifh)
             pRd.read(myContainerList)
             ifh.close()
@@ -227,16 +222,16 @@ class PdbxSchemaMapReader(object):
                 #
                 # read schema details --
                 #
-                if cN == 'rcsb_schema':
+                if cN == "rcsb_schema":
                     #
                     catObj = myContainer.getObj("rcsb_table")
                     if catObj is not None:
-                        i1 = catObj.getAttributeIndex('table_name')
+                        i1 = catObj.getAttributeIndex("table_name")
                         for row in catObj.getRowList():
                             tableNameList.append(row[i1])
                     #
                     catObj = myContainer.getObj("rcsb_attribute_def")
-                    atList = ['table_name', 'attribute_name', 'data_type', 'index_flag', 'null_flag', 'width', 'precision', 'populated']
+                    atList = ["table_name", "attribute_name", "data_type", "index_flag", "null_flag", "width", "precision", "populated"]
                     indList = []
                     if catObj is not None:
                         for at in atList:
@@ -252,8 +247,8 @@ class PdbxSchemaMapReader(object):
                     #
                     catObj = myContainer.getObj("rcsb_table_abbrev")
                     if catObj is not None:
-                        i1 = catObj.getAttributeIndex('table_name')
-                        i2 = catObj.getAttributeIndex('table_abbrev')
+                        i1 = catObj.getAttributeIndex("table_name")
+                        i2 = catObj.getAttributeIndex("table_abbrev")
                         for row in catObj.getRowList():
                             tableAbbrevD[row[i1]] = row[i2]
                     #
@@ -263,9 +258,9 @@ class PdbxSchemaMapReader(object):
 
                     catObj = myContainer.getObj("rcsb_attribute_abbrev")
                     if catObj is not None:
-                        i1 = catObj.getAttributeIndex('table_name')
-                        i2 = catObj.getAttributeIndex('attribute_name')
-                        i3 = catObj.getAttributeIndex('attribute_abbrev')
+                        i1 = catObj.getAttributeIndex("table_name")
+                        i2 = catObj.getAttributeIndex("attribute_name")
+                        i3 = catObj.getAttributeIndex("attribute_abbrev")
                         for row in catObj.getRowList():
                             if row[i1] not in attribAbbrevD:
                                 attribAbbrevD[row[i1]] = {}
@@ -273,9 +268,9 @@ class PdbxSchemaMapReader(object):
 
                 # read attribute mapping details --
                 #
-                elif cN == 'rcsb_schema_map':
+                elif cN == "rcsb_schema_map":
                     catObj = myContainer.getObj("rcsb_attribute_map")
-                    atList = ['target_table_name', 'target_attribute_name', 'source_item_name', 'condition_id', 'function_id']
+                    atList = ["target_table_name", "target_attribute_name", "source_item_name", "condition_id", "function_id"]
                     indList = []
                     if catObj is not None:
                         for at in atList:
@@ -289,12 +284,12 @@ class PdbxSchemaMapReader(object):
                 else:
                     self.__lfh.write("+ERROR -unanticipated data container %s\n" % cN)
 
-        except:
-            self.__lfh.write("+ERROR - error processing schema map file %s\n" % schemaMapFile)
+        except Exception as e:
+            self.__lfh.write("+ERROR - error processing schema map file %s - %s\n" % (schemaMapFile, str(e)))
             traceback.print_exc(file=self.__lfh)
 
         return tableNameList, atDefList, atMapList, tableAbbrevD, attribAbbrevD
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

@@ -45,7 +45,6 @@ class MysqlSchemaImporter(object):
         defD = {}
         tableId = str(tableName).upper()
         attIdKeyList = []
-        attIdDel = None
         attMap = {}
         indD = {}
         attInfo = {}
@@ -110,40 +109,6 @@ class MysqlSchemaImporter(object):
                 schemaDef[tableId] = defD
         #
         pprint.pprint(schemaDef, stream=sys.stdout, width=120, indent=3)
-
-
-def importxxx(self):
-    tableNameList0 = ['diffrn_radiation_wavelength',
-                      'exptl_crystal',
-                      'exptl_crystal_grow',
-                      'geometry',
-                      'pdb_entry',
-                      'pdb_entry_tmp',
-                      'pdbx_density',
-                      'pdbx_density_corr',
-                      'pdbx_rscc_mapman',
-                      'pdbx_rscc_mapman_overall',
-                      'pdbx_webselect',
-                      'refine',
-                      'refine_analyze',
-                      'refine_ls_shell',
-                      'reflns',
-                      'reflns_shell',
-                      'rscc',
-                      'struct_conf',
-                      'struct_sheet_range',
-                      'weight_in_asu']
-    tableNameList = ["entity",
-                     "entity_poly",
-                     "entity_src_gen",
-                     "entity_src_nat",
-                     "pdbx_entity_src_syn"]
-    # tableNameList = ['weight_in_asu']
-    dbUser = os.getenv('MYSQL_DB_USER')
-    dbPw = os.getenv('MYSQL_SBKB_PW')
-    dbHost = 'localhost'
-    msi = MysqlSchemaImporter(dbUser, dbPw, dbHost, mysqlPath='/opt/local/bin/mysql', verbose=True, log=sys.stderr)
-    msi.create('stat', tableNameList)
 
 
 if __name__ == "__main__":

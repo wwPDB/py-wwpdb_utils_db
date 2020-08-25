@@ -31,11 +31,11 @@ if True:
     try:
         import sqlalchemy.pool as pool
         MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True)
-    except:
+    except:  # noqa: E722
         logger.exception("Creating MYSQL connection pool failing")
 
 
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo  # noqa: E402
 
 
 class MyConnectionBase(object):
@@ -159,7 +159,7 @@ class MyConnectionBase(object):
             else:
                 self.__dbPort = 3306
             self.__dbServer = self.__authD["DB_SERVER"]
-        except:
+        except:  # noqa: E722
             pass
 
     def openConnection(self):
@@ -192,7 +192,7 @@ class MyConnectionBase(object):
 
             self._dbCon = dbcon
             return True
-        except:
+        except:  # noqa: E722
             logger.exception("+MyDbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d \n" %
                              (self.__dbServer, self.__dbHost, self.__databaseName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort))
             self._dbCon = None
@@ -215,7 +215,7 @@ class MyConnectionBase(object):
     def getCursor(self):
         try:
             return self._dbCon.cursor()
-        except:
+        except:  # noqa: E722
             logger.exception("+MyConnectionBase(getCursor) failing.\n")
 
         return None

@@ -22,7 +22,7 @@ __version__ = "V0.001"
 import sys
 import os
 import traceback
-from optparse import OptionParser
+from optparse import OptionParser  # pylint: disable=deprecated-module
 
 from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
@@ -30,8 +30,7 @@ from wwpdb.utils.session.WebRequest import InputRequest
 
 
 class StatusHistoryExec(object):
-
-    def __init__(self, defSiteId='WWWDPB_INTERNAL_RU', sessionId=None, verbose=True, log=sys.stderr):
+    def __init__(self, defSiteId="WWWDPB_INTERNAL_RU", sessionId=None, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
         self.__setup(defSiteId=defSiteId, sessionId=sessionId)
@@ -42,8 +41,8 @@ class StatusHistoryExec(object):
         self.__siteId = getSiteId(defaultSiteId=defSiteId)
         #
         self.__cI = ConfigInfo(self.__siteId)
-        self.__topPath = self.__cI.get('SITE_WEB_APPS_TOP_PATH')
-        self.__topSessionPath = self.__cI.get('SITE_WEB_APPS_TOP_SESSIONS_PATH')
+        self.__topPath = self.__cI.get("SITE_WEB_APPS_TOP_PATH")
+        self.__topSessionPath = self.__cI.get("SITE_WEB_APPS_TOP_SESSIONS_PATH")
         #
         self.__reqObj = InputRequest({}, verbose=self.__verbose, log=self.__lfh)
         self.__reqObj.setValue("TopSessionPath", self.__topSessionPath)
@@ -74,7 +73,7 @@ class StatusHistoryExec(object):
             else:
                 rL = shu.createHistory(entryIdList, overWrite=overWrite)
             self.__lfh.write("StatusHistoryExec.doCreateStatusHistory() %d status files created.\n\n" % len(rL))
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
 
     def doLoadStatusHistory(self, numProc=1, newTable=False):
@@ -86,7 +85,7 @@ class StatusHistoryExec(object):
                 return shu.loadStatusHistoryMulti(numProc, newTable=newTable)
             else:
                 return shu.loadStatusHistory(newTable=newTable)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
 
         return False
@@ -97,7 +96,7 @@ class StatusHistoryExec(object):
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             return shu.loadEntryStatusHistory(entryIdList=[entryId])
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
         return False
 
@@ -108,7 +107,7 @@ class StatusHistoryExec(object):
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             rL = shu.createHistory([entryId], overWrite=overWrite)
             self.__lfh.write("StatusHistoryExec.doCreateEntryStatusHistory() %d status files created.\n\n" % len(rL))
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
 
     def doCreateStatusHistorySchema(self):
@@ -117,7 +116,7 @@ class StatusHistoryExec(object):
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             return shu.createStatusHistorySchema()
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
         return False
 
@@ -129,20 +128,20 @@ def main():
     parser.add_option("--loadentry", dest="loadEntryId", default=None, help="Load/reload datadase with entry status history file")
     parser.add_option("--createentry", dest="createEntryId", default=None, help="Create entry status history file")
 
-    parser.add_option("--create", dest="create", action='store_true', default=False, help="Batch mode create/recreate missing history files")
-    parser.add_option("--overwrite", dest="new", action='store_true', default=False, help="Overwrite any existing history files")
+    parser.add_option("--create", dest="create", action="store_true", default=False, help="Batch mode create/recreate missing history files")
+    parser.add_option("--overwrite", dest="new", action="store_true", default=False, help="Overwrite any existing history files")
 
-    parser.add_option("--load", dest="load", action='store_true', default=False, help="Batch mode data load for all history files")
-    parser.add_option("--newtable", dest="newTable", action='store_true', default=False, help="Create a new status history database table before load")
+    parser.add_option("--load", dest="load", action="store_true", default=False, help="Batch mode data load for all history files")
+    parser.add_option("--newtable", dest="newTable", action="store_true", default=False, help="Create a new status history database table before load")
 
     parser.add_option("--numproc", dest="numProc", default=1, help="Number of processors to engage in batch mode operations.")
 
     parser.add_option("-v", "--verbose", default=False, action="store_true", dest="verbose")
 
-    (options, args) = parser.parse_args()
+    (options, _args) = parser.parse_args()
 
     #    crx=StatusHistoryExec(defSiteId='WWDPB_INTERNAL_RU',sessionId=None,verbose=options.verbose,log=sys.stderr)
-    crx = StatusHistoryExec(defSiteId='WWPDB_DEPLOY_MACOSX', sessionId=None, verbose=options.verbose, log=sys.stderr)
+    crx = StatusHistoryExec(defSiteId="WWPDB_DEPLOY_MACOSX", sessionId=None, verbose=options.verbose, log=sys.stderr)
 
     if options.newTable and not options.load:
         crx.doCreateStatusHistorySchema()
@@ -160,5 +159,5 @@ def main():
             crx.doLoadStatusHistory(int(options.numProc), newTable=options.newTable)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

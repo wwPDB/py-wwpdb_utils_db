@@ -22,8 +22,10 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-import traceback
 from wwpdb.utils.db.MyDbSqlGen import MyDbQuerySqlGen, MyDbConditionSqlGen
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MyQueryDirectives(object):
@@ -138,13 +140,16 @@ class MyQueryDirectives(object):
         self.__selectTupList = []
         self.__orgSelectCount = 0
 
-    def build(self, queryDirL=[], domD={}, appendValueConditonsToSelect=False, queryDirSeparator=':', domRefSeparator='|'):
-        ''' Build SQL instructure from the input list of query directives and dictionary or dom references.
+    def build(self, queryDirL=None, domD=None, appendValueConditonsToSelect=False, queryDirSeparator=":", domRefSeparator="|"):
+        """ Build SQL instructure from the input list of query directives and dictionary or dom references.
 
-        '''
+        """
+        if queryDirL is None:
+            queryDirL = []
+        if domD is None:
+            domD = {}
         if self.__verbose:
-            self.__lfh.write("\n+%s.%s() dom dictionary length domD %d\n" %
-                             (self.__class__.__name__, sys._getframe().f_code.co_name, len(domD)))
+            logger.info("dom dictionary length domD %d", len(domD))
         tL = []
         qL = []
         self.__selectTupList = []
@@ -159,9 +164,9 @@ class MyQueryDirectives(object):
         qL = self.__queryDirSub(inpQueryDirList=tL, domD=domD, domRefSeparator=domRefSeparator)
 
         if self.__debug:
-            self.__lfh.write("+%s.%s() length qL %d\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, len(qL)))
+            logger.debug("length qL %d", len(qL))
             for q in qL:
-                self.__lfh.write("+%s.%s() qL %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, q))
+                logger.debug("qL %r", q)
         # Now parse the token list --
         #
         selectD, orderD, conditionD, self.__orgSelectCount = self.__parseTokenList(qL, appendValueConditonsToSelect)
@@ -174,23 +179,24 @@ class MyQueryDirectives(object):
         return self.__selectTupList, self.__orgSelectCount
 
     def __getTokenD(self, tL, index, nPairs):
-        '''  Return a dictionary of token and value pairs in the input list starting at tL[index].
-        '''
+        """  Return a dictionary of token and value pairs in the input list starting at tL[index].
+        """
         tD = {}
         try:
             i1 = index
             i2 = index + nPairs * 2
             for i in range(i1, i2, 2):
                 tD[tL[i]] = tL[i + 1]
-        except:
+        except Exception as e:
             if self.__verbose:
-                self.__lfh.write("\n+%s.%s() failes with index %d nPairs %d tL %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, index, nPairs, tL))
-                traceback.print_exc(file=self.__lfh)
+                logger.info("fails with index %d nPairs %d tL %r err %r", index, nPairs, tL, str(e))
+                logger.exception("_getTokenD failure")
 
         return tD
 
         #
         #
+
     def __parseTokenList(self, qdL, appendValueConditonsToSelect=False):
         """
             Parse input list of tokens and return dictionaries of instructions (selections, conditions, sorting order)
@@ -209,97 +215,97 @@ class MyQueryDirectives(object):
             while i < len(qdL):
                 # Get selections  -
                 #
-                if qdL[i] in ['SELECT_ITEM']:
+                if qdL[i] in ["SELECT_ITEM"]:
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 1)
-                    if (('ITEM' in tD) and (tD['ITEM'] is not None)):
-                        tdotc = str(tD['ITEM']).split('.')
+                    if ("ITEM" in tD) and (tD["ITEM"] is not None):
+                        tdotc = str(tD["ITEM"]).split(".")
                         # (tableId, attributeId)  apply the upper case convention used in schema map
                         selectD[ordinal] = (tdotc[0].upper(), tdotc[1].upper())
                     else:
                         if self.__verbose:
-                            self.__lfh.write("\n+%s.%s() selection incomplete at i = %d\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, i))
+                            logger.info("selection incomplete at i = %d", i)
                             for k, v in tD.items():
-                                self.__lfh.write(" --- tD --  %r %r\n" % (k, v))
+                                logger.info(" --- tD --  %r %r", k, v)
                         # raise ValueError("Selection definition incomplete")
                     i += 4
                     continue
-                elif qdL[i] in ['VALUE_CONDITION']:
+                elif qdL[i] in ["VALUE_CONDITION"]:
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 4)
-                    if (('VALUE' in tD) and (tD['VALUE'] is not None)):
-                        if 'LOP' in tD and 'ITEM' in tD and 'COP' in tD:
-                            tdotc = str(tD['ITEM']).split('.')
+                    if ("VALUE" in tD) and (tD["VALUE"] is not None):
+                        if "LOP" in tD and "ITEM" in tD and "COP" in tD:
+                            tdotc = str(tD["ITEM"]).split(".")
                             tableId = tdotc[0].upper()
                             attributeId = tdotc[1].upper()
                             tObj = self.__sd.getTable(tableId)
                             aType = tObj.getAttributeType(attributeId)
-                            cop = str(tD['COP']).upper()
-                            conditionD[ordinal] = {'cType': 'value', 'lOp': tD['LOP'], 'cObj': ((tableId, attributeId), cop, (tD['VALUE'], aType))}
+                            cop = str(tD["COP"]).upper()
+                            conditionD[ordinal] = {"cType": "value", "lOp": tD["LOP"], "cObj": ((tableId, attributeId), cop, (tD["VALUE"], aType))}
                         else:
                             raise ValueError("Value condition incomplete")
                     else:
                         pass
                     i += 10
                     continue
-                elif qdL[i] in ['VALUE_LIST_CONDITION']:
+                elif qdL[i] in ["VALUE_LIST_CONDITION"]:
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 5)
-                    if (('VALUE_LIST' in tD) and (tD['VALUE_LIST'] is not None)):
-                        if 'LOP' in tD and 'ITEM' in tD and 'COP' in tD and 'VALUE_LOP' in tD:
-                            tdotc = str(tD['ITEM']).split('.')
+                    if ("VALUE_LIST" in tD) and (tD["VALUE_LIST"] is not None):
+                        if "LOP" in tD and "ITEM" in tD and "COP" in tD and "VALUE_LOP" in tD:
+                            tdotc = str(tD["ITEM"]).split(".")
                             tableId = tdotc[0].upper()
                             attributeId = tdotc[1].upper()
                             tObj = self.__sd.getTable(tableId)
                             aType = tObj.getAttributeType(attributeId)
-                            cop = str(tD['COP']).upper()
-                            vLop = str(tD['VALUE_LOP']).upper()
-                            if isinstance(tD['VALUE_LIST'], list):
-                                vL = tD['VALUE_LIST']
+                            cop = str(tD["COP"]).upper()
+                            vLop = str(tD["VALUE_LOP"]).upper()
+                            if isinstance(tD["VALUE_LIST"], list):
+                                vL = tD["VALUE_LIST"]
                             else:
-                                vL = [tD['VALUE_LIST']]
-                            conditionD[ordinal] = {'cType': 'value_list', 'lOp': tD['LOP'], 'cObj': ((tableId, attributeId), cop, vLop, (vL, aType))}
+                                vL = [tD["VALUE_LIST"]]
+                            conditionD[ordinal] = {"cType": "value_list", "lOp": tD["LOP"], "cObj": ((tableId, attributeId), cop, vLop, (vL, aType))}
                         else:
                             raise ValueError("Value list condition incomplete")
                     else:
                         pass
                     i += 12
                     continue
-                elif qdL[i] in ['JOIN_CONDITION']:
+                elif qdL[i] in ["JOIN_CONDITION"]:
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 4)
-                    if 'LOP' in tD and 'L_ITEM' in tD and 'COP' in tD and 'R_ITEM' in tD:
-                        ltdotc = str(tD['L_ITEM']).split('.')
+                    if "LOP" in tD and "L_ITEM" in tD and "COP" in tD and "R_ITEM" in tD:
+                        ltdotc = str(tD["L_ITEM"]).split(".")
                         ltableId = ltdotc[0].upper()
                         lattributeId = ltdotc[1].upper()
-                        rtdotc = str(tD['R_ITEM']).split('.')
+                        rtdotc = str(tD["R_ITEM"]).split(".")
                         rtableId = rtdotc[0].upper()
                         rattributeId = rtdotc[1].upper()
-                        cop = str(tD['COP']).upper()
-                        conditionD[ordinal] = {'cType': 'join', 'lOp': tD['LOP'], 'cObj': ((ltableId, lattributeId), cop, (rtableId, rattributeId))}
+                        cop = str(tD["COP"]).upper()
+                        conditionD[ordinal] = {"cType": "join", "lOp": tD["LOP"], "cObj": ((ltableId, lattributeId), cop, (rtableId, rattributeId))}
                     else:
                         raise ValueError("Join condition incomplete")
                     i += 10
                     continue
-                elif qdL[i] in ['CONDITION_LIST']:
+                elif qdL[i] in ["CONDITION_LIST"]:
                     # example: CONDITION_LIST:1:KEY:mr:LOP:OR:ITEM:pdbx_webselect.solution:COP:LIKE:VALUE:%MR%
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 5)
-                    if (('VALUE' in tD) and (tD['VALUE'] is not None)):
-                        if 'LOP' in tD and 'ITEM' in tD and 'COP' in tD and 'KEY' in tD:
-                            tdotc = str(tD['ITEM']).split('.')
+                    if ("VALUE" in tD) and (tD["VALUE"] is not None):
+                        if "LOP" in tD and "ITEM" in tD and "COP" in tD and "KEY" in tD:
+                            tdotc = str(tD["ITEM"]).split(".")
                             tableId = tdotc[0].upper()
                             attributeId = tdotc[1].upper()
                             tObj = self.__sd.getTable(tableId)
                             aType = tObj.getAttributeType(attributeId)
-                            cop = str(tD['COP']).upper()
-                            ky = str(tD['KEY'])
+                            cop = str(tD["COP"]).upper()
+                            ky = str(tD["KEY"])
                             # ('PDB_ENTRY_TMP', 'PDB_ID'), 'LIKE', ('x-ray', 'char'), 'AND')
                             if ordinal not in condListD:
                                 condListD[ordinal] = {}
                             if ky not in condListD[ordinal]:
                                 condListD[ordinal][ky] = []
-                            condListD[ordinal][ky].append((tD['LOP'], (tableId, attributeId), cop, (tD['VALUE'], aType)))
+                            condListD[ordinal][ky].append((tD["LOP"], (tableId, attributeId), cop, (tD["VALUE"], aType)))
                         else:
                             raise ValueError("Value condition incomplete")
                     else:
@@ -307,81 +313,81 @@ class MyQueryDirectives(object):
 
                     i += 12
                     continue
-                elif qdL[i] in ['VALUE_KEYED_CONDITION']:
+                elif qdL[i] in ["VALUE_KEYED_CONDITION"]:
                     # example: "VALUE_KEYED_CONDITION:15:LOP:AND:CONDITION_LIST_ID:1:VALUE:DOM_REF:solution"
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 3)
-                    if (('VALUE' in tD) and (tD['VALUE'] is not None)):
-                        if 'LOP' in tD and 'CONDITION_LIST_ID' in tD:
-                            keyCondD[ordinal] = (int(str(tD['CONDITION_LIST_ID'])), tD['VALUE'], tD['LOP'])
+                    if ("VALUE" in tD) and (tD["VALUE"] is not None):
+                        if "LOP" in tD and "CONDITION_LIST_ID" in tD:
+                            keyCondD[ordinal] = (int(str(tD["CONDITION_LIST_ID"])), tD["VALUE"], tD["LOP"])
                         else:
                             raise ValueError("Value key condition incomplete")
                     else:
                         pass
                     i += 8
                     continue
-                elif qdL[i] in ['ORDER_ITEM']:
+                elif qdL[i] in ["ORDER_ITEM"]:
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 2)
-                    if (('ITEM' in tD) and ('SORT_ORDER' in tD) and (tD['ITEM'] is not None)):
-                        tdotc = str(tD['ITEM']).split('.')
+                    if ("ITEM" in tD) and ("SORT_ORDER" in tD) and (tD["ITEM"] is not None):
+                        tdotc = str(tD["ITEM"]).split(".")
                         # (tableId, attributeId)  apply the upper case convention used in schema map
-                        if tD['SORT_ORDER'] in ['ASC', 'ASCENDING', 'INCREASING']:
-                            sf = 'ASC'
-                        elif tD['SORT_ORDER'] in ['DESC', 'DESCENDING', 'DECREASING']:
-                            sf = 'DESC'
+                        if tD["SORT_ORDER"] in ["ASC", "ASCENDING", "INCREASING"]:
+                            sf = "ASC"
+                        elif tD["SORT_ORDER"] in ["DESC", "DESCENDING", "DECREASING"]:
+                            sf = "DESC"
                         else:
-                            sf = 'ASC'
+                            sf = "ASC"
 
                         orderD[ordinal] = ((tdotc[0].upper(), tdotc[1].upper()), sf)
                     else:
                         if self.__verbose:
-                            self.__lfh.write("\n+%s.%s() orderby incomplete at i = %d\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, i))
+                            logger.info("orderby incomplete at i = %d", i)
                             for k, v in tD.items():
-                                self.__lfh.write(" --- tD --  %r %r\n" % (k, v))
+                                logger.info(" --- tD --  %r %r", k, v)
                         # raise ValueError("Order definition incomplete")
                     i += 6
                     continue
                 else:
                     pass
-        except:
+        except Exception as e:
             if self.__verbose:
-                self.__lfh.write("\n+%s.%s() fails at i = %d\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, i))
+                logger.error("fails at i = %d err=%s", i, str(e))
                 for k, v in tD.items():
-                    self.__lfh.write(" --- tD --  %r %r\n" % (k, v))
+                    logger.error(" --- tD --  %r %r", k, v)
 
-                traceback.print_exc(file=self.__lfh)
+                logger.exception("__parseTokenList failure")
 
         #
         # Create condition groups by expanding key-value condition definition using the supporting condition list info in condListD ...
         #
         for ordinal, keyCond in keyCondD.items():
             condListId, keyValue, lOp = keyCond
-            conditionD[ordinal] = {'cType': 'group', 'lOp': lOp, 'cObj': []}
+            conditionD[ordinal] = {"cType": "group", "lOp": lOp, "cObj": []}
             if condListId in condListD:
-                self.__lfh.write("++++condListId %r keyValue %r lOp %r\n" % (condListId, keyValue, lOp))
+                logger.info("++++condListId %r keyValue %r lOp %r", condListId, keyValue, lOp)
                 if keyValue in condListD[condListId]:
                     for cond in condListD[condListId][keyValue]:
-                        self.__lfh.write("+++++++condListId %r keyValue %r lOp %r cond %r\n" % (condListId, keyValue, lOp, cond))
+                        logger.info("+++++++condListId %r keyValue %r lOp %r cond %r", condListId, keyValue, lOp, cond)
                         # example : ('OR', ('PDBX_WEBSELECT', 'METHOD_TO_DETERMINE_STRUCT'), 'LIKE', ('MOLECULAR REPLACEMENT', 'char')
                         # using  condListD[ordinal][ky].append((tD['LOP'], (tableId, attributeId), cop, (tD['VALUE'], aType)))
-                        conditionD[ordinal]['cObj'].append(cond)
+                        conditionD[ordinal]["cObj"].append(cond)
         #
         if self.__verbose:
             for k, v in selectD.items():
-                self.__lfh.write("\n+%s.%s() select %r  %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, k, v))
+                logger.info("select %r  %r", k, v)
             for k, v in orderD.items():
-                self.__lfh.write("\n+%s.%s() order  %r  %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, k, v))
+                logger.info("order  %r  %r", k, v)
             #
             for k, v in keyCondD.items():
-                self.__lfh.write("\n+%s.%s() keycondD  %r  %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, k, v))
+                logger.info("keycondD  %r  %r", k, v)
             for k1, vD in condListD.items():
                 for k2, v in vD.items():
-                    self.__lfh.write("\n+%s.%s() condListD %r  %r  %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, k1, k2, v))
+                    logger.info("condListD %r  %r  %r", k1, k2, v)
             #
             for k1, vD in conditionD.items():
                 for k2, v in vD.items():
-                    self.__lfh.write("\n+%s.%s() ordinal %3d type %r: %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, k1, k2, v))
+                    logger.info("ordinal %3d type %r: %r", k1, k2, v)
 
         #
         orgSelectCount = len(selectD)
@@ -389,10 +395,10 @@ class MyQueryDirectives(object):
             vSelectL = []
             for k in sorted(conditionD.keys()):
                 tD = conditionD[k]
-                if tD['cType'] in ['value', 'value_list']:
-                    vSelectL.append(tD['cObj'][0])
-                elif tD['cType'] in ['group']:
-                    cL = tD['cObj']
+                if tD["cType"] in ["value", "value_list"]:
+                    vSelectL.append(tD["cObj"][0])
+                elif tD["cType"] in ["group"]:
+                    cL = tD["cObj"]
                     for c in cL:
                         vSelectL.append(c[1])
             nxtOrd = max(selectD.keys()) + 1
@@ -420,15 +426,15 @@ class MyQueryDirectives(object):
 
             for k in sorted(conditionD.keys()):
                 cD = conditionD[k]
-                cObj = cD['cObj']
-                lOp = cD['lOp']
-                if cD['cType'] in ['value']:
+                cObj = cD["cObj"]
+                lOp = cD["lOp"]
+                if cD["cType"] in ["value"]:
                     sqlCondition.addValueCondition(lhsTuple=cObj[0], opCode=cObj[1], rhsTuple=cObj[2], preOp=lOp)
-                elif cD['cType'] in ['join']:
+                elif cD["cType"] in ["join"]:
                     sqlCondition.addJoinCondition(lhsTuple=cObj[0], opCode=cObj[1], rhsTuple=cObj[2], preOp=lOp)
-                elif cD['cType'] in ['group']:
-                    sqlCondition.addGroupValueConditionList(cD['cObj'], preOp=lOp)
-                elif cD['cType'] in ['value_list']:
+                elif cD["cType"] in ["group"]:
+                    sqlCondition.addGroupValueConditionList(cD["cObj"], preOp=lOp)
+                elif cD["cType"] in ["value_list"]:
                     # build cDefList = [(lPreOp,lhsTuple, opCode, rhsTuple), ...] from value_list -
                     # cObj  = ((tableId, attributeId), cop, vLop, (tD['VALUE_LIST'], aType))}
                     #
@@ -453,13 +459,13 @@ class MyQueryDirectives(object):
             sqlGen.addOrderByAttributeId(attributeTuple=oTup, sortFlag=sf)
         #
         sqlS = sqlGen.getSql()
-        if (self.__verbose):
-            self.__lfh.write("\n+%s.%s() sql:\n%s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, sqlS))
+        if self.__verbose:
+            logger.info("sql: %s", sqlS)
         sqlGen.clear()
         #
         return sqlS
 
-    def __queryDirSub(self, inpQueryDirList, domD={}, domRefSeparator='|'):
+    def __queryDirSub(self, inpQueryDirList, domD=None, domRefSeparator="|"):
         """  Substitute DOM references into the input query directive list -
 
              Substitions:
@@ -470,44 +476,46 @@ class MyQueryDirectives(object):
                                     multiple correlated values as in a "select" (e.g. dom-ref -> myselect = "value1|value2")
 
         """
+        if domD is None:
+            domD = {}
         qL = []
         try:
             i = 0
-            while (i < len(inpQueryDirList)):
+            while i < len(inpQueryDirList):
                 t = inpQueryDirList[i]
-                if t.upper().startswith('DOM_REF_'):
-                    indx = int(str(t.upper()).split('_')[2])
+                if t.upper().startswith("DOM_REF_"):
+                    indx = int(str(t.upper()).split("_")[2])
                     if inpQueryDirList[i + 1] in domD and domD[inpQueryDirList[i + 1]] is not None and len(domD[inpQueryDirList[i + 1]]) > 0:
-                        if (isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) > 1)):
+                        if isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) > 1):
                             tV = [str(tt).split(domRefSeparator)[indx] for tt in domD[inpQueryDirList[i + 1]]]
-                        elif (isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) == 1)):
+                        elif isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) == 1):
                             tV = str(domD[inpQueryDirList[i + 1]][0]).split(domRefSeparator)[indx]
                         else:
                             tV = str(domD[inpQueryDirList[i + 1]]).split(domRefSeparator)[indx]
                     else:
-                        tV = ''
+                        tV = ""
                     qL.append(tV if len(tV) > 0 else None)
                     i += 1
-                elif t.upper() in ['DOM_REF']:
-                    if ((inpQueryDirList[i + 1] in domD) and (domD[inpQueryDirList[i + 1]] is not None) and (len(domD[inpQueryDirList[i + 1]]) > 0)):
-                        if (isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) > 1)):
+                elif t.upper() in ["DOM_REF"]:
+                    if (inpQueryDirList[i + 1] in domD) and (domD[inpQueryDirList[i + 1]] is not None) and (len(domD[inpQueryDirList[i + 1]]) > 0):
+                        if isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) > 1):
                             tV = domD[inpQueryDirList[i + 1]]
-                        elif (isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) == 1)):
+                        elif isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) == 1):
                             tV = domD[inpQueryDirList[i + 1]][0]
                         else:
                             tV = domD[inpQueryDirList[i + 1]]
                     else:
-                        tV = ''
+                        tV = ""
                     qL.append(tV if len(tV) > 0 else None)
                     i += 1
                 else:
                     qL.append(t)
                 i += 1
-        except:
+        except Exception as e:
             if self.__verbose:
-                self.__lfh.write("\n+%s.%s() fails at i = %d\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, i))
+                logger.error("fails at i = %d err=%s", i, str(e))
                 for ii, qd in enumerate(inpQueryDirList):
-                    self.__lfh.write(" --- qd %4d  %r\n" % (ii, qd))
-                traceback.print_exc(file=self.__lfh)
+                    logger.error(" --- qd %4d  %r", ii, qd)
+                logger.exception("Failed in queryDirSub")
 
         return qL

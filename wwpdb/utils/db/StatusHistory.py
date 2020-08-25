@@ -41,6 +41,10 @@ class StatusHistory(object):
         self.__sessionPath = sessionPath
         self.__siteId = siteId
         #
+        self.__inpFilePath = None
+        self.__entryId = None
+        self.__pdbId = None
+        #
         self.__setup()
 
     def __setup(self):
@@ -56,7 +60,7 @@ class StatusHistory(object):
         self.__entryId = None
         self.__pdbId = None
         self.__pio = PdbxStatusHistoryIo(verbose=self.__verbose, log=self.__lfh)
-        self.__statusCategory = 'pdbx_database_status_history'
+        self.__statusCategory = "pdbx_database_status_history"
         self.__timeFormat = "%Y-%m-%d:%H:%M"
         #
 
@@ -107,7 +111,7 @@ class StatusHistory(object):
 
         return self.__getRowCount()
 
-    def store(self, entryId, outPath=None, versionId='latest'):
+    def store(self, entryId, outPath=None, versionId="latest"):
 
         if self.__getRowCount() < 1:
             return False
@@ -141,17 +145,17 @@ class StatusHistory(object):
     def dateTimeOk(self, dateTime):
         try:
             tS = self.__makeTimeStamp(dateTime)
-            if ((tS is not None) and (len(tS) < 16)):
+            if (tS is not None) and (len(tS) < 16):
                 return False
             else:
                 datetime.datetime.strptime(tS, self.__timeFormat)
                 return True
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             return False
 
     def __makeTimeStamp(self, inpTimeStamp):
         try:
-            inpT = ''
+            inpT = ""
             if len(inpTimeStamp) < 10:
                 return inpT
             elif len(inpTimeStamp) == 10:
@@ -161,8 +165,8 @@ class StatusHistory(object):
             #
             t = datetime.datetime.strptime(inpT, self.__timeFormat)
             return str(t.strftime(self.__timeFormat))
-        except:
-            self.__lfh.write("+StatusHistory.__makeTimeStamp() fails for inpTimeStamp %r inpT %r\n" % (inpTimeStamp, inpT))
+        except Exception as e:
+            self.__lfh.write("+StatusHistory.__makeTimeStamp() fails for inpTimeStamp %r inpT %r err %r\n" % (inpTimeStamp, inpT, str(e)))
             if self.__debug:
                 traceback.print_exc(file=self.__lfh)
             return inpTimeStamp
@@ -175,7 +179,7 @@ class StatusHistory(object):
         """
         nRows = self.__getRowCount()
         if nRows > 0 and dateEnd is not None:
-            ok = self.__pio.updateAttribute(catName=self.__statusCategory, attribName='date_end', value=dateEnd, iRow=nRows - 1)
+            ok = self.__pio.updateAttribute(catName=self.__statusCategory, attribName="date_end", value=dateEnd, iRow=nRows - 1)
             return ok
         else:
             return False
@@ -185,7 +189,7 @@ class StatusHistory(object):
 
     def getLastStatusAndDate(self):
         tup = self.__lastStatusAndDate()
-        if ((self.__pdbId is None) and (len(tup) > 3)):
+        if (self.__pdbId is None) and (len(tup) > 3):
             self.__pdbId = tup[3]
         return (tup[0], tup[1])
 
@@ -199,30 +203,30 @@ class StatusHistory(object):
                 # -- Get the row with the last ordinal --
                 tOrd = (-1, -1)
                 for ii, d in enumerate(dList):
-                    if int(str(d['ordinal'])) > tOrd[1]:
-                        tOrd = (ii, int(d['ordinal']))
+                    if int(str(d["ordinal"])) > tOrd[1]:
+                        tOrd = (ii, int(d["ordinal"]))
                 dA = dList[tOrd[0]]
-                return (dA['status_code_end'], dA['date_end'], int(str(dA['ordinal'])), dA['pdb_id'])
+                return (dA["status_code_end"], dA["date_end"], int(str(dA["ordinal"])), dA["pdb_id"])
             else:
                 return (None, None, None, None)
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             return (None, None, None, None)
 
-    def __testValueExists(self, value, key='status_code_begin'):
+    def __testValueExists(self, value, key="status_code_begin"):
         try:
             dList = self.__pio.getAttribDictList(catName=self.__statusCategory)
-            for ii, d in enumerate(dList):
+            for _ii, d in enumerate(dList):
                 if d[key] == value:
                     return True
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             return False
 
-    def nextRecord(self, statusCodeNext='AUTH', dateNext=None, annotator=None, details=None):
+    def nextRecord(self, statusCodeNext="AUTH", dateNext=None, annotator=None, details=None):
         """
         """
         try:
-            statusLast, dateLast, ordinalLast, pdbId = self.__lastStatusAndDate()
+            statusLast, dateLast, _ordinalLast, pdbId = self.__lastStatusAndDate()
             if statusCodeNext == statusLast:
                 return False
             if self.__pdbId is None or len(self.__pdbId) < 4:
@@ -231,14 +235,22 @@ class StatusHistory(object):
                 dateNext = self.getNow()
             ok = self.add(statusCodeBegin=statusLast, dateBegin=dateLast, statusCodeEnd=statusCodeNext, dateEnd=dateNext, annotator=annotator, details=details)
             return ok
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             return False
 
-    def add(self, statusCodeBegin='PROC', dateBegin=None, statusCodeEnd='PROC', dateEnd=None, annotator=None, details=None):
-        return self.__appendRow(entryId=self.__entryId, pdbId=self.__pdbId, statusCodeBegin=statusCodeBegin, dateBegin=self.__makeTimeStamp(dateBegin),
-                                statusCodeEnd=statusCodeEnd, dateEnd=self.__makeTimeStamp(dateEnd), annotator=annotator, details=details)
+    def add(self, statusCodeBegin="PROC", dateBegin=None, statusCodeEnd="PROC", dateEnd=None, annotator=None, details=None):
+        return self.__appendRow(
+            entryId=self.__entryId,
+            pdbId=self.__pdbId,
+            statusCodeBegin=statusCodeBegin,
+            dateBegin=self.__makeTimeStamp(dateBegin),
+            statusCodeEnd=statusCodeEnd,
+            dateEnd=self.__makeTimeStamp(dateEnd),
+            annotator=annotator,
+            details=details,
+        )
 
-    def __appendRow(self, entryId, pdbId, statusCodeBegin='PROC', dateBegin=None, statusCodeEnd='PROC', dateEnd=None, annotator=None, details=None):
+    def __appendRow(self, entryId, pdbId, statusCodeBegin="PROC", dateBegin=None, statusCodeEnd="PROC", dateEnd=None, annotator=None, details=None):
         """
             Append a row to the status history list --
 
@@ -250,63 +262,65 @@ class StatusHistory(object):
 
         nRows = self.__getRowCount()
         if self.__verbose:
-            self.__lfh.write("+StatusHistory.__appendRow() %s  begins with nRows %r pdbId %r statusBegin %r dateBegin %r statusEnd %r dateEnd %r\n" %
-                             (entryId, nRows, pdbId, statusCodeBegin, dateBegin, statusCodeEnd, dateEnd))
+            self.__lfh.write(
+                "+StatusHistory.__appendRow() %s  begins with nRows %r pdbId %r statusBegin %r dateBegin %r statusEnd %r dateEnd %r\n"
+                % (entryId, nRows, pdbId, statusCodeBegin, dateBegin, statusCodeEnd, dateEnd)
+            )
         if nRows < 0:
             return False
         #
         if entryId is not None and len(entryId) > 0:
-            uD['entry_id'] = str(entryId)
+            uD["entry_id"] = str(entryId)
         else:
             return False
 
         if pdbId is not None and len(pdbId) > 0:
-            uD['pdb_id'] = str(pdbId)
+            uD["pdb_id"] = str(pdbId)
         else:
             return False
 
         if statusCodeBegin is not None and len(statusCodeBegin) > 0:
-            uD['status_code_begin'] = str(statusCodeBegin)
+            uD["status_code_begin"] = str(statusCodeBegin)
         else:
             return False
 
         if statusCodeEnd is not None and len(statusCodeEnd) > 0:
-            uD['status_code_end'] = str(statusCodeEnd)
+            uD["status_code_end"] = str(statusCodeEnd)
         else:
             return False
 
         if dateBegin is not None and len(dateBegin) > 0:
-            uD['date_begin'] = str(dateBegin)
+            uD["date_begin"] = str(dateBegin)
         else:
             return False
 
         if dateEnd is not None and len(dateEnd) > 0:
-            uD['date_end'] = str(dateEnd)
+            uD["date_end"] = str(dateEnd)
         else:
-            uD['date_end'] = self.__getNow()
+            uD["date_end"] = self.__getNow()
 
         if details is not None:
-            uD['details'] = str(details)
+            uD["details"] = str(details)
 
         if annotator is not None and len(annotator) > 0:
-            uD['annotator'] = str(annotator)
+            uD["annotator"] = str(annotator)
         else:
-            uD['annotator'] = 'UNASSIGNED'
+            uD["annotator"] = "UNASSIGNED"
 
         if nRows == 0:
             iOrdinal = 0
         else:
-            t, tt, iOrdinal, ttt = self.__lastStatusAndDate()
+            _t, tt, iOrdinal, _ttt = self.__lastStatusAndDate()
 
-        uD['ordinal'] = str(iOrdinal + 1)
+        uD["ordinal"] = str(iOrdinal + 1)
         #
         # Compute the time delta -
         #
-        tt = self.__deltaDate(uD['date_end'], uD['date_begin'])
+        tt = self.__deltaDate(uD["date_end"], uD["date_begin"])
         if tt > 0:
-            uD['delta_days'] = "%.4f" % tt
+            uD["delta_days"] = "%.4f" % tt
         else:
-            uD['delta_days'] = '0.0000'
+            uD["delta_days"] = "0.0000"
         #
 
         ok = self.__pio.appendRowByAttribute(rowAttribDict=uD, catName=self.__statusCategory)
@@ -320,5 +334,5 @@ class StatusHistory(object):
             days = float(tDelta.total_seconds()) / 86400.0
             #  print " dateTimeBegin=", dateTimeBegin, " dateTimeEnd=", dateTimeEnd, " tDelta=", tDelta.total_seconds(), " days=", days
             return days
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             return fail
