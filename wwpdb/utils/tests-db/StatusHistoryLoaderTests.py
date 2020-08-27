@@ -71,8 +71,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
             self.__dbCon.close()
 
     def testStatusHistorySchemaCreate(self):
-        """Test case -  create table schema using status history schema definition
-        """
+        """Test case -  create table schema using status history schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting StatusHistoryLoaderTests testStatusHistorySchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -103,8 +102,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         )
 
     def testFileInventorySchemaCreate(self):
-        """Test case -  create table schema for file inventory table using status history schema definition
-        """
+        """Test case -  create table schema for file inventory table using status history schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting StatusHistoryLoaderTests testFileInventorySchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -135,8 +133,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         )
 
     def testLoadInventoryFile(self):
-        """Test case - create batch load files for all chemical component definition data files -
-        """
+        """Test case - create batch load files for all chemical component definition data files -"""
         self.__lfh.write("\nStarting StatusHistoryLoaderTests testLoadInventoryFile\n")
         startTime = time.time()
         try:

@@ -27,7 +27,8 @@ import sqlparse
 
 class _DbConnection(object):
     """Internal class for connecting to mysql server without connection pool present in MyDbUtil"""
-    def __init__(self, dbServer='mysql', dbHost='localhost', dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr):
+
+    def __init__(self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr):
         self.__verbose = verbose
         self.__lfh = log
 
@@ -44,16 +45,16 @@ class _DbConnection(object):
         #
         self.__dbServer = dbServer
 
-        if (dbServer != 'mysql'):
+        if dbServer != "mysql":
             self.__lfh.write("+__DbOnnectiont. Unsupported server %s\n" % dbServer)
             sys.exit(1)
 
         self.__dbcon = None
 
     def connect(self):
-        """ Create a database connection and return a connection object.
+        """Create a database connection and return a connection object.
 
-            Returns None on failure
+        Returns None on failure
         """
         #
         if self.__dbcon is not None:
@@ -62,32 +63,32 @@ class _DbConnection(object):
             self.close()
         try:
             if self.__dbSocket is None:
-                dbcon = MySQLdb.connect(db="%s" % self.__dbName,
-                                        user="%s" % self.__dbUser,
-                                        passwd="%s" % self.__dbPw,
-                                        host="%s" % self.__dbHost,
-                                        port=self.__dbPort,
-                                        local_infile=1)
+                dbcon = MySQLdb.connect(
+                    db="%s" % self.__dbName, user="%s" % self.__dbUser, passwd="%s" % self.__dbPw, host="%s" % self.__dbHost, port=self.__dbPort, local_infile=1
+                )
             else:
-                dbcon = MySQLdb.connect(db="%s" % self.__dbName,
-                                        user="%s" % self.__dbUser,
-                                        passwd="%s" % self.__dbPw,
-                                        host="%s" % self.__dbHost,
-                                        port=self.__dbPort,
-                                        unix_socket="%s" % self.__dbSocket,
-                                        local_infile=1)
+                dbcon = MySQLdb.connect(
+                    db="%s" % self.__dbName,
+                    user="%s" % self.__dbUser,
+                    passwd="%s" % self.__dbPw,
+                    host="%s" % self.__dbHost,
+                    port=self.__dbPort,
+                    unix_socket="%s" % self.__dbSocket,
+                    local_infile=1,
+                )
 
             self.__dbcon = dbcon
         except Exception as e:
-            self.__lfh.write("+__DbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d err %s\n" %
-                             (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort, str(e)))
+            self.__lfh.write(
+                "+__DbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d err %s\n"
+                % (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort, str(e))
+            )
             self.__dbcon = None
 
         return self.__dbcon
 
     def close(self):
-        """ Close any open database connection.
-        """
+        """Close any open database connection."""
         if self.__dbcon is not None:
             try:
                 self.__dbcon.close()
@@ -102,6 +103,7 @@ class SqlLoader(object):
     """
     Loads data into database
     """
+
     def __init__(self, siteId=None, resource="DA_INTERNAL", log=sys.stderr, verbose=False):
         self.__lfh = log
         self.__verbose = verbose
@@ -148,7 +150,7 @@ class SqlLoader(object):
 
         try:
             with open(sql_file, "r") as fin:
-                sqldata = ' '.join(fin.read().splitlines())
+                sqldata = " ".join(fin.read().splitlines())
 
             sq = sqlparse.split(sqldata)
         except Exception as e:
@@ -160,9 +162,17 @@ class SqlLoader(object):
             if os.path.exists(logFile):
                 os.unlink(logFile)
 
-        db = _DbConnection(dbServer=self.__dbServer, dbHost=self.__dbHost, dbName=self.__dbName,
-                           dbUser=self.__dbUser, dbPw=self.__dbPw, dbSocket=self.__dbSocket, dbPort=self.__dbPort,
-                           verbose=self.__verbose, log=self.__lfh)
+        db = _DbConnection(
+            dbServer=self.__dbServer,
+            dbHost=self.__dbHost,
+            dbName=self.__dbName,
+            dbUser=self.__dbUser,
+            dbPw=self.__dbPw,
+            dbSocket=self.__dbSocket,
+            dbPort=self.__dbPort,
+            verbose=self.__verbose,
+            log=self.__lfh,
+        )
 
         dbcon = db.connect()
         if dbcon is None:

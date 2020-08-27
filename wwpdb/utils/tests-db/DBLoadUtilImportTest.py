@@ -15,8 +15,7 @@ class DBLoaderTests(unittest.TestCase):
         pass
 
     def testDbLoaderImport(self):
-        """Test case -  noop - as cannot instantiate
-        """
+        """Test case -  noop - as cannot instantiate"""
         pass  # pylint: disable=unnecessary-pass
 
 

@@ -50,26 +50,22 @@ class MiscSchemaReportTests(unittest.TestCase):
                 print("Mapped attribute list in %s :  %s" % (c, str(aL)))
 
     def testChemCompSchema(self):
-        """Test case -  chemCompSchema test
-        """
+        """Test case -  chemCompSchema test"""
         sd = ChemCompSchemaDef()
         self.__dotest(sd)
 
     def testPdbxSchema(self):
-        """Test case -  chemCompSchema test
-        """
+        """Test case -  chemCompSchema test"""
         sd = PdbxSchemaDef()
         self.__dotest(sd)
 
     def testStatusHistorySchema(self):
-        """Test case -  StatusHistorySchema test
-        """
+        """Test case -  StatusHistorySchema test"""
         sd = StatusHistorySchemaDef()
         self.__dotest(sd)
 
     def testDaInternalSchema(self):
-        """Test case -  DaInternalSchema test
-        """
+        """Test case -  DaInternalSchema test"""
         sd = DaInternalSchemaDef()
         self.__dotest(sd)
         sd = DaInternalSchemaDef(databaseName="da_internal_combined")

@@ -65,8 +65,7 @@ class ChemCompLoaderTests(unittest.TestCase):
             self.__dbCon.close()
 
     def __makeComponentPathList(self):
-        """ Return the list of chemical component definition file paths in the current repository.
-        """
+        """Return the list of chemical component definition file paths in the current repository."""
 
         self.__lfh.write("\nStarting ChemCompLoaderTests __makeComponentPathList\n")
         startTime = time.time()
@@ -85,8 +84,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         return pathList
 
     def testListFiles(self):
-        """Test case - for loading chemical component definition data files -
-        """
+        """Test case - for loading chemical component definition data files -"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testListFiles\n")
         startTime = time.time()
         try:
@@ -99,8 +97,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         self.__lfh.write("\nCompleted ChemCompLoaderTests testListFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testConnect(self):
-        """Test case - for creating a test connection
-        """
+        """Test case - for creating a test connection"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testConnect\n")
         startTime = time.time()
         try:
@@ -114,8 +111,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         self.__lfh.write("\nCompleted ChemCompLoaderTests testConnect at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testLoadFiles(self):
-        """Test case - create batch load files for all chemical component definition data files -
-        """
+        """Test case - create batch load files for all chemical component definition data files -"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testLoadFiles\n")
         startTime = time.time()
         try:
@@ -155,8 +151,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         return dataList, dataList, []
 
     def makeComponentPathListMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
-        """ Return the list of chemical component definition file paths in the current repository.
-        """
+        """Return the list of chemical component definition file paths in the current repository."""
         pathList = []
         for subdir in dataList:
             dd = os.path.join(self.__topCachePath, subdir)
@@ -169,8 +164,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         return dataList, pathList, []
 
     def testLoadFilesMulti(self):
-        """Test case - create batch load files for all chemical component definition data files - (multiproc test)
-        """
+        """Test case - create batch load files for all chemical component definition data files - (multiproc test)"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testLoadFilesMulti\n")
         startTime = time.time()
         numProc = 8

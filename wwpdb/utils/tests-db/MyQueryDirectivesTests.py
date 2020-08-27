@@ -115,8 +115,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
             self.__dbCon.close()
 
     def testDirective1(self):
-        """Test case -  selection everything for a simple condition -
-        """
+        """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyQueryDirectivesTest testDirective1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -289,8 +288,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         self.__testDirectiveWithHistoryQuery(qdL=qdL, domD=myDomD)
 
     def __testDirectiveWithDistroQuery(self, qdL, domD):
-        """Test case -  selection everything for a simple condition - (Distro Schema)
-        """
+        """Test case -  selection everything for a simple condition - (Distro Schema)"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyQueryDirectivesTest __testDirectiveWithDistroQuery at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -320,8 +318,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         )
 
     def __testDirectiveWithHistoryQuery(self, qdL, domD):
-        """Test case -  selection everything for a simple condition -
-        """
+        """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyQueryDirectivesTest __testDirectiveWithHistoryQuery at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:

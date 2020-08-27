@@ -65,8 +65,7 @@ class StatusHistory(object):
         #
 
     def __setEntryId(self, entryId, pdbId):
-        """  Set the file path of the status history file and read any existing content --
-        """
+        """Set the file path of the status history file and read any existing content --"""
         self.__entryId = entryId
         self.__pdbId = pdbId
         self.__inpFilePath = self.__pI.getStatusHistoryFilePath(dataSetId=entryId, fileSource=self.__fileSource, versionId="latest")
@@ -76,8 +75,7 @@ class StatusHistory(object):
             return False
 
     def __setInpPath(self, inpPath, entryId, pdbId):
-        """  Set the file path of the status history file and read any existing content --
-        """
+        """Set the file path of the status history file and read any existing content --"""
         self.__entryId = entryId
         self.__pdbId = pdbId
         self.__inpFilePath = inpPath
@@ -87,18 +85,17 @@ class StatusHistory(object):
             return False
 
     def __new(self, entryId):
-        """  Create a new status history category using base category style content definition --
-        """
+        """Create a new status history category using base category style content definition --"""
         return self.__pio.newContainer(containerName=entryId, overWrite=True)
 
     def setEntryId(self, entryId, pdbId, inpPath=None, overWrite=False):
-        """ Open an existing status history file from the archive directory and read the container corresponding to the input
-            entry id.    An alternate file path can be provided to override reading input from the archive directory.
+        """Open an existing status history file from the archive directory and read the container corresponding to the input
+        entry id.    An alternate file path can be provided to override reading input from the archive directory.
 
-            overWrite = True to rewrite any existing history file -
+        overWrite = True to rewrite any existing history file -
 
-            Return:  True for an existing file or for the creation of a new empty container initialized with an
-                          empty status history data category, or False otherwise.
+        Return:  True for an existing file or for the creation of a new empty container initialized with an
+                      empty status history data category, or False otherwise.
 
         """
         if inpPath is not None:
@@ -126,8 +123,7 @@ class StatusHistory(object):
         return self.__pio.write(outFilePath)
 
     def __exists(self):
-        """   Return True if a status history file exists or false otherwise.
-        """
+        """Return True if a status history file exists or false otherwise."""
         if os.access(self.__inpFilePath, os.R_OK):
             return True
         else:
@@ -137,8 +133,7 @@ class StatusHistory(object):
         return self.__getNow()
 
     def __getNow(self):
-        """  Return a CIF style date-timestamp value for current local time -
-        """
+        """Return a CIF style date-timestamp value for current local time -"""
         today = datetime.datetime.today()
         return str(today.strftime(self.__timeFormat))
 
@@ -175,8 +170,7 @@ class StatusHistory(object):
         return self.__pio.getRowCount(catName=self.__statusCategory)
 
     def __updatePriorEndDate(self, dateEnd=None):
-        """   Update the 'end-date' value for the previous status history record.
-        """
+        """Update the 'end-date' value for the previous status history record."""
         nRows = self.__getRowCount()
         if nRows > 0 and dateEnd is not None:
             ok = self.__pio.updateAttribute(catName=self.__statusCategory, attribName="date_end", value=dateEnd, iRow=nRows - 1)
@@ -194,8 +188,7 @@ class StatusHistory(object):
         return (tup[0], tup[1])
 
     def __lastStatusAndDate(self):
-        """  Return the last status code, time stamp, and ordinal index in the current data context.
-        """
+        """Return the last status code, time stamp, and ordinal index in the current data context."""
         try:
             nRows = self.__getRowCount()
             if nRows > 0:
@@ -223,8 +216,7 @@ class StatusHistory(object):
             return False
 
     def nextRecord(self, statusCodeNext="AUTH", dateNext=None, annotator=None, details=None):
-        """
-        """
+        """"""
         try:
             statusLast, dateLast, _ordinalLast, pdbId = self.__lastStatusAndDate()
             if statusCodeNext == statusLast:
@@ -252,11 +244,11 @@ class StatusHistory(object):
 
     def __appendRow(self, entryId, pdbId, statusCodeBegin="PROC", dateBegin=None, statusCodeEnd="PROC", dateEnd=None, annotator=None, details=None):
         """
-            Append a row to the status history list --
+        Append a row to the status history list --
 
-            if -  dateEnd is not specified then the current date-time is used.
+        if -  dateEnd is not specified then the current date-time is used.
 
-            return True for success or false otherwise
+        return True for success or false otherwise
         """
         uD = {}
 

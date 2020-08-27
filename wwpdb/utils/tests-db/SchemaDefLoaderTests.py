@@ -52,8 +52,7 @@ class SchemaDefLoaderTests(unittest.TestCase):
         pass
 
     def testLoadFile(self):
-        """Test case - for loading BIRD definition data files
-        """
+        """Test case - for loading BIRD definition data files"""
         self.__lfh.write("\nStarting SchemaDefLoaderTests testLoadFile\n")
         try:
             bsd = BirdSchemaDef()

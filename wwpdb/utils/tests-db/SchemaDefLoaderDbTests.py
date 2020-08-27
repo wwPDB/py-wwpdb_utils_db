@@ -93,8 +93,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.__dbCon.close()
 
     def testSchemaCreate(self):
-        """  Create table schema for BIRD, chemical component, and PDBx data.
-        """
+        """Create table schema for BIRD, chemical component, and PDBx data."""
         sd = BirdSchemaDef()
         self.__schemaCreate(schemaDefObj=sd)
         #
@@ -259,8 +258,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
         )
 
     def __schemaCreateSQL(self, schemaDefObj):
-        """Test case -  create table schema using schema definition
-        """
+        """Test case -  create table schema using schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __schemaCreateSQL at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -281,8 +279,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
         self.__lfh.write("\nCompleted SchemaDefLoaderDbTest __schemaCreateSQL at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def __schemaCreate(self, schemaDefObj):
-        """Test case -  create table schema using schema definition
-        """
+        """Test case -  create table schema using schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __schemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -313,8 +310,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
         self.__lfh.write("\nCompleted SchemaDefLoaderDbTest __schemaCreate at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def __getPdbxPathList(self):
-        """Test case -  get the path list of PDBx instance example files -
-        """
+        """Test case -  get the path list of PDBx instance example files -"""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getPdbxPathList\n")
         try:
             loadPathList = [os.path.join(self.__pdbxPath, v) for v in self.__pdbxFileList]
@@ -325,8 +321,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.fail()
 
     def __getPrdPathList(self):
-        """Test case -  get the path list of PRD definitions in the CVS repository.
-        """
+        """Test case -  get the path list of PRD definitions in the CVS repository."""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getPrdPathList\n")
         try:
             refIo = PdbxPrdIo(verbose=self.__verbose, log=self.__lfh)
@@ -339,8 +334,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.fail()
 
     def __getPrdFamilyPathList(self):
-        """Test case -  get the path list of PRD Family definitions in the CVS repository.
-        """
+        """Test case -  get the path list of PRD Family definitions in the CVS repository."""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getPrdFamilyPathList\n")
         try:
             refIo = PdbxFamilyIo(verbose=self.__verbose, log=self.__lfh)
@@ -353,8 +347,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.fail()
 
     def __getChemCompPathList(self):
-        """Test case -  get the path list of definitions in the CVS repository.
-        """
+        """Test case -  get the path list of definitions in the CVS repository."""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getChemCompPathList\n")
         try:
             refIo = PdbxChemCompIo(verbose=self.__verbose, log=self.__lfh)

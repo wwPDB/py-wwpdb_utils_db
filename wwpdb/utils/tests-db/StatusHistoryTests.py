@@ -64,8 +64,7 @@ class StatusHistoryTests(unittest.TestCase):
         pass
 
     def testReadWriteHistory(self):
-        """ Read and write history file --
-        """
+        """Read and write history file --"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
         self.__lfh.write("Starting StatusHistoryTests testReadWriteHistory at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -106,8 +105,7 @@ class StatusHistoryTests(unittest.TestCase):
         self.__lfh.write("\nCompleted StatusHistoryTests testReadWriteHistory at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testCreateHistory(self):
-        """ Read existing entry and create initial status records as required -
-        """
+        """Read existing entry and create initial status records as required -"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
         self.__lfh.write("Starting StatusHistoryTests testCreateHistory at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))

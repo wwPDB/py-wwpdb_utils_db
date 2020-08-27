@@ -93,9 +93,9 @@ class MyDbUtilTests(unittest.TestCase):
     def testOpen2(self):
         """Test case -  w/o socket
 
-            Environment setup --
+        Environment setup --
 
-            . set-test-env.sh
+        . set-test-env.sh
 
         """
         startTime = time.time()
@@ -120,9 +120,9 @@ class MyDbUtilTests(unittest.TestCase):
     def testOpen3(self):
         """Test case -  w/o socket w/ localhost
 
-            Environment setup --
+        Environment setup --
 
-            . set-test-env.sh
+        . set-test-env.sh
 
         """
         startTime = time.time()

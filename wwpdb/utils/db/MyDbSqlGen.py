@@ -38,9 +38,9 @@ except ImportError:  # pragma: no cover
 
 class MyDbAdminSqlGen(object):
 
-    """ Builds SQL commands to create table schema from a schema definition derived from class SchemaDefBase.
+    """Builds SQL commands to create table schema from a schema definition derived from class SchemaDefBase.
 
-        Note:
+    Note:
     """
 
     def __init__(self, verbose=False, log=sys.stderr):
@@ -49,17 +49,16 @@ class MyDbAdminSqlGen(object):
         self.__verbose = verbose
 
     def truncateTableSQL(self, databaseName, tableName):
-        """ Return the SQL string require to truncate (remove all rows) from the input table.
-        """
+        """Return the SQL string require to truncate (remove all rows) from the input table."""
         return "TRUNCATE TABLE %s.%s; " % (databaseName, tableName)
 
     def idUpdateTemplateSQL(self, databaseName, tableDefObj, updateAttributeIdList=None, conditionAttributeIdList=None):
-        """ Return the SQL string template for updating the input attributes into the named table subject
-            to the constraining attributes.
+        """Return the SQL string template for updating the input attributes into the named table subject
+        to the constraining attributes.
 
-            The string provides formatting placeholders for updated values  as well as for constraining values.
+        The string provides formatting placeholders for updated values  as well as for constraining values.
 
-            The input table object is used to adjust the value quoting in the returned template string.
+        The input table object is used to adjust the value quoting in the returned template string.
 
         """
         if updateAttributeIdList is None:
@@ -92,11 +91,11 @@ class MyDbAdminSqlGen(object):
         return tS
 
     def idInsertTemplateSQL(self, databaseName, tableDefObj, insertAttributeIdList=None):
-        """  Return the SQL string template for inserting the input attributes into the named table.
+        """Return the SQL string template for inserting the input attributes into the named table.
 
-            The string provides formatting placeholders for updated values  as well as for constraining values.
+        The string provides formatting placeholders for updated values  as well as for constraining values.
 
-            The input table object is used to adjust the value quoting in the returned template string.
+        The input table object is used to adjust the value quoting in the returned template string.
 
         """
         if insertAttributeIdList is None:
@@ -121,12 +120,12 @@ class MyDbAdminSqlGen(object):
         return tS
 
     def idDeleteTemplateSQL(self, databaseName, tableDefObj, conditionAttributeIdList=None):
-        """ Return the SQL string template for deleting records in the named table subject
-            to the constraining attributes.
+        """Return the SQL string template for deleting records in the named table subject
+        to the constraining attributes.
 
-            The string provides formatting placeholders for constraining values.
+        The string provides formatting placeholders for constraining values.
 
-            The input table object is used to adjust the value quoting in the returned template string.
+        The input table object is used to adjust the value quoting in the returned template string.
 
         """
         if conditionAttributeIdList is None:
@@ -148,10 +147,10 @@ class MyDbAdminSqlGen(object):
         return tS
 
     def insertTemplateSQL(self, databaseName, tableName, attributeNameList=None):
-        """ Return the SQL string template for inserting the input attributes into the named table.
+        """Return the SQL string template for inserting the input attributes into the named table.
 
-            The string provides formatting placeholders for inserted values that are added when
-            the SQL command is executed.
+        The string provides formatting placeholders for inserted values that are added when
+        the SQL command is executed.
 
         """
         if attributeNameList is None:
@@ -164,10 +163,10 @@ class MyDbAdminSqlGen(object):
         return tS
 
     def deleteTemplateSQL(self, databaseName, tableName, attributeNameList=None):
-        """ Return the SQL string template for deleting table records constrained by the input attributes.
+        """Return the SQL string template for deleting table records constrained by the input attributes.
 
-            The string provides formatting placeholders for the constraining values.
-             delete from <tableName>  where at1=%s and at2=%s
+        The string provides formatting placeholders for the constraining values.
+         delete from <tableName>  where at1=%s and at2=%s
 
         """
         if attributeNameList is None:
@@ -180,10 +179,10 @@ class MyDbAdminSqlGen(object):
         return tS
 
     def deleteFromListSQL(self, databaseName, tableName, attributeName, valueList, chunkSize=10):
-        """ Return the SQL string for deleting table records for a list of string values of
-            the input attribute.
+        """Return the SQL string for deleting table records for a list of string values of
+        the input attribute.
 
-             delete from <databaseName>.<tableName>  where attributeName  IN (v1,v2,v3);
+         delete from <databaseName>.<tableName>  where attributeName  IN (v1,v2,v3);
 
         """
         sqlList = []
@@ -199,10 +198,10 @@ class MyDbAdminSqlGen(object):
         return ([e for e in t if e is not None] for t in zip_longest(*args))
 
     def createDatabaseSQL(self, databaseName):
-        """ Return a list of strings containing the SQL to drop and recreate the input database.
+        """Return a list of strings containing the SQL to drop and recreate the input database.
 
-           DROP DATABASE IF EXISTS <databaseName>;
-           CREATE DATABASE <databaseName>;
+        DROP DATABASE IF EXISTS <databaseName>;
+        CREATE DATABASE <databaseName>;
         """
         oL = []
         oL.append("DROP DATABASE IF EXISTS %s;" % databaseName)
@@ -210,8 +209,8 @@ class MyDbAdminSqlGen(object):
         return oL
 
     def createTableSQL(self, databaseName, tableDefObj):
-        """ Return a list of strings containing the SQL commands to create the table and indices
-            described by the input table definition.
+        """Return a list of strings containing the SQL commands to create the table and indices
+        described by the input table definition.
 
         """
         oL = []
@@ -224,20 +223,20 @@ class MyDbAdminSqlGen(object):
     def __setDatabase(self, databaseName):
         """Return a list of strings containing database connection SQL command for the input database
 
-           USE <databaseName>;
+        USE <databaseName>;
         """
         return ["USE %s;" % databaseName]
 
     def __dropTable(self, tableName):
-        """ Return a list of strings containing the SQL DROP TABLE command for the input table:
+        """Return a list of strings containing the SQL DROP TABLE command for the input table:
 
-           DROP TABLE IF EXISTS <tableName>;
+        DROP TABLE IF EXISTS <tableName>;
         """
         return ["DROP TABLE IF EXISTS %s;" % tableName]
 
     def __createTable(self, tableDefObj):
-        """ Return a list of strings containing the SQL command to create the table described in
-            input table schema definition object.
+        """Return a list of strings containing the SQL command to create the table described in
+        input table schema definition object.
 
         """
         oL = []
@@ -292,8 +291,8 @@ class MyDbAdminSqlGen(object):
         return ["\n".join(oL)]
 
     def __createTableIndices(self, tableDefObj):
-        """ Return a list of strings containing the SQL command to create any indices described in
-            input table schema definition object.
+        """Return a list of strings containing the SQL command to create any indices described in
+        input table schema definition object.
 
         """
         oL = []
@@ -320,8 +319,7 @@ class MyDbAdminSqlGen(object):
         return oL
 
     def exportTable(self, databaseName, tableDefObj, exportPath, withDoubleQuotes=False):
-        """
-        """
+        """"""
         tableName = tableDefObj.getName()
         aNames = tableDefObj.getAttributeNameList()
         #
@@ -337,12 +335,12 @@ class MyDbAdminSqlGen(object):
         return "\n".join(oL)
 
     def importTable(self, databaseName, tableDefObj, importPath, withTruncate=False, withDoubleQuotes=False):
-        """ Create the SQL commands to data files stored in charactore delimited data files into the
-            in put database and table.    Input data may be optionally enclosed in double quotes.
+        """Create the SQL commands to data files stored in charactore delimited data files into the
+        in put database and table.    Input data may be optionally enclosed in double quotes.
 
-            An options is provied to  pre-truncate the table before loading.
+        An options is provied to  pre-truncate the table before loading.
 
-            Return:  a string containing the SQL for the load command.
+        Return:  a string containing the SQL for the load command.
         """
         tableName = tableDefObj.getName()
         aNames = tableDefObj.getAttributeNameList()
@@ -367,13 +365,12 @@ class MyDbAdminSqlGen(object):
 
 class MyDbQuerySqlGen(object):
 
-    """ Builds an the SQL command string for a selection query.
-    """
+    """Builds an the SQL command string for a selection query."""
 
     def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):
-        """  Input:
+        """Input:
 
-             schemaDef is instance of class derived from SchemaDefBase().
+        schemaDef is instance of class derived from SchemaDefBase().
         """
         self.__schemaDefObj = schemaDefObj
         self.__lfh = log
@@ -411,23 +408,22 @@ class MyDbQuerySqlGen(object):
             return False
 
     def addSelectAttributeId(self, attributeTuple=(None, None)):
-        """ Add the input attribute to the current attribute select list.
+        """Add the input attribute to the current attribute select list.
 
-            where attributeTuple contains (tableId,attributeId)
+        where attributeTuple contains (tableId,attributeId)
 
         """
         self.__selectList.append(attributeTuple)
         return True
 
     def setOrderBySortOrder(self, dir="ASC"):  # pylint: disable=redefined-builtin
-        """  The default sort order applied to attributes in the ORDER BY clause. (ASC|DESC)
-        """
+        """The default sort order applied to attributes in the ORDER BY clause. (ASC|DESC)"""
         self.__sortOrder = dir
 
     def addOrderByAttributeId(self, attributeTuple=(None, None), sortFlag="DEFAULT"):
-        """ Add the input attribute to the current orderBy list.
+        """Add the input attribute to the current orderBy list.
 
-            where attributeTuple contains (tableId,attributeId)
+        where attributeTuple contains (tableId,attributeId)
 
         """
         sf = self.__sortOrder if sortFlag == "DEFAULT" else sortFlag
@@ -435,20 +431,17 @@ class MyDbQuerySqlGen(object):
         return True
 
     def setCondition(self, conditionObj):
-        """ Set an instance of the condition object from the MyDbConditionSqlGen() class.
-
-        """
+        """Set an instance of the condition object from the MyDbConditionSqlGen() class."""
         self.__conditionObj = conditionObj
         return True
 
     def getSql(self):
-        """
-        """
+        """"""
         return self.__makeSql()
 
     def __makeSql(self):
-        """  Builds SQL string for the query from the current list of attributes, list of
-             ORDER BY attributes and the constrainObj.
+        """Builds SQL string for the query from the current list of attributes, list of
+        ORDER BY attributes and the constrainObj.
         """
         #
         if len(self.__selectList) == 0:
@@ -494,13 +487,12 @@ class MyDbQuerySqlGen(object):
 
 class MyDbConditionSqlGen(object):
 
-    """ Builds the Condition portion of an SQL selection or related query.
-    """
+    """Builds the Condition portion of an SQL selection or related query."""
 
     def __init__(self, schemaDefObj, addKeyJoinFlag=True, verbose=False, log=sys.stderr):
-        """  Input:
+        """Input:
 
-             schemaDef is instance of class derived from SchemaDefBase().
+        schemaDef is instance of class derived from SchemaDefBase().
         """
         self.__schemaDefObj = schemaDefObj
         self.__lfh = log
@@ -523,8 +515,7 @@ class MyDbConditionSqlGen(object):
         return True
 
     def set(self, conditionDefList=None):
-        """ Set/reset the current condition list --- The input is used verbatim and unmodified.
-        """
+        """Set/reset the current condition list --- The input is used verbatim and unmodified."""
         if conditionDefList is not None:
             self.__cList = conditionDefList
             self.__tableIdList = []
@@ -535,8 +526,7 @@ class MyDbConditionSqlGen(object):
             return False
 
     def __updateTableList(self, cObj):
-        """  Add the tables included in the input condition to the internal table list.
-        """
+        """Add the tables included in the input condition to the internal table list."""
         cType = cObj[0]
         if cType in ["VALUE_CONDITION", "VALUE_LIST_CONDITION"]:
             cType, lhsTuple, _opCode, rhsTuple = cObj
@@ -572,26 +562,26 @@ class MyDbConditionSqlGen(object):
         return self.__tableIdList
 
     def addTables(self, tableIdList):
-        """  Add the tables from the input tableIdList to the internal list of tables.
+        """Add the tables from the input tableIdList to the internal list of tables.
 
-             The internal list of tables is used to materialize join contraints between
-             all tables based on primary keys defined in the schema definition.
+        The internal list of tables is used to materialize join contraints between
+        all tables based on primary keys defined in the schema definition.
         """
         for tableId in tableIdList:
             self.__addTable(tableId)
         return True
 
     def addValueCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp="AND"):
-        """  Adds a condition to the current contraint list -
+        """Adds a condition to the current contraint list -
 
-             lhsTuple = (TableId,AttributeId)
-             opCode   = one of the operations defined in self.__opDict.keys()
-             rhsTuple = (value,type) where for
+         lhsTuple = (TableId,AttributeId)
+         opCode   = one of the operations defined in self.__opDict.keys()
+         rhsTuple = (value,type) where for
 
-                        simple values -
+                    simple values -
 
-                        (simpleValue,'CHAR|OTHER')
-            preOp = logical operator preceding this contraint in the current contraint list.
+                    (simpleValue,'CHAR|OTHER')
+        preOp = logical operator preceding this contraint in the current contraint list.
 
         """
         cObj = ("VALUE_CONDITION", lhsTuple, opCode, rhsTuple)
@@ -606,20 +596,20 @@ class MyDbConditionSqlGen(object):
         return self.__numConditions
 
     def addGroupValueConditionList(self, cDefList, preOp="AND"):
-        """  Add a value alternative condition to the current contraint list
-             using the input list of value condition definitions defined as -
+        """Add a value alternative condition to the current contraint list
+         using the input list of value condition definitions defined as -
 
-             cDefList = [(lPreOp,lhsTuple, opCode, rhsTuple), ...]
-               lPreOp   = local logical conjunction used to add condition within the group (leading value is ignored)
-               lhsTuple = (TableId,AttributeId)
-               opCode   = one of the operations defined in self.__opDict.keys()
-               rhsTuple = (value,type) where for
+         cDefList = [(lPreOp,lhsTuple, opCode, rhsTuple), ...]
+           lPreOp   = local logical conjunction used to add condition within the group (leading value is ignored)
+           lhsTuple = (TableId,AttributeId)
+           opCode   = one of the operations defined in self.__opDict.keys()
+           rhsTuple = (value,type) where for
 
-                        simple values are defined as -
+                    simple values are defined as -
 
-                        (simpleValue,'CHAR|<ANY OTHER>')   < CHAR > types are quoted
+                    (simpleValue,'CHAR|<ANY OTHER>')   < CHAR > types are quoted
 
-            preOp is the logical conjuction used to add the group condition to current condition list.
+        preOp is the logical conjuction used to add the group condition to current condition list.
 
         """
         if len(cDefList) < 1:
@@ -644,20 +634,20 @@ class MyDbConditionSqlGen(object):
         return self.__numConditions
 
     def addJoinCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp="AND"):
-        """  Adds a join condition to the current contraint list -
+        """Adds a join condition to the current contraint list -
 
-            lhsTuple = (TableId,AttributeId)
-            opCode   = one of the operations defined in self.__opDict.keys()
-            rhsTuple = (TableId,AttributeId)
+        lhsTuple = (TableId,AttributeId)
+        opCode   = one of the operations defined in self.__opDict.keys()
+        rhsTuple = (TableId,AttributeId)
 
-                        For join conditions rhsTuple values implemented as -
+                    For join conditions rhsTuple values implemented as -
 
-                        (tableId,attributeId)
+                    (tableId,attributeId)
 
-                        rhsTuple type is currrently only implemented as 'ATTRIBUTE' target but
-                                 but could be extended to support other targets for different operators.
+                    rhsTuple type is currrently only implemented as 'ATTRIBUTE' target but
+                             but could be extended to support other targets for different operators.
 
-            preOp = logical operator preceding this contraint in the current contraint list.
+        preOp = logical operator preceding this contraint in the current contraint list.
 
         """
         cObj = ("JOIN_CONDITION", lhsTuple, opCode, rhsTuple)
@@ -672,25 +662,22 @@ class MyDbConditionSqlGen(object):
         return self.__numConditions
 
     def addLogicalOp(self, lOp):
-        """ Adds a logical operation into the current condition list.
+        """Adds a logical operation into the current condition list.
 
-             lOp  =  one of 'AND','OR', 'NOT'
+        lOp  =  one of 'AND','OR', 'NOT'
         """
         self.__cList.append(("LOG_OP", lOp))
 
     def addBeginGroup(self):
-        """ Inserts the beginning of a parenthetical group in the current condition list.
-        """
+        """Inserts the beginning of a parenthetical group in the current condition list."""
         self.__cList.append(("GROUPING", "BEGIN"))
 
     def addEndGroup(self):
-        """ Inserts the ending of a parenthetical group in the current condition list.
-        """
+        """Inserts the ending of a parenthetical group in the current condition list."""
         self.__cList.append(("GROUPING", "END"))
 
     def addKeyAttributeEquiJoinConditions(self):
-        """ Auto add equi-join contraints between tables in the current table list -
-        """
+        """Auto add equi-join contraints between tables in the current table list -"""
         if len(self.__tableIdList) < 2:
             return 0
         cList = copy.deepcopy(self.__cList)
@@ -706,19 +693,19 @@ class MyDbConditionSqlGen(object):
         return len(tablePairList)
 
     def __makeSql(self):
-        """  Builds SQL string for the query condition encoded in the input contraint command list.
+        """Builds SQL string for the query condition encoded in the input contraint command list.
 
-             The condition command list is a sequence of tuples with the following syntax:
+        The condition command list is a sequence of tuples with the following syntax:
 
-             ('VALUE_CONDITION', (tableId,attributeId), 'EQ'|'NE'|GE'|'GT'|'LT'|'LE'|'LIKE'|'IS'|'IS NOT', (Value, 'CHAR'|'OTHER'))
+        ('VALUE_CONDITION', (tableId,attributeId), 'EQ'|'NE'|GE'|'GT'|'LT'|'LE'|'LIKE'|'IS'|'IS NOT', (Value, 'CHAR'|'OTHER'))
 
-             ('VALUE_LIST_CONDITION', (tableId,attributeId), 'IN'|'NOT IN', (valueList, 'CHAR'|'INT'|'FLOAT'))
+        ('VALUE_LIST_CONDITION', (tableId,attributeId), 'IN'|'NOT IN', (valueList, 'CHAR'|'INT'|'FLOAT'))
 
-             ('JOIN_CONDITION',  (tableId,attributeId), 'EQ'|'NE'|'GE'|'GT'|'LT'|'LE'|'LIKE', (tableId,attributeId) )
+        ('JOIN_CONDITION',  (tableId,attributeId), 'EQ'|'NE'|'GE'|'GT'|'LT'|'LE'|'LIKE', (tableId,attributeId) )
 
-             ('LOG_OP', 'AND'|'OR'|'NOT')     -> conjunction / negation
+        ('LOG_OP', 'AND'|'OR'|'NOT')     -> conjunction / negation
 
-             ('GROUPING', 'BEGIN'|'END')          -> (grouping/parenthetical control)
+        ('GROUPING', 'BEGIN'|'END')          -> (grouping/parenthetical control)
 
         """
         #
@@ -789,8 +776,7 @@ class MyDbConditionSqlGen(object):
         return "\n".join(cSqlL)
 
     def __addInterTableJoinContraints(self, lTableId, rTableId):
-        """ The ...
-        """
+        """The ..."""
         lTdef = self.__schemaDefObj.getTable(lTableId)
         lKeyAttributeIdL = lTdef.getPrimaryKeyAttributeIdList()
         rTdef = self.__schemaDefObj.getTable(rTableId)

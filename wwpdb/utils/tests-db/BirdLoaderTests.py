@@ -72,8 +72,7 @@ class BirdLoaderTests(unittest.TestCase):
             self.__dbCon.close()
 
     def testBirdSchemaCreate(self):
-        """Test case -  create table schema using BIRD schema definition
-        """
+        """Test case -  create table schema using BIRD schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -101,8 +100,7 @@ class BirdLoaderTests(unittest.TestCase):
         self.__lfh.write("\nCompleted BirdLoaderTests testBirdSchemaCreate at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testPrdPathList(self):
-        """Test case -  get the path list of PRD definitions in the CVS repository.
-        """
+        """Test case -  get the path list of PRD definitions in the CVS repository."""
         self.__lfh.write("\nStarting BirdLoaderTests testPrdPathList\n")
         try:
             prd = PdbxPrdIo(verbose=self.__verbose, log=self.__lfh)
@@ -115,8 +113,7 @@ class BirdLoaderTests(unittest.TestCase):
             self.fail()
 
     def testMakeLoadPrdFiles(self):
-        """Test case - for loading BIRD definition data files
-        """
+        """Test case - for loading BIRD definition data files"""
         self.__lfh.write("\nStarting BirdLoaderTests resrMakeLoadPrdFiles\n")
         startTime = time.time()
         try:
@@ -134,8 +131,7 @@ class BirdLoaderTests(unittest.TestCase):
         self.__lfh.write("\nCompleted BirdLoaderTests testMakeLoadPrdFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testBirdBatchImport(self):
-        """Test case -  import loadable files
-        """
+        """Test case -  import loadable files"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdBatchImport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -173,8 +169,7 @@ class BirdLoaderTests(unittest.TestCase):
         self.__lfh.write("\nCompleted BirdLoaderTests testBirdBatchImport at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testBirdInsertImport(self):
-        """Test case -  import loadable data via SQL inserts
-        """
+        """Test case -  import loadable data via SQL inserts"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdInsertImport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -223,8 +218,7 @@ class BirdLoaderTests(unittest.TestCase):
         self.__lfh.write("\nCompleted BirdLoaderTests testBirdInsertImport at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testBirdBatchInsertImport(self):
-        """Test case -  import loadable data via SQL inserts -
-        """
+        """Test case -  import loadable data via SQL inserts -"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdBatchInsertImport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:

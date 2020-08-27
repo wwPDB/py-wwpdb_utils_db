@@ -36,8 +36,7 @@ class StatusHistoryExec(object):
         self.__setup(defSiteId=defSiteId, sessionId=sessionId)
 
     def __setup(self, defSiteId=None, sessionId=None):
-        """  Simulate the web application environment for managing session storage of  temporaty data files.
-        """
+        """Simulate the web application environment for managing session storage of  temporaty data files."""
         self.__siteId = getSiteId(defaultSiteId=defSiteId)
         #
         self.__cI = ConfigInfo(self.__siteId)
@@ -63,8 +62,7 @@ class StatusHistoryExec(object):
         #
 
     def doCreateStatusHistory(self, numProc=1, overWrite=False):
-        """
-        """
+        """"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             entryIdList = shu.getEntryIdList()
@@ -77,8 +75,7 @@ class StatusHistoryExec(object):
             traceback.print_exc(file=self.__lfh)
 
     def doLoadStatusHistory(self, numProc=1, newTable=False):
-        """
-        """
+        """"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             if numProc > 1:
@@ -91,8 +88,7 @@ class StatusHistoryExec(object):
         return False
 
     def doLoadEntryStatusHistory(self, entryId):
-        """  Load/reload status history file for the input entryId
-        """
+        """Load/reload status history file for the input entryId"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             return shu.loadEntryStatusHistory(entryIdList=[entryId])
@@ -101,8 +97,7 @@ class StatusHistoryExec(object):
         return False
 
     def doCreateEntryStatusHistory(self, entryId, overWrite=False):
-        """
-        """
+        """"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             rL = shu.createHistory([entryId], overWrite=overWrite)
@@ -111,8 +106,7 @@ class StatusHistoryExec(object):
             traceback.print_exc(file=self.__lfh)
 
     def doCreateStatusHistorySchema(self):
-        """  Create/recreate status history schema -
-        """
+        """Create/recreate status history schema -"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             return shu.createStatusHistorySchema()

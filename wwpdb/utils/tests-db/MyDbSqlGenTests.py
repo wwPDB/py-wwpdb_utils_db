@@ -43,8 +43,7 @@ class MyDbSqlGenTests(unittest.TestCase):
         pass
 
     def testMessageSchemaCreate(self):
-        """Test case -  create table schema using message schema definition as an example
-        """
+        """Test case -  create table schema using message schema definition as an example"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testMessageSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -67,8 +66,7 @@ class MyDbSqlGenTests(unittest.TestCase):
         self.__lfh.write("\nCompleted MyDbSqlGenTests testMessageSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testMessageImportExport(self):
-        """Test case -  import and export commands --
-        """
+        """Test case -  import and export commands --"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testMessageImportExport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -96,8 +94,7 @@ class MyDbSqlGenTests(unittest.TestCase):
         self.__lfh.write("\nCompleted MyDbSqlGenTests testMessageImportExport at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testBirdSchemaCreate(self):
-        """Test case -  create table schema using message schema definition as an example
-        """
+        """Test case -  create table schema using message schema definition as an example"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testBirdSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -120,8 +117,7 @@ class MyDbSqlGenTests(unittest.TestCase):
         self.__lfh.write("\nCompleted MyDbSqlGenTests testBirdSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testBirdImportExport(self):
-        """Test case -  import and export commands --
-        """
+        """Test case -  import and export commands --"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testBirdImportExport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -149,8 +145,7 @@ class MyDbSqlGenTests(unittest.TestCase):
         self.__lfh.write("\nCompleted MyDbSqlGenTests testBirdImportExport at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testSelect1(self):
-        """Test case -  selection everything for a simple condition-
-        """
+        """Test case -  selection everything for a simple condition-"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -180,8 +175,7 @@ class MyDbSqlGenTests(unittest.TestCase):
         self.__lfh.write("\nCompleted MyDbSqlGenTests testSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
     def testSelectDistro(self):
-        """Test case -  selection, condition and ordering methods using distro schema
-        """
+        """Test case -  selection, condition and ordering methods using distro schema"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testSelectDistro at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:

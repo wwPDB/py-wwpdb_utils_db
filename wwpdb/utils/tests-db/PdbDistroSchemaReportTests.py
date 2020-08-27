@@ -33,8 +33,7 @@ class PdbDistroSchemaReportTests(unittest.TestCase):
         pass
 
     def testSelect1(self):
-        """Test case -  selection everything for a simple condition -
-        """
+        """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting PdbDistroSchemaReportTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:

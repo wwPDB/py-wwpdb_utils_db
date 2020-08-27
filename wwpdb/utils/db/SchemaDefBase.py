@@ -29,8 +29,7 @@ from operator import itemgetter
 
 class SchemaDefBase(object):
 
-    """ A base class for schema definitions.
-    """
+    """A base class for schema definitions."""
 
     def __init__(self, databaseName=None, schemaDefDict=None, verbose=True, log=sys.stderr):
         self.__verbose = verbose
@@ -62,8 +61,8 @@ class SchemaDefBase(object):
         return [tup[0] for tup in sTupL]
 
     def getDefaultAttributeParameterMap(self, tableId, skipAuto=True):
-        """ For the input table, return a dictionary of attribute identifiers and parameter names.
-            Default parameter names are compressed and camel-case conversions of the attribute ids.
+        """For the input table, return a dictionary of attribute identifiers and parameter names.
+        Default parameter names are compressed and camel-case conversions of the attribute ids.
         """
         dL = []
         aIdList = self.getAttributeIdList(tableId)
@@ -106,8 +105,7 @@ class SchemaDefBase(object):
 
 class TableDef(object):
 
-    """  Wrapper class for table schema definition.
-    """
+    """Wrapper class for table schema definition."""
 
     def __init__(self, tableDefDict=None, verbose=True, log=sys.stderr):
         self.__verbose = verbose
@@ -147,8 +145,7 @@ class TableDef(object):
             return None
 
     def getMapAttributeInfo(self, attributeId):
-        """ Return the tuple of mapping details for the input attribute id.
-        """
+        """Return the tuple of mapping details for the input attribute id."""
         try:
             return self.__tD["ATTRIBUTE_MAP"][attributeId]
         except:  # noqa: E722  pylint: disable=bare-except
@@ -220,8 +217,7 @@ class TableDef(object):
         return []
 
     def getAttributeIdList(self):
-        """ Get the ordered attribute Id list
-        """
+        """Get the ordered attribute Id list"""
         tupL = []
         for k, v in self.__tD["ATTRIBUTE_INFO"].items():
             tupL.append((k, v["ORDER"]))
@@ -229,8 +225,7 @@ class TableDef(object):
         return [tup[0] for tup in sTupL]
 
     def getAttributeNameList(self):
-        """ Get the ordered attribute name list
-        """
+        """Get the ordered attribute name list"""
         tupL = []
         for k, v in self.__tD["ATTRIBUTE_INFO"].items():
             tupL.append((k, v["ORDER"]))
@@ -256,8 +251,7 @@ class TableDef(object):
             return []
 
     def getMapAttributeNameList(self):
-        """ Get the ordered mapped attribute name list
-        """
+        """Get the ordered mapped attribute name list"""
         try:
             tupL = []
             for k in self.__tD["ATTRIBUTE_MAP"].keys():
@@ -270,8 +264,7 @@ class TableDef(object):
             return []
 
     def getMapAttributeIdList(self):
-        """ Get the ordered mapped attribute name list
-        """
+        """Get the ordered mapped attribute name list"""
         try:
             tupL = []
             for k in self.__tD["ATTRIBUTE_MAP"].keys():
@@ -285,8 +278,7 @@ class TableDef(object):
             return []
 
     def getMapInstanceCategoryList(self):
-        """ Get the unique list of instance categories within the attribute map.
-        """
+        """Get the unique list of instance categories within the attribute map."""
         try:
             cL = [vTup[0] for k, vTup in self.__tD["ATTRIBUTE_MAP"].items() if vTup[0] is not None]
             uL = list(set(cL))
@@ -295,8 +287,7 @@ class TableDef(object):
             return []
 
     def getMapOtherAttributeIdList(self):
-        """ Get the list of attributes that have no assigned instance mapping.
-        """
+        """Get the list of attributes that have no assigned instance mapping."""
         try:
             aL = []
             for k, vTup in self.__tD["ATTRIBUTE_MAP"].items():
@@ -307,8 +298,7 @@ class TableDef(object):
             return []
 
     def getMapInstanceAttributeList(self, categoryName):
-        """ Get the list of instance category attribute names for mapped attributes in the input instance category.
-        """
+        """Get the list of instance category attribute names for mapped attributes in the input instance category."""
         try:
             aL = []
             for _k, vTup in self.__tD["ATTRIBUTE_MAP"].items():
@@ -319,8 +309,7 @@ class TableDef(object):
             return []
 
     def getMapInstanceAttributeIdList(self, categoryName):
-        """ Get the list of schema attribute Ids for mapped attributes from the input instance category.
-        """
+        """Get the list of schema attribute Ids for mapped attributes from the input instance category."""
         try:
             aL = []
             for k, vTup in self.__tD["ATTRIBUTE_MAP"].items():
@@ -331,48 +320,42 @@ class TableDef(object):
             return []
 
     def getMapAttributeFunction(self, attributeId):
-        """ Return the tuple element of mapping details for the input attribute id for the optional function.
-        """
+        """Return the tuple element of mapping details for the input attribute id for the optional function."""
         try:
             return self.__tD["ATTRIBUTE_MAP"][attributeId][2]
         except:  # noqa: E722  pylint: disable=bare-except
             return None
 
     def getMapAttributeFunctionArgs(self, attributeId):
-        """ Return the tuple element of mapping details for the input attribute id for the optional function arguments.
-        """
+        """Return the tuple element of mapping details for the input attribute id for the optional function arguments."""
         try:
             return self.__tD["ATTRIBUTE_MAP"][attributeId][3]
         except:  # noqa: E722  pylint: disable=bare-except
             return None
 
     def getMapAttributeDict(self):
-        """ Return the dictionary of d[schema attribute id] = mapped instance category attribute
-        """
+        """Return the dictionary of d[schema attribute id] = mapped instance category attribute"""
         d = {}
         for k, v in self.__tD["ATTRIBUTE_MAP"].items():
             d[k] = v[1]
         return d
 
     def getMapMergeIndexAttributes(self, categoryName):
-        """  Return the list of merging index attribures for this mapped instance category.
-        """
+        """Return the list of merging index attribures for this mapped instance category."""
         try:
             return self.__tD["MAP_MERGE_INDICES"][categoryName]["ATTRIBUTES"]
         except:  # noqa: E722  pylint: disable=bare-except
             return []
 
     def getMapMergeIndexType(self, indexName):
-        """ Return the merging index type for this mapped instance category.
-        """
+        """Return the merging index type for this mapped instance category."""
         try:
             return self.__tD["MAP_MERGE_INDICES"][indexName]["TYPE"]
         except:  # noqa: E722  pylint: disable=bare-except
             return []
 
     def getSqlNullValue(self, attributeId):
-        """ Return the appropriate NULL value for this attribute:.
-        """
+        """Return the appropriate NULL value for this attribute:."""
         try:
             if self.__isStringType(self.__tD["ATTRIBUTE_INFO"][attributeId]["SQL_TYPE"].upper()):
                 return ""
@@ -384,8 +367,7 @@ class TableDef(object):
             return r"\N"
 
     def getSqlNullValueDict(self):
-        """ Return a dictionary containing appropriate NULL value for each attribute.
-        """
+        """Return a dictionary containing appropriate NULL value for each attribute."""
         d = {}
         for atId, atInfo in self.__tD["ATTRIBUTE_INFO"].items():
 
@@ -399,8 +381,8 @@ class TableDef(object):
         return d
 
     def getStringWidthDict(self):
-        """ Return a dictionary containing maximum string widths assigned to char data types.
-            Non-character type data items are assigned zero width.
+        """Return a dictionary containing maximum string widths assigned to char data types.
+        Non-character type data items are assigned zero width.
         """
         d = {}
         for atId, atInfo in self.__tD["ATTRIBUTE_INFO"].items():
@@ -411,29 +393,25 @@ class TableDef(object):
         return d
 
     def __isStringType(self, sqlType):
-        """ Return if input type corresponds to a common SQL string data type.
-        """
+        """Return if input type corresponds to a common SQL string data type."""
         return sqlType in ["VARCHAR", "CHAR", "TEXT", "MEDIUMTEXT", "LONGTEXT"]
 
     def __isDateType(self, sqlType):
-        """ Return if input type corresponds to a common SQL date/time data type.
-        """
+        """Return if input type corresponds to a common SQL date/time data type."""
         return sqlType in ["DATE", "DATETIME"]
 
     def __isFloatType(self, sqlType):
-        """ Return if input type corresponds to a common SQL string data type.
-        """
+        """Return if input type corresponds to a common SQL string data type."""
         return sqlType in ["FLOAT", "DECIMAL", "DOUBLE PRECISION", "NUMERIC"]
 
     def __isIntegerType(self, sqlType):
-        """ Return if input type corresponds to a common SQL string data type.
-        """
+        """Return if input type corresponds to a common SQL string data type."""
         return sqlType.startswith("INT") or sqlType in ["INTEGER", "BIGINT", "SMALLINT"]
 
     def getDeleteAttributeId(self):
-        """ Return the attribute identifier that is used to delete all of the
-            records associated with the highest level of organizaiton provided by
-            this schema definition (e.g. entry, definition, ...).
+        """Return the attribute identifier that is used to delete all of the
+        records associated with the highest level of organizaiton provided by
+        this schema definition (e.g. entry, definition, ...).
         """
         try:
             return self.__tD["TABLE_DELETE_ATTRIBUTE"]
@@ -441,9 +419,9 @@ class TableDef(object):
             return None
 
     def getDeleteAttributeName(self):
-        """ Return the attribute name that is used to delete all of the
-            records associated with the highest level of organizaiton provided by
-            this schema definition (e.g. entry, definition, ...).
+        """Return the attribute name that is used to delete all of the
+        records associated with the highest level of organizaiton provided by
+        this schema definition (e.g. entry, definition, ...).
         """
         try:
             return self.__tD["ATTRIBUTES"][self.__tD["TABLE_DELETE_ATTRIBUTE"]]

@@ -31,8 +31,8 @@ __version__ = "V0.07"
 
 
 class DBLoadUtil(object):
-    """ Class responsible for loading model cif file(s) into da_internal database
-    """
+    """Class responsible for loading model cif file(s) into da_internal database"""
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         self.__verbose = verbose
         self.__lfh = log
@@ -46,16 +46,15 @@ class DBLoadUtil(object):
         self.__getSession()
 
     def doLoading(self, fileList):
-        """ Update content database
-        """
+        """Update content database"""
         if not fileList:
             return
         #
         #
-        listfile = self.__getFileName(self.__sessionPath, 'filelist', 'txt')
-        sqlfile = os.path.join(self.__sessionPath, 'dbload', 'DB_LOADER.sql')
-        logfile1 = os.path.join(self.__sessionPath, 'dbload', 'db-loader.log')
-        clogfile1 = os.path.join(self.__sessionPath, 'dbload', 'sqlload.log')
+        listfile = self.__getFileName(self.__sessionPath, "filelist", "txt")
+        sqlfile = os.path.join(self.__sessionPath, "dbload", "DB_LOADER.sql")
+        logfile1 = os.path.join(self.__sessionPath, "dbload", "db-loader.log")
+        clogfile1 = os.path.join(self.__sessionPath, "dbload", "sqlload.log")
         #
         self.__genListFile(listfile, fileList)
         self.__getLoadFile(self.__sessionPath, listfile, sqlfile, logfile1)
@@ -71,26 +70,24 @@ class DBLoadUtil(object):
             traceback.print_exc(file=self.__lfh)
 
     def __getFileName(self, path, root, ext):
-        """Create unique file name.
-        """
+        """Create unique file name."""
         count = 1
         while True:
-            filename = root + '_' + str(count) + '.' + ext
+            filename = root + "_" + str(count) + "." + ext
             fullname = os.path.join(path, filename)
             if not os.access(fullname, os.F_OK):
                 return filename
             #
             count += 1
             #
-            return root + '_1.' + ext
+            return root + "_1." + ext
 
     def __genListFile(self, filename, filelist):
-        """
-        """
+        """"""
         fn = os.path.join(self.__sessionPath, filename)
-        f = open(fn, 'w')
+        f = open(fn, "w")
         for entryfile in filelist:
-            f.write(entryfile + '\n')
+            f.write(entryfile + "\n")
         #
         f.close()
 
@@ -117,13 +114,12 @@ class DBLoadUtil(object):
             traceback.print_exc(file=self.__lfh)
 
     def __getSession(self):
-        """ Join existing session or create new session as required.
-        """
+        """Join existing session or create new session as required."""
         #
         self.__sObj = self.__reqObj.newSessionObj()
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        if (self.__verbose):
+        if self.__verbose:
             self.__lfh.write("------------------------------------------------------\n")
             self.__lfh.write("+DBLoadUtil.__getSession() - creating/joining session %s\n" % self.__sessionId)
             self.__lfh.write("+DBLoadUtil.__getSession() - session path %s\n" % self.__sessionPath)

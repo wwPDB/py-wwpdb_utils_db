@@ -54,8 +54,7 @@ logger = logging.getLogger(__name__)
 
 class StatusHistoryUtils(MyConnectionBase):
 
-    """ Wrapper for utilities for database loading of content from status history
-    """
+    """Wrapper for utilities for database loading of content from status history"""
 
     #
 
@@ -114,8 +113,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return hList
 
     def __makeEntryPathList(self, archivePath):
-        """ Return the list of entries in the archive directory names and paths -
-        """
+        """Return the list of entries in the archive directory names and paths -"""
         pathList = []
         dataList = []
         for root, dirs, _files in scandir.walk(archivePath, topdown=False):
@@ -127,8 +125,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
     #
     def createHistory(self, entryIdList, overWrite=False, statusUpdateAuthWait=None):
-        """ Read existing entry and create initial status records as required
-        """
+        """Read existing entry and create initial status records as required"""
         startTime = time.time()
         logger.debug("e========================================================================================================")
         logger.debug("Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -190,12 +187,12 @@ class StatusHistoryUtils(MyConnectionBase):
         return defValue
 
     def __createStatusHistoryFile(self, entryId, overWrite=False, statusUpdateAuthWait=None):
-        """ Read existing entry and create initial status records as required
+        """Read existing entry and create initial status records as required
 
-            overWrite = controls if existing files are rewritten.
-            statusUpdateAuthWait = [AUTH,WAIT]
-                                    This special case is required to create initial status
-                                    from the status module at the on the first setting of AUTH/WAIT status.
+        overWrite = controls if existing files are rewritten.
+        statusUpdateAuthWait = [AUTH,WAIT]
+                                This special case is required to create initial status
+                                from the status module at the on the first setting of AUTH/WAIT status.
         """
         statusFlag = False
         try:
@@ -389,8 +386,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return statusFlag
 
     def __schemaCreate(self, schemaDefObj):
-        """Create and load table schema using schema definition
-        """
+        """Create and load table schema using schema definition"""
         startTime = time.time()
         logger.debug("StatusHistoryUtils(__schemaCreate) Starting at %s\n", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -425,8 +421,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return ([e for e in t if e is not None] for t in zip_longest(*args))
 
     def loadBatchFilesWorker(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
-        """ Load tabular batch files created for the chemical component definitions into the database server.
-        """
+        """Load tabular batch files created for the chemical component definitions into the database server."""
         shsd = StatusHistorySchemaDef()
         myC = MyDbConnect(verbose=self.__verbose, log=self.__lfh)
         myC.setAuth(optionsD)
@@ -439,8 +434,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return dataList, dataList, []
 
     def loadStatusHistoryMulti(self, numProc=2, newTable=False):
-        """ Create batch load files for all status history data files - (multiprocessing version)
-        """
+        """Create batch load files for all status history data files - (multiprocessing version)"""
         if self.__verbose:
             logger.info("Starting")
         startTime = time.time()
@@ -510,8 +504,7 @@ class StatusHistoryUtils(MyConnectionBase):
         logger.debug("Completed at %s (%.2f seconds)", time.localtime(), endTime - startTime)
 
     def loadStatusHistory(self, newTable=False):
-        """  Do a full batch load/reload of status history files from the current file source (e.g. archive).
-        """
+        """Do a full batch load/reload of status history files from the current file source (e.g. archive)."""
         startTime = time.time()
         logger.debug("+StatusHistoryUtils(loadStatusHistory) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -549,8 +542,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return ok
 
     def loadEntryStatusHistory(self, entryIdList):
-        """  Load/reload of status history files for the current entry list obtained from the current file source (e.g. archive).
-        """
+        """Load/reload of status history files for the current entry list obtained from the current file source (e.g. archive)."""
         startTime = time.time()
         logger.debug("+StatusHistoryUtils(loadEntryStatusHistory) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime))
         try:
@@ -584,8 +576,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return ok
 
     def createStatusHistorySchema(self):
-        """  Create/recreate status history database schema -
-        """
+        """Create/recreate status history database schema -"""
         startTime = time.time()
         logger.debug("+StatusHistoryUtils(createStatusHistorySchema) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -611,11 +602,11 @@ class StatusHistoryUtils(MyConnectionBase):
         return ok
 
     def updateEntryStatusHistory(self, entryIdList, statusCode, annotatorInitials, details="Update by status module", statusCodePrior=None):
-        """  Update status history files from the input entry list obtained from the current file source (e.g. archive)
-             with the input (statusCode, annotatorInitials, and details).
+        """Update status history files from the input entry list obtained from the current file source (e.g. archive)
+        with the input (statusCode, annotatorInitials, and details).
 
-             Use the priorStatusCode to detect missing history records for the special case of ['AUCO','REPL'] where
-             an additional status record is inserted using a time stamp inferred from the modification date of a model milestone file.
+        Use the priorStatusCode to detect missing history records for the special case of ['AUCO','REPL'] where
+        an additional status record is inserted using a time stamp inferred from the modification date of a model milestone file.
 
 
         """

@@ -22,7 +22,7 @@ import traceback
 import time
 import os
 
-if __package__ is None or __package__ == '':
+if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import
 else:
@@ -46,8 +46,7 @@ class StatusLoadWrapperTests(unittest.TestCase):
         pass
 
     def testLoad(self):
-        """ Load da_internal database -
-        """
+        """Load da_internal database -"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
         self.__lfh.write("Starting StatusLoadWrapperTests testLoad at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
