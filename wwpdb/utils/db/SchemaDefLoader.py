@@ -131,10 +131,10 @@ class SchemaDefLoader(object):
     def __cleanUpFile(self, filePath):
         try:
             os.remove(filePath)
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             pass
 
-    def makeLoadFilesMulti(self, dataList, procName, optionsD, workingDir):
+    def makeLoadFilesMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
         """ Create a loadable data file for each table defined in the current schema
             definition object.   Data is extracted from the input file list.
 
@@ -266,7 +266,7 @@ class SchemaDefLoader(object):
                 exportList.append((tableId, fn))
         return exportList
 
-    def __evalMapFunction(self, dataContainer, rowList, attributeId, functionName, functionArgs=None):
+    def __evalMapFunction(self, dataContainer, rowList, attributeId, functionName, functionArgs=None):  # pylint: disable=unused-argument
         if (functionName == "datablockid()"):
             val = dataContainer.getName()
             for rowD in rowList:
@@ -361,7 +361,7 @@ class SchemaDefLoader(object):
                         d[atId] = val[:maxW] if ((val != '?') and (val != '.')) else nullValueDict[atId]
                     else:
                         d[atId] = val if ((val != '?') and (val != '.')) else nullValueDict[atId]
-                except:  # noqa: E722
+                except:  # noqa: E722 pylint: disable=bare-except
                     if (self.__verbose):
                         self.__lfh.write("\n+ERROR - processing table %s attribute %s row %r\n" % (schemaTableId, atId, row))
                         traceback.print_exc(file=self.__lfh)
@@ -410,7 +410,7 @@ class SchemaDefLoader(object):
                 for atName in indL:
                     try:
                         mK.append(row[attributeIndexDict[atName]])
-                    except:  # noqa: E722
+                    except:  # noqa: E722 pylint: disable=bare-except
                         # would reflect a serious issue of missing key-
                         if (self.__debug):
                             traceback.print_exc(file=self.__lfh)
@@ -427,7 +427,7 @@ class SchemaDefLoader(object):
                             d[atId] = val[:maxW] if ((val != '?') and (val != '.')) else nullValueDict[atId]
                         else:
                             d[atId] = val if ((val != '?') and (val != '.')) else nullValueDict[atId]
-                    except:  # noqa: E722
+                    except:  # noqa: E722 pylint: disable=bare-except
                         # only for testing -
                         if (self.__debug):
                             traceback.print_exc(file=self.__lfh)
@@ -443,7 +443,7 @@ class SchemaDefLoader(object):
 
         return mD.values()
 
-    def delete(self, tableId, containerNameList=None, deleteOpt='all'):
+    def delete(self, tableId, containerNameList=None, deleteOpt='all'):  # pylint: disable=unused-argument
         #
         startTime = time.time()
         sqlCommandList = self.__getSqlDeleteList(tableId, containerNameList=None, deleteOpt=deleteOpt)
@@ -486,7 +486,7 @@ class SchemaDefLoader(object):
             self.__lfh.write("+SchemaDefLoader(__getSqlDeleteList) delete SQL for %s : %r\n" % (tableId, sqlDeleteList))
         return sqlDeleteList
 
-    def __batchFileImport(self, tableId, tableLoadPath, sqlFilePath=None, containerNameList=None, deleteOpt='all'):
+    def __batchFileImport(self, tableId, tableLoadPath, sqlFilePath=None, containerNameList=None, deleteOpt='all'):  # pylint: disable=unused-argument
         """ Batch load the input table using data in the input loadable data file.
 
             if sqlFilePath is provided then any generated SQL commands are preserved in this file.
@@ -521,7 +521,7 @@ class SchemaDefLoader(object):
                 ofh = open(sqlFilePath, 'w')
                 ofh.write("%s" % '\n'.join(sqlCommandList))
                 ofh.close()
-            except:  # noqa: E722
+            except:  # noqa: E722 pylint: disable=bare-except
                 pass
         #
         myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
@@ -576,9 +576,9 @@ class SchemaDefLoader(object):
         for row in rowList:
             vList = []
             aList = []
-            for id, nm in zip(tableAttributeIdList, tableAttributeNameList):
-                if len(row[id]) > 0 and row[id] != r'\N':
-                    vList.append(row[id])
+            for tid, nm in zip(tableAttributeIdList, tableAttributeNameList):
+                if len(row[tid]) > 0 and row[tid] != r'\N':
+                    vList.append(row[tid])
                     aList.append(nm)
             sqlInsertList.append((sqlGen.insertTemplateSQL(databaseName, tableName, aList), vList))
 

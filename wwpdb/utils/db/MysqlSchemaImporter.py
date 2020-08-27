@@ -41,7 +41,7 @@ class MysqlSchemaImporter(object):
         cmd = self.__mysqlPath + cmdDetail + ' > %s' % filePath
         return os.system(cmd)
 
-    def __buildDef(self, dbName, tableName, colDataList):
+    def __buildDef(self, dbName, tableName, colDataList):  # pylint: disable=unused-argument
         defD = {}
         tableId = str(tableName).upper()
         attIdKeyList = []
@@ -111,8 +111,7 @@ class MysqlSchemaImporter(object):
         pprint.pprint(schemaDef, stream=sys.stdout, width=120, indent=3)
 
 
-if __name__ == "__main__":
-
+def __main():
     tableNameList = ['PDB_status_information',
                      'audit_author',
                      'chem_comp',
@@ -141,3 +140,7 @@ if __name__ == "__main__":
     dbHost = 'localhost'
     msi = MysqlSchemaImporter(dbUser, dbPw, dbHost, mysqlPath='/opt/local/bin/mysql', verbose=True, log=sys.stderr)
     msi.create('da_internal', tableNameList)
+
+
+if __name__ == "__main__":
+    __main()

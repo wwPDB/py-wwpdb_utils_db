@@ -27,11 +27,11 @@ import logging
 logger = logging.getLogger(__name__)
 #
 #
-if True:
+if True:  # pylint: disable=using-constant-test
     try:
         import sqlalchemy.pool as pool
         MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True)
-    except:  # noqa: E722
+    except:  # noqa: E722 pylint: disable=bare-except
         logger.exception("Creating MYSQL connection pool failing")
 
 
@@ -132,8 +132,8 @@ class MyConnectionBase(object):
         else:
             self.__dbPort = int(str(self.__dbPort))
 
-        logger.info("+MyConnectionBase(setResource) %s resource name %s server %s dns %s host %s user %s socket %s port %r" %
-                    (self.__siteId, resourceName, self.__dbServer, self.__databaseName, self.__dbHost, self.__dbUser, self.__dbSocket, self.__dbPort))
+        logger.info("+MyConnectionBase(setResource) %s resource name %s server %s dns %s host %s user %s socket %s port %r",
+                    self.__siteId, resourceName, self.__dbServer, self.__databaseName, self.__dbHost, self.__dbUser, self.__dbSocket, self.__dbPort)
         #
         self.__authD["DB_NAME"] = self.__databaseName
         self.__authD["DB_HOST"] = self.__dbHost
@@ -149,6 +149,7 @@ class MyConnectionBase(object):
 
     def setAuth(self, authD):
         try:
+            self.__authD = authD
             self.__databaseName = self.__authD["DB_NAME"]
             self.__dbHost = self.__authD["DB_HOST"]
             self.__dbUser = self.__authD["DB_USER"]
@@ -159,7 +160,7 @@ class MyConnectionBase(object):
             else:
                 self.__dbPort = 3306
             self.__dbServer = self.__authD["DB_SERVER"]
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             pass
 
     def openConnection(self):
@@ -192,9 +193,9 @@ class MyConnectionBase(object):
 
             self._dbCon = dbcon
             return True
-        except:  # noqa: E722
-            logger.exception("+MyDbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d \n" %
-                             (self.__dbServer, self.__dbHost, self.__databaseName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort))
+        except:  # noqa: E722 pylint: disable=bare-except
+            logger.exception("+MyDbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d \n",
+                             self.__dbServer, self.__dbHost, self.__databaseName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort)
             self._dbCon = None
 
         return False
@@ -215,7 +216,7 @@ class MyConnectionBase(object):
     def getCursor(self):
         try:
             return self._dbCon.cursor()
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             logger.exception("+MyConnectionBase(getCursor) failing.\n")
 
         return None

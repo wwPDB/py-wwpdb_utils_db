@@ -47,7 +47,7 @@ class StatusLoadWrapper(object):
         try:
             self.__lfh.write("+StatusLoadWrapper.dbload() site %s loading data set %s %s %s %s\n" % (self.__siteId, depSetId, fileSource, mileStone, versionId))
             pdbxFilePath = self.__pI.getModelPdbxFilePath(dataSetId=depSetId, fileSource=fileSource, versionId=versionId, mileStone=mileStone)
-            fD, fN = os.path.split(pdbxFilePath)
+            fD, fN = os.path.split(pdbxFilePath)  # pylint: disable=unused-variable
             dbLd = DbLoadingApi(log=self.__lfh, verbose=self.__verbose)
             return dbLd.doLoadStatus(pdbxFilePath, fD)
         except Exception as e:

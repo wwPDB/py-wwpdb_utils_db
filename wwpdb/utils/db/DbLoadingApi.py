@@ -20,7 +20,7 @@ import sys
 import traceback
 #
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=no-name-in-module,import-error
 from wwpdb.utils.db.SqlLoader import SqlLoader
 
 # import signal
@@ -63,12 +63,10 @@ class DbLoadingApi(object):
         """
            Take deposition id and session directory as input
 
-        """
-        """
-          If a sequence of commands appears in a pipeline, and one of the
-          reading commands finishes before the writer has finished, the
-          writer receives a SIGPIPE signal.
-          Set signal for running os.system() with broken PIPE problem
+           If a sequence of commands appears in a pipeline, and one of the
+           reading commands finishes before the writer has finished, the
+           writer receives a SIGPIPE signal.
+           Set signal for running os.system() with broken PIPE problem
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
@@ -133,7 +131,7 @@ class DbLoadingApi(object):
             dp.exp(sql_file)
             dp.cleanup()
             return
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::__generateLoadDb(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
 
@@ -188,7 +186,7 @@ class DbLoadingApi(object):
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
 
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
@@ -248,7 +246,7 @@ class DbLoadingApi(object):
             else:
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
@@ -258,12 +256,10 @@ class DbLoadingApi(object):
            Similar as doDataLoading(), Run db-loader with the option to
            get bcp data files, not sql commands.
 
-        """
-        """
-          If a sequence of commands appears in a pipeline, and one of the
-          reading commands finishes before the writer has finished, the
-          writer receives a SIGPIPE signal.
-          Set signal for running os.system() with broken PIPE problem
+           If a sequence of commands appears in a pipeline, and one of the
+           reading commands finishes before the writer has finished, the
+           writer receives a SIGPIPE signal.
+           Set signal for running os.system() with broken PIPE problem
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
         # print self.__dbHost
@@ -332,12 +328,10 @@ class DbLoadingApi(object):
 
            Note: mappingFile is the full path
 
-        """
-        """
-          If a sequence of commands appears in a pipeline, and one of the
-          reading commands finishes before the writer has finished, the
-          writer receives a SIGPIPE signal.
-          Set signal for running os.system() with broken PIPE problem
+           If a sequence of commands appears in a pipeline, and one of the
+           reading commands finishes before the writer has finished, the
+           writer receives a SIGPIPE signal.
+           Set signal for running os.system() with broken PIPE problem
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
         # print self.__dbHost

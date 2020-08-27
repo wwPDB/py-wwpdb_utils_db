@@ -20,7 +20,7 @@ import sys
 import traceback
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=import-error,no-name-in-module
 from wwpdb.utils.db.SqlLoader import SqlLoader
 
 __docformat__ = "restructuredtext en"
@@ -84,12 +84,12 @@ class DBLoadUtil(object):
             #
             return root + '_1.' + ext
 
-    def __genListFile(self, filename, list):
+    def __genListFile(self, filename, filelist):
         """
         """
         fn = os.path.join(self.__sessionPath, filename)
         f = open(fn, 'w')
-        for entryfile in list:
+        for entryfile in filelist:
             f.write(entryfile + '\n')
         #
         f.close()
@@ -112,7 +112,7 @@ class DBLoadUtil(object):
             dp.exp(sqlfile)
             dp.cleanup()
             return
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadUtil::__getLoadFile(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
 

@@ -41,11 +41,11 @@ import warnings
 
 #
 #
-if True:
+if True:  # pylint: disable=using-constant-test
     try:
         import sqlalchemy.pool as pool
         MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True)
-    except:  # noqa: E722
+    except:  # noqa: E722 pylint: disable=bare-except
         pass
 
 
@@ -172,7 +172,7 @@ class MyDbConnect(object):
                 self.__dbcon.close()
                 self.__dbcon = None
                 return True
-            except:  # noqa: E722
+            except:  # noqa: E722 pylint: disable=bare-except
                 pass
         return False
 
@@ -236,7 +236,7 @@ class MyDbQuery(object):
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (t % tuple(v)))
             self.__dbcon.rollback()
             curs.close()
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("MyDbQuery.sqlCommand generated exception for command:\n%s\n" % (t % tuple(v)))
                 traceback.print_exc(file=self.__lfh)
@@ -244,12 +244,14 @@ class MyDbQuery(object):
             curs.close()
         return False
 
-    def sqlTemplateCommand(self, sqlTemplate=None, valueList=[]):
+    def sqlTemplateCommand(self, sqlTemplate=None, valueList=None):
         """  Execute sql template command with associated value list.
 
              Errors and warnings that generate exceptions are caught by this method.
         """
         # warnings.simplefilter("error", MySQLdb.Warning)
+        if valueList is None:
+            valueList = []
         self.__setWarningHandler()
         try:
             curs = self.__dbcon.cursor()
@@ -270,7 +272,7 @@ class MyDbQuery(object):
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
             self.__dbcon.rollback()
             curs.close()
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
                 traceback.print_exc(file=self.__lfh)
@@ -324,7 +326,7 @@ class MyDbQuery(object):
                 traceback.print_exc(file=self.__lfh)
             # self.__dbcon.rollback()
             curs.close()
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % sqlCommand)
                 traceback.print_exc(file=self.__lfh)
@@ -359,7 +361,7 @@ class MyDbQuery(object):
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                     self.__lfh.write("MyDbQuery.sqlCommand MySQL warning is message is:\n%s\n" % e)
                 curs.close()
-            except:  # noqa: E722
+            except:  # noqa: E722 pylint: disable=bare-except
                 if (self.__verbose):
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                 curs.close()
@@ -409,7 +411,7 @@ class MyDbQuery(object):
                     self.__lfh.write("MyDbQuery.sqlCommand MySQL warning is message is:\n%s\n" % e)
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                 curs.close()
-            except:  # noqa: E722
+            except:  # noqa: E722 pylint: disable=bare-except
                 if (self.__verbose):
                     self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % queryString)
                     traceback.print_exc(file=self.__lfh)
@@ -417,10 +419,18 @@ class MyDbQuery(object):
 
         return []
 
-    def simpleQuery(self, selectList=[], fromList=[], condition='',
-                    orderList=[], returnObj=[]):
+    def simpleQuery(self, selectList=None, fromList=None, condition='',
+                    orderList=None, returnObj=None):
         """
         """
+        if selectList is None:
+            selectList = []
+        if fromList is None:
+            fromList = []
+        if orderList is None:
+            orderList = []
+        if returnObj is None:
+            returnObj = []
         #
         colsCsv = ",".join(["%s" % k for k in selectList])
         tablesCsv = ",".join(["%s" % k for k in fromList])
@@ -454,253 +464,5 @@ class MyDbQuery(object):
             rowL = self.selectRows(queryString=tSQL)
             tup = rowL[0]
             return int(str(tup[0])) == count
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=bare-except
             return False
-
-    #
-    def OldxselectRow(self, tableDefObj, constraintDef, returnRowDict=None):
-        """ Execute query on the single table described by "tableDefObj"
-            subject to the conditions in "constraintDef"
-
-            ConstraintDef can be a simple of dictionary of key == value pairs
-            which are logically AND'd together, or a more general constraint
-            can be contructed using the compact contraint specification list
-            decoded in method makeSqlConstraint() above.
-
-            Add any result to dictionary returnRowDict[attributeId]=value for any
-            attributes in tableDefObj.
-        """
-        #
-        if returnRowDict is None:
-            returnRowDict = {}
-        #
-        tableName = tableDefObj.getName()
-        #
-        # Get the ordered lists of attributeId's and attributeNames
-        #
-        attributeIdList = tableDefObj.getAttributeIdList()
-        attributeNameList = tableDefObj.getAttributeNameList()
-
-        attribsCsv = ",".join(attributeNameList)
-        #
-        #  Build selection constraints ...
-        #
-        constraintSql = self.makeSqlConstraint(constraintDef)
-        #
-        query = "SELECT " + attribsCsv + " FROM " + tableName + constraintSql
-        if (self.__verbose and self.__lfh):
-            self.__lfh.write("Query: %s\n" % query)
-
-        # #
-        row = {}
-        curs = self.__dbcon.cursor()
-        curs.execute(query)
-        result = curs.fetchone()
-        if (result is not None):
-            ir = 0
-            for k in attributeIdList:
-                row[k] = result[ir]
-                ir += 1
-        #
-        # copy any new results to the accumulator in returnRowDict
-        for k, v in row.items():
-            if (k not in returnRowDict):
-                returnRowDict[k] = v
-
-    def OldselectRows(self, tableDef, constraintDef, returnKeyAttribTuple=(None, None, None),
-                      orderList=[], selectList=[], returnObj=None):
-        """ Execute query on the table described by "tableDef"
-            subject to the conditions in constraintDef and
-            sorted by the list of attributes in orderList [(attrib,type),..].
-            An optional selectList=[attrib,attrib] can be provided to limit
-            the query selection.
-
-            ConstraintDef can be a simple of dictionary of key == value pairs
-            which are logically AND'd together, or a more general constraint
-            can be contructed using the compact contraint specification list
-            decoded in method makeSqlConstraint() above.
-
-            Return a <row list or row dictionary>.
-        """
-        #
-        tableName = tableDef['TABLE_NAME']
-        attribDict = tableDef['ATTRIBUTES']
-        if (len(selectList) > 0):
-            if (returnKeyAttribTuple is not None):
-                selectList.append(returnKeyAttribTuple[0])
-            attribsCsv = ",".join(["%s" % attribDict[k] for k in selectList])
-            attribs = selectList
-        else:
-            attribsCsv = ",".join(["%s" % v for v in attribDict.values()])
-            attribs = attribDict.keys()
-
-        #
-        #  Build selection constraints ...
-        #
-        constraint = self.makeSqlConstraint(attribDict, constraintDef)
-
-        order = ""
-        if (len(orderList) > 0):
-            (a, t) = orderList[0]
-            order = " ORDER BY CAST(%s AS %s)" % (attribDict[a], t)
-            for (a, t) in orderList[1:]:
-                order += ", CAST(%s AS %s)" % (a, t)
-
-        #
-        query = "SELECT " + attribsCsv + " FROM " + tableName + constraint + order
-        if (self.__verbose and self.__lfh):
-            self.__lfh.write("Query: %s\n" % query)
-        #
-        ##
-        if (returnKeyAttribTuple is None):
-            if (returnObj is None):
-                returnObj = []
-        else:
-            if (returnObj is None):
-                returnObj = {}
-            kUniq = True
-            kRet = returnKeyAttribTuple[0]
-            if (len(returnKeyAttribTuple) == 3):
-                if (returnKeyAttribTuple[1] == 'INT'):
-                    kType = 'int'
-                else:
-                    kType = 'str'
-                if (returnKeyAttribTuple[2] == 'LIST'):
-                    kUniq = False
-                if (self.__verbose and self.__lfh):
-                    self.__lfh.write("returnKeyAttribTuple: %s type %s uniq %s\n" %
-                                     (returnKeyAttribTuple[0], returnKeyAttribTuple[1],
-                                      returnKeyAttribTuple[2]))
-            elif (len(returnKeyAttribTuple) == 2):
-                if (returnKeyAttribTuple[1] == 'INT'):
-                    kType = 'int'
-                else:
-                    kType = 'str'
-                if (self.__verbose and self.__lfh):
-                    self.__lfh.write("returnKeyAttribTuple: %s type %s\n" %
-                                     (returnKeyAttribTuple[0], returnKeyAttribTuple[1]))
-
-            else:
-                kType = None
-
-        curs = self.__dbcon.cursor()
-        curs.execute(query)
-        while True:
-            result = curs.fetchone()
-            if (result is not None):
-                row = {}
-                ir = 0
-                for k in attribs:
-                    row[k] = result[ir]
-                    ir += 1
-                if (returnKeyAttribTuple is None):
-                    returnObj.append(row)
-                else:
-                    if (kUniq):
-                        if (kType is None):
-                            returnObj[row[kRet]] = row
-                        elif (kType == 'str'):
-                            returnObj[str(row[kRet])] = row
-                        elif (kType == 'int'):
-                            returnObj[int(row[kRet])] = row
-                    else:
-                        if (kType is None):
-                            if (row[kRet] not in returnObj):
-                                returnObj[row[kRet]] = []
-                            returnObj[row[kRet]].append(row)
-                        elif (kType == 'str'):
-                            if (str(row[kRet]) not in returnObj):
-                                returnObj[str(row[kRet])] = []
-                            returnObj[str(row[kRet])].append(row)
-                        elif (kType == 'int'):
-                            if (int(row[kRet]) not in returnObj):
-                                returnObj[int(row[kRet])] = []
-                            returnObj[int(row[kRet])].append(row)
-            else:
-                break
-
-        return returnObj
-
-#
-    def OLDmakeSqlConstraint(self, attribDict, constraintDef):
-        """  Returns SQL string for the query constraint encoded in the input constraintDf
-
-        attribDict[attributeId]=attributeName
-
-        constraintDef-> [] or {}
-
-        A DICTIONARY of  key=value pairs employed as  key=value [AND...]
-
-                 constraint[attributeId]=attributeValue
-
-        or a LIST of tuples with the following syntax:
-
-             ('EQ'|'GE'|'GT'|'LT'|'LE'|'LIKE', AttributeId, Value, 'CHAR'|'OTHER') ->  key op value
-
-             ('LOGOP', 'AND'|'OR'|'NOT')     -> logical combination
-
-             ('GROUP', 'BEGIN|END')          -> (parenthesis control)
-
-        """
-        #
-        constraint = ""
-        cType = str(type(constraintDef))
-
-        if (cType.find('dict') > 0):
-            l = []  # noqa: E741
-            for k, v in constraintDef.items():
-                c = " %s = '%s' " % (attribDict[k], v)
-                l.append(c)
-
-                if (len(l) > 0):
-                    constraint = " WHERE " + l[0]
-                    for c in l[1:]:
-                        constraint += " AND " + c
-        elif (cType.find('list') > 0):
-            #
-            # List of tuples with the following syntax:
-            #
-            # ('EQ'|'GE'|'GT'|'LT'|'LE'|'LIKE', AttributeId, Value, type)
-            # ('LOGOP', 'AND'|'OR'|'NOT')
-            # ('GROUP', 'BEGIN|END')
-
-            if (len(constraintDef) > 0):
-                constraint += ' WHERE '
-                for c in constraintDef:
-                    if (len(c) == 4 and str(c[0]).upper() in self.__ops):
-
-                        if (str(c[3]).upper() == 'CHAR'):
-                            constraint += " %s %s '%s' " % \
-                                          (attribDict[str(c[1]).upper()],
-                                           self.__opDict[str(c[0]).upper()],
-                                           str(c[2]))
-                        else:
-                            constraint += " %s %s %s " % \
-                                          (attribDict[str(c[1]).upper()],
-                                           self.__opDict[str(c[0]).upper()],
-                                           str(c[2]))
-
-                    elif (len(c) == 3 and str(c[0]).upper() in self.__ops):
-                        constraint += " %s %s '%s' " % \
-                                      (attribDict[str(c[1]).upper()],
-                                       self.__opDict[str(c[0]).upper()],
-                                       str(c[2]))
-                    elif (len(c) == 2 and str(c[0]).upper() == 'GROUP'
-                          and str(c[1]).upper() in self.__grpOps):
-                        if (str(c[1]).upper() == 'BEGIN'):
-                            constraint += "("
-                        else:
-                            constraint += ")"
-                    elif (len(c) == 2 and str(c[0]).upper() == 'LOGOP'
-                          and str(c[1]).upper() in self.__logOps):
-                        constraint += " %s " % str(c[1]).upper()
-                    else:
-                        if (self.__lfh):
-                            self.__lfh.write("Constraint error : %s\n" % str(c))
-
-        else:
-            #           Just ignore if contraints are entered as None
-            #            if (self.__lfh): self.__lfh.write("Constraint type error : %s\n" % str(cType))
-            pass
-
-        return constraint
