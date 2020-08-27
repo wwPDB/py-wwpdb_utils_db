@@ -25,21 +25,17 @@ from wwpdb.utils.db.WorkflowSchemaDef import WorkflowSchemaDef
 
 
 class WorkflowSchemaReportTests(unittest.TestCase):
-
     def setUp(self):
         self.__lfh = sys.stdout
-        self.__verbose = False
+        self.__verbose = True
 
     def tearDown(self):
         pass
 
     def testSelect1(self):
-        """Test case -  selection everything for a simple condition -
-        """
+        """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting WorkflowSchemaReportTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             sd = WorkflowSchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = sd.getTableIdList()
@@ -50,33 +46,30 @@ class WorkflowSchemaReportTests(unittest.TestCase):
                 for aId in aIdList:
                     sqlGen.addSelectAttributeId(attributeTuple=(tableId, aId))
 
-                if 'DEP_SET_ID' in aIdList:
+                if "DEP_SET_ID" in aIdList:
                     sqlCondition = MyDbConditionSqlGen(schemaDefObj=sd, verbose=self.__verbose, log=self.__lfh)
-                    sqlCondition.addValueCondition((tableId, "DEP_SET_ID"), 'EQ', ('D_1000000000', 'CHAR'))
+                    sqlCondition.addValueCondition((tableId, "DEP_SET_ID"), "EQ", ("D_1000000000", "CHAR"))
                     sqlGen.setCondition(sqlCondition)
-                if 'ORDINAL_ID' in aIdList:
-                    sqlGen.addOrderByAttributeId(attributeTuple=(tableId, 'ORDINAL_ID'))
+                if "ORDINAL_ID" in aIdList:
+                    sqlGen.addOrderByAttributeId(attributeTuple=(tableId, "ORDINAL_ID"))
                 sqlS = sqlGen.getSql()
-                if (self.__verbose):
+                if self.__verbose:
                     self.__lfh.write("\n\n+MyDbSqlGenTests table creation SQL string\n %s\n\n" % sqlS)
                 sqlGen.clear()
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except  # pragma: no cover
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%d seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted WorkflowSchemaReportTests tesSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
 
-def suiteSelect():
-    suiteSelect = unittest.TestSuite()
-    suiteSelect.addTest(WorkflowSchemaReportTests("testSelect1"))
-    return suiteSelect
+def suiteSelect():  # pragma: no cover
+    suiteSelectA = unittest.TestSuite()
+    suiteSelectA.addTest(WorkflowSchemaReportTests("testSelect1"))
+    return suiteSelectA
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":  # pragma: no cover
     mySuite = suiteSelect()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

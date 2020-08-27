@@ -3,7 +3,7 @@
     File:    DbLoadingApi.py
 
     Providing an API for WFM to parse the cif file and run MYSQL commands to load data to the database 'da_internal'.
- 
+
    __author__    = "Li Chen"
    __email__     = "lchen@rcsb.rutgers.edu"
    __version__   = "V0.01"
@@ -15,23 +15,23 @@
    21-May-2015  LC Add function doDataLoadingBcp()
 """
 
-import os, sys, traceback
+import os
+import sys
+import traceback
+
 #
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=no-name-in-module,import-error
 from wwpdb.utils.db.SqlLoader import SqlLoader
 
 # import signal
 
 
 class DbLoadingApi(object):
-    """
-    """
+    """"""
 
     def __init__(self, log=sys.stderr, verbose=False):
-        """
-           
-        """
+        """"""
         self.__lfh = log
         self.__verbose = verbose
         self.__debug = True
@@ -60,22 +60,20 @@ class DbLoadingApi(object):
 
     def doDataLoading(self, depId, sessionDir):
         """
-           Take deposition id and session directory as input
+        Take deposition id and session directory as input
 
-        """
-        """
-          If a sequence of commands appears in a pipeline, and one of the
-          reading commands finishes before the writer has finished, the
-          writer receives a SIGPIPE signal.
-          Set signal for running os.system() with broken PIPE problem
+        If a sequence of commands appears in a pipeline, and one of the
+        reading commands finishes before the writer has finished, the
+        writer receives a SIGPIPE signal.
+        Set signal for running os.system() with broken PIPE problem
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
         depId = depId.upper()
         cifPath = self.__workPath + "/" + depId + "/"
-        ## test if there is any cif file if yes do ...
 
-        if (os.path.exists(cifPath + depId + '_model_P1.cif.V1')):
+        # test if there is any cif file if yes do ...
+        if os.path.exists(cifPath + depId + "_model_P1.cif.V1"):
             dataDir = sessionDir + "/" + self.__workDir
             log1 = "db-loader.log"
             if not os.path.exists(dataDir):
@@ -91,63 +89,78 @@ class DbLoadingApi(object):
             # for file in os.listdir(dataDir):
             #    print file
 
-            if (os.path.exists(dataDir + "/FILELIST")):
+            if os.path.exists(dataDir + "/FILELIST"):
                 # checking generated files
                 file1 = os.path.join(dataDir, "DB_LOADER.sql")
                 log2 = os.path.join(dataDir, "data_loading.log")
-                if (os.path.exists(file1)):
+                if os.path.exists(file1):
                     cmd = "cd " + dataDir
                     if self.__dbSocket is None:
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + " >&" + log2
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + " >&" + log2
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + file1
+                            + " >&"
+                            + log2
+                        )  # noqa: E501
 
                     os.system(cmd)
-                    if (os.path.exists(log2)):
+                    if os.path.exists(log2):
                         print("Finished the database commands")
-                        file = open(log2, 'r')
+                        file = open(log2, "r")
                         for line in file:
                             for word in line.split():
-                                if (word.upper() == "ERROR"):
-                                    print(
-                                        "DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file " + log2 + " for details.")
+                                if word.upper() == "ERROR":
+                                    print("DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file " + log2 + " for details.")
 
                 else:
                     print(
-                        "DbLoadingApi::doDataLoading(): db-loader didn't generate the data file \"DB_LOADER.sql\". Please check the log file " + os.path.join(
-                            dataDir, log1) + " for details.")
+                        'DbLoadingApi::doDataLoading(): db-loader didn\'t generate the data file "DB_LOADER.sql". Please check the log file '
+                        + os.path.join(dataDir, log1)
+                        + " for details."
+                    )
             else:
                 print("DbLoadingApi::doDataLoading(): No cif file found. Please check if the cif file exists.")
 
-
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")
-
 
     def __generateLoadDb(self, tmpPath, filePath, sql_file, logFile):
         try:
             dp = RcsbDpUtility(tmpPath=tmpPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(filePath)
-            dp.addInput(name = "mapping_file", value=self.__mapping, type="file")
+            dp.addInput(name="mapping_file", value=self.__mapping, type="file")
             dp.op("db-loader")
             dp.expLog(logFile)
             dp.exp(sql_file)
             dp.cleanup()
             return
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::__generateLoadDb(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
 
     def doLoadStatus(self, pdbxFilePath, sessionDir):
         """
-           Load the input file into the status database and session directory as input
+        Load the input file into the status database and session directory as input
 
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-        self.__lfh.write(
-            "DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
+        self.__lfh.write("DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
         try:
-            if (os.path.exists(pdbxFilePath)):
+            if os.path.exists(pdbxFilePath):
                 dataDir = sessionDir + "/" + self.__workDir
 
                 if not os.path.exists(dataDir):
@@ -159,7 +172,7 @@ class DbLoadingApi(object):
 
                 sql_file = os.path.join(dataDir, "DB_LOADER.sql")
                 log1 = os.path.join(dataDir, "db-loader.log")
-                
+
                 self.__generateLoadDb(dataDir, pdbxFilePath, sql_file, log1)
 
                 log2 = os.path.join(dataDir, "status_load.log")
@@ -168,19 +181,17 @@ class DbLoadingApi(object):
 
                 if os.path.exists(sql_file):
                     sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
-                    #self.__loadSql(sql_file, log2)
                     sq.loadSql(sql_file, log2)
                 else:
                     self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
                     return False
 
-                if (os.path.exists(log2)):
-                    with open(log2, 'r') as fin:
+                if os.path.exists(log2):
+                    with open(log2, "r") as fin:
                         for line in fin:
                             for word in line.split():
-                                if (word.upper() == "ERROR"):
-                                    self.__lfh.write(
-                                        "DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
+                                if word.upper() == "ERROR":
+                                    self.__lfh.write("DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
                                     return False
 
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
@@ -190,22 +201,20 @@ class DbLoadingApi(object):
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
 
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
 
-
     def XXXdoLoadStatus(self, pdbxFilePath, sessionDir):
         """
-           Load the input file into the status database and session directory as input
+        Load the input file into the status database and session directory as input
 
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-        self.__lfh.write(
-            "DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
+        self.__lfh.write("DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
         try:
-            if (os.path.exists(pdbxFilePath)):
+            if os.path.exists(pdbxFilePath):
                 dataDir = sessionDir + "/" + self.__workDir
                 log1 = "db-loader.log"
                 if not os.path.exists(dataDir):
@@ -220,27 +229,45 @@ class DbLoadingApi(object):
 
                 file1 = os.path.join(dataDir, "DB_LOADER.sql")
                 log2 = os.path.join(dataDir, "status_load.log")
-                if (os.path.exists(file1)):
+                if os.path.exists(file1):
                     cmd = "cd " + dataDir
                     if self.__dbSocket is None:
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + " >& " + log2
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + " >& " + log2
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + file1
+                            + " >& "
+                            + log2
+                        )  # noqa: E501
                     if self.__debug:
                         self.__lfh.write("DbLoadingApi::doLoadStatus(): database server command %s\n" % cmd)
                     os.system(cmd)
-                    if (os.path.exists(log2)):
-                        file = open(log2, 'r')
+                    if os.path.exists(log2):
+                        file = open(log2, "r")
                         for line in file:
                             for word in line.split():
-                                if (word.upper() == "ERROR"):
-                                    self.__lfh.write(
-                                        "DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
+                                if word.upper() == "ERROR":
+                                    self.__lfh.write("DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
                                     return False
                     else:
                         self.__lfh.write(
-                            "DbLoadingApi::doLoadStatus(): db-loader didn't generate the data file \"DB_LOADER.sql\". Please check the log file " + os.path.join(
-                                dataDir, log1) + " for details.\n")
+                            'DbLoadingApi::doLoadStatus(): db-loader didn\'t generate the data file "DB_LOADER.sql". Please check the log file '
+                            + os.path.join(dataDir, log1)
+                            + " for details.\n"
+                        )
 
                     #
                     self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
@@ -251,31 +278,29 @@ class DbLoadingApi(object):
             else:
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
 
     def doDataLoadingBcp(self, depId, sessionDir):
         """
-           Similar as doDataLoading(), Run db-loader with the option to
-           get bcp data files, not sql commands.
+        Similar as doDataLoading(), Run db-loader with the option to
+        get bcp data files, not sql commands.
 
-        """
-        """
-          If a sequence of commands appears in a pipeline, and one of the
-          reading commands finishes before the writer has finished, the
-          writer receives a SIGPIPE signal.
-          Set signal for running os.system() with broken PIPE problem
+        If a sequence of commands appears in a pipeline, and one of the
+        reading commands finishes before the writer has finished, the
+        writer receives a SIGPIPE signal.
+        Set signal for running os.system() with broken PIPE problem
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
         # print self.__dbHost
 
         depId = depId.upper()
         cifPath = self.__workPath + "/" + depId + "/"
-        ## test if there is any cif file if yes do ...
+        # test if there is any cif file if yes do ...
 
-        if (os.path.exists(cifPath + depId + '_model_P1.cif.V1')):
+        if os.path.exists(cifPath + depId + "_model_P1.cif.V1"):
             dataDir = sessionDir + "/" + self.__workDir
             log1 = "db-loader.log"
             if not os.path.exists(dataDir):
@@ -292,56 +317,88 @@ class DbLoadingApi(object):
             # for file in os.listdir(dataDir):
             #    print file
 
-            if (os.path.exists(dataDir + "/FILELIST")):
+            if os.path.exists(dataDir + "/FILELIST"):
                 # checking generated files
                 file1 = os.path.join(dataDir, "DB_LOADER_DELETE.sql")
                 file2 = os.path.join(dataDir, "DB_LOADER_LOAD.sql")
                 log2 = os.path.join(dataDir, "data_loading.log")
                 log3 = os.path.join(dataDir, "data_delete.log")
-                if (os.path.exists(file2)):
+                if os.path.exists(file2):
                     cmd = "cd " + dataDir
                     if self.__dbSocket is None:
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + ">& " + log3
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file2 + ">& " + log2
 
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + ">& " + log3
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file2 + ">& " + log2
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + file1
+                            + ">& "
+                            + log3
+                        )  # noqa: E501
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + file2
+                            + ">& "
+                            + log2
+                        )  # noqa: E501
                     # print cmd
                     os.system(cmd)
-                    if (os.path.exists(log2)):
+                    if os.path.exists(log2):
                         print("Finished the database commands")
-                        file = open(log2, 'r')
+                        file = open(log2, "r")
                         for line in file:
                             for word in line.split():
-                                if (word.upper() == "ERROR"):
-                                    print(
-                                        "DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file " + log2 + " for details.")
+                                if word.upper() == "ERROR":
+                                    print("DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file " + log2 + " for details.")
 
                 else:
                     print(
-                        "DbLoadingApi::doDataLoading(): db-loader didn't generate the data file \"DB_LOADER_LOAD.sql\". Please check the log file " + os.path.join(
-                            dataDir, log1) + " for details.")
+                        'DbLoadingApi::doDataLoading(): db-loader didn\'t generate the data file "DB_LOADER_LOAD.sql". Please check the log file '
+                        + os.path.join(dataDir, log1)
+                        + " for details."
+                    )
             else:
                 print("DbLoadingApi::doDataLoading(): No cif file found. Please check if the cif file exists.")
-
 
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")
 
     def doDataLoadingByMapping(self, depId, sessionDir, mappingFile, dbName):
         """
-           Similar as doDataLoading(), Run db-loader with the option to
-           get bcp data files using the giving mapping file and dbname.
+        Similar as doDataLoading(), Run db-loader with the option to
+        get bcp data files using the giving mapping file and dbname.
 
-           Note: mappingFile is the full path
+        Note: mappingFile is the full path
 
-        """
-        """
-          If a sequence of commands appears in a pipeline, and one of the
-          reading commands finishes before the writer has finished, the
-          writer receives a SIGPIPE signal.
-          Set signal for running os.system() with broken PIPE problem
+        If a sequence of commands appears in a pipeline, and one of the
+        reading commands finishes before the writer has finished, the
+        writer receives a SIGPIPE signal.
+        Set signal for running os.system() with broken PIPE problem
         """
         # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
         # print self.__dbHost
@@ -349,9 +406,9 @@ class DbLoadingApi(object):
         depId = depId.upper()
         myMappingFile = mappingFile
         cifPath = self.__workPath + "/" + depId + "/"
-        ## test if there is any cif file if yes do ...
+        # test if there is any cif file if yes do ...
 
-        if (os.path.exists(cifPath + depId + '_model_P1.cif.V1')):
+        if os.path.exists(cifPath + depId + "_model_P1.cif.V1"):
             dataDir = sessionDir + "/" + self.__workDir
             log1 = "db-loader.log"
             if not os.path.exists(dataDir):
@@ -368,42 +425,76 @@ class DbLoadingApi(object):
             # for file in os.listdir(dataDir):
             #    print file
 
-            if (os.path.exists(dataDir + "/FILELIST")):
+            if os.path.exists(dataDir + "/FILELIST"):
                 # checking generated files
                 file1 = os.path.join(dataDir, "DB_LOADER_DELETE.sql")
                 file2 = os.path.join(dataDir, "DB_LOADER_LOAD.sql")
                 log2 = os.path.join(dataDir, "data_loading.log")
                 log3 = os.path.join(dataDir, "data_delete.log")
-                if (os.path.exists(file2)):
+                if os.path.exists(file2):
                     cmd = "cd " + dataDir
                     if self.__dbSocket is None:
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + ">& " + log3
                         cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file2 + ">& " + log2
 
                     else:
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file1 + ">& " + log3
-                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " -S " + self.__dbSocket + " <" + file2 + ">& " + log2
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + file1
+                            + ">& "
+                            + log3
+                        )  # noqa: E501
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + file2
+                            + ">& "
+                            + log2
+                        )  # noqa: E501
                     # print cmd
                     os.system(cmd)
-                    if (os.path.exists(log2)):
+                    if os.path.exists(log2):
                         print("Finished the database commands")
-                        file = open(log2, 'r')
+                        file = open(log2, "r")
                         for line in file:
                             for word in line.split():
-                                if (word.upper() == "ERROR"):
-                                    print(
-                                        "DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file " + log2 + " for details.")
+                                if word.upper() == "ERROR":
+                                    print("DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file " + log2 + " for details.")
 
                 else:
                     print(
-                        "DbLoadingApi::doDataLoading(): db-loader didn't generate the data file \"DB_LOADER_LOAD.sql\". Please check the log file " + os.path.join(
-                            dataDir, log1) + " for details.")
+                        'DbLoadingApi::doDataLoading(): db-loader didn\'t generate the data file "DB_LOADER_LOAD.sql". Please check the log file '
+                        + os.path.join(dataDir, log1)
+                        + " for details."
+                    )
             else:
                 print("DbLoadingApi::doDataLoading(): No cif file found. Please check if the cif file exists.")
-
 
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")
 
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         pass

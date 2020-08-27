@@ -25,7 +25,6 @@ from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 
 
 class PdbDistroSchemaReportTests(unittest.TestCase):
-
     def setUp(self):
         self.__lfh = sys.stdout
         self.__verbose = False
@@ -34,32 +33,31 @@ class PdbDistroSchemaReportTests(unittest.TestCase):
         pass
 
     def testSelect1(self):
-        """Test case -  selection everything for a simple condition -
-        """
+        """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
-                                                       sys._getframe().f_code.co_name,
-                                                       time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting PdbDistroSchemaReportTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             # selection list  -
-            sList = [('PDB_ENTRY_TMP', 'PDB_ID'), ('REFINE', 'LS_D_RES_LOW'), ('REFINE', 'LS_R_FACTOR_R_WORK')]
+            sList = [("PDB_ENTRY_TMP", "PDB_ID"), ("REFINE", "LS_D_RES_LOW"), ("REFINE", "LS_R_FACTOR_R_WORK")]
             # condition value list -
-            cList = [(('PDB_ENTRY_TMP', 'PDB_ID'), 'LIKE', ('x-ray', 'char')),
-                     (('PDB_ENTRY_TMP', 'STATUS_CODE'), 'EQ', ('REL', 'char')),
-                     (('PDB_ENTRY_TMP', 'METHOD'), 'NE', ('THEORETICAL_MODEL', 'char')),
-                     (('PDBX_WEBSELECT', 'ENTRY_TYPE'), 'EQ', ('PROTEIN', 'char')),
-                     (('PDBX_WEBSELECT', 'CRYSTAL_TWIN'), 'GT', (0, 'int')),
-                     (('PDBX_WEBSELECT', 'REFINEMENT_SOFTWARE'), 'LIKE', ('REFMAC', 'char')),
-                     (('PDBX_WEBSELECT', 'DATE_OF_RCSB_RELEASE'), 'GE', (1900, 'date')),
-                     (('PDBX_WEBSELECT', 'DATE_OF_RCSB_RELEASE'), 'LE', (2014, 'date'))
-                     ]
+            cList = [
+                (("PDB_ENTRY_TMP", "PDB_ID"), "LIKE", ("x-ray", "char")),
+                (("PDB_ENTRY_TMP", "STATUS_CODE"), "EQ", ("REL", "char")),
+                (("PDB_ENTRY_TMP", "METHOD"), "NE", ("THEORETICAL_MODEL", "char")),
+                (("PDBX_WEBSELECT", "ENTRY_TYPE"), "EQ", ("PROTEIN", "char")),
+                (("PDBX_WEBSELECT", "CRYSTAL_TWIN"), "GT", (0, "int")),
+                (("PDBX_WEBSELECT", "REFINEMENT_SOFTWARE"), "LIKE", ("REFMAC", "char")),
+                (("PDBX_WEBSELECT", "DATE_OF_RCSB_RELEASE"), "GE", (1900, "date")),
+                (("PDBX_WEBSELECT", "DATE_OF_RCSB_RELEASE"), "LE", (2014, "date")),
+            ]
             #
             #
-            gList = [('OR', ('PDBX_WEBSELECT', 'METHOD_TO_DETERMINE_STRUCT'), 'LIKE', ('MOLECULAR REPLACEMENT', 'char')),
-                     ('OR', ('PDBX_WEBSELECT', 'METHOD_TO_DETERMINE_STRUCT'), 'LIKE', ('MR', 'char'))
-                     ]
+            gList = [
+                ("OR", ("PDBX_WEBSELECT", "METHOD_TO_DETERMINE_STRUCT"), "LIKE", ("MOLECULAR REPLACEMENT", "char")),
+                ("OR", ("PDBX_WEBSELECT", "METHOD_TO_DETERMINE_STRUCT"), "LIKE", ("MR", "char")),
+            ]
             # attribute ordering list
-            oList = [('PDB_ENTRY_TMP', 'PDB_ID'), ('REFINE', 'LS_D_RES_LOW'), ('REFINE', 'LS_R_FACTOR_R_WORK')]
+            oList = [("PDB_ENTRY_TMP", "PDB_ID"), ("REFINE", "LS_D_RES_LOW"), ("REFINE", "LS_R_FACTOR_R_WORK")]
 
             sd = PdbDistroSchemaDef(verbose=self.__verbose, log=self.__lfh)
             # tableIdList = sd.getTableIdList()
@@ -74,33 +72,30 @@ class PdbDistroSchemaReportTests(unittest.TestCase):
             sqlCondition = MyDbConditionSqlGen(schemaDefObj=sd, verbose=self.__verbose, log=self.__lfh)
             for cTup in cList:
                 sqlCondition.addValueCondition(cTup[0], cTup[1], cTup[2])
-            sqlCondition.addGroupValueConditionList(gList, preOp='AND')
+            sqlCondition.addGroupValueConditionList(gList, preOp="AND")
             sqlCondition.addTables(sTableIdList)
             #
             sqlGen.setCondition(sqlCondition)
             for oTup in oList:
                 sqlGen.addOrderByAttributeId(attributeTuple=oTup)
             sqlS = sqlGen.getSql()
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("\n\n+MyDbSqlGenTests table creation SQL string\n %s\n\n" % sqlS)
             sqlGen.clear()
-        except:
+        except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted %s %s at %s (%d seconds)\n" % (self.__class__.__name__,
-                                                                     sys._getframe().f_code.co_name,
-                                                                     time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
-                                                                     endTime - startTime))
+        self.__lfh.write("\nCompleted PdbDistroSchemaReportTests testSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
 
 def suiteSelect():
-    suiteSelect = unittest.TestSuite()
-    suiteSelect.addTest(PdbDistroSchemaReportTests("testSelect1"))
-    return suiteSelect
+    suiteSelectA = unittest.TestSuite()
+    suiteSelectA.addTest(PdbDistroSchemaReportTests("testSelect1"))
+    return suiteSelectA
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     mySuite = suiteSelect()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

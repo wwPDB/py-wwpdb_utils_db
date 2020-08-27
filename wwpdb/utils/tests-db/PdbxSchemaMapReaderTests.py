@@ -26,27 +26,26 @@ import sys
 import unittest
 import traceback
 import pprint
-import sys
 import os
-import json
+
+# import json
 import platform
-import shutil
 
 from wwpdb.utils.db.PdbxSchemaMapReader import PdbxSchemaMapReader
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
-if not os.path.exists(TESTOUTPUT):
+TESTOUTPUT = os.path.join(HERE, "test-output", platform.python_version())
+if not os.path.exists(TESTOUTPUT):  # pragma: no cover
     os.makedirs(TESTOUTPUT)
 
-class PdbxSchemaMapReaderTests(unittest.TestCase):
 
+class PdbxSchemaMapReaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stderr
         self.__verbose = True
-        mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
-        schemaPath = os.path.join(mockTopPath, 'SCHEMA_MAP')
+        mockTopPath = os.path.join(TOPDIR, "wwpdb", "mock-data")
+        schemaPath = os.path.join(mockTopPath, "SCHEMA_MAP")
         self.__pathPrdSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_prd_v5.cif")
         self.__pathPdbxSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_v40.cif")
         self.__pathCcSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_cc.cif")
@@ -64,9 +63,8 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
         self.__readMap(self.__pathPdbxSchemaMapFile, os.path.join(TESTOUTPUT, "pdbx-def.out"))
 
     def __readMap(self, mapFilePath, defFilePath):
-        """Test case -  read input schema map file and write python schema def data structure -
-        """
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        """Test case -  read input schema map file and write python schema def data structure -"""
+        self.__lfh.write("\nStarting PdbxSchemaMapReaderTests __readap\n")
         try:
             smr = PdbxSchemaMapReader(verbose=self.__verbose, log=self.__lfh)
             smr.read(mapFilePath)
@@ -75,22 +73,27 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
 
             # sOut=json.dumps(sd,sort_keys=True,indent=3)
             sOut = pprint.pformat(sd, indent=1, width=120)
-            ofh = open(defFilePath, 'w')
+            ofh = open(defFilePath, "w")
             ofh.write("\n%s\n" % sOut)
             ofh.close()
-        except Exception as e:
+
+            with open(os.devnull, "w") as fout:
+                smr.dump(fout)
+
+        except Exception as _e:  # noqa: F841  # pragma: no cover
             traceback.print_exc(file=sys.stderr)
             self.fail()
 
 
-def schemaSuite():
+def schemaSuite():  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadPrdMap"))
     suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadCcMap"))
     suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadPdbxMap"))
     return suiteSelect
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":  # pragma: no cover
     #
     mySuite = schemaSuite()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

@@ -117,7 +117,7 @@ class StatusHistorySchemaDef(SchemaDefBase):
                         "i1": {"TYPE": "SEARCH", "ATTRIBUTES": ["ENTRY_ID"]},
                         "i2": {"TYPE": "SEARCH", "ATTRIBUTES": ["CONTENT_TYPE"]},
                         "i3": {"TYPE": "SEARCH", "ATTRIBUTES": ["VERSION_NUMBER"]},
-                        "i3": {"TYPE": "SEARCH", "ATTRIBUTES": ["ENTRY_ID", "CONTENT_TYPE", "VERSION_NUMBER"]},
+                        "i4": {"TYPE": "SEARCH", "ATTRIBUTES": ["ENTRY_ID", "CONTENT_TYPE", "VERSION_NUMBER"]},
                         },
             'MAP_MERGE_INDICES': {'pdbx_database_status_history': {'ATTRIBUTES': ('ordinal', 'entry_id'),
                                                                    'TYPE': 'EQUI-JOIN'}},

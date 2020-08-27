@@ -1,0 +1,13 @@
+mmcif
+scandir
+mysqlclient
+wwpdb.utils.config
+wwpdb.io
+wwpdb.utils.session
+rcsb.utils.multiproc
+sqlalchemy
+
+# For testing - extra imports
+wwpdb.utils.testing
+mmcif.utils
+mock
