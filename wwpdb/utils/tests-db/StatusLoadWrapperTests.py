@@ -24,9 +24,9 @@ import os
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import
+    from mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import,import-error
 else:
-    from .mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import
+    from .mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import,import-error
 
 from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 from wwpdb.utils.config.ConfigInfo import getSiteId
