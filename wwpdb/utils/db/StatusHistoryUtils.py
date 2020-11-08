@@ -544,7 +544,7 @@ class StatusHistoryUtils(MyConnectionBase):
     def loadEntryStatusHistory(self, entryIdList):
         """Load/reload of status history files for the current entry list obtained from the current file source (e.g. archive)."""
         startTime = time.time()
-        logger.debug("+StatusHistoryUtils(loadEntryStatusHistory) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime))
+        logger.debug("+StatusHistoryUtils(loadEntryStatusHistory) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             pathList = self.getEntryStatusHistoryPathList(entryIdList)
             if self.__verbose:
