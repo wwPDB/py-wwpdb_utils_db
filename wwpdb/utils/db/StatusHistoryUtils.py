@@ -568,7 +568,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
         except:  # noqa: E722  pylint: disable=bare-except
             self.closeConnection()
-            logger.traceback("In load entry status history")
+            logger.exception("In load entry status history")
             ok = False
 
         endTime = time.time()
