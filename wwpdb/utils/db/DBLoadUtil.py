@@ -83,7 +83,7 @@ class DBLoadUtil(object):
             return root + "_1." + ext
 
     def __genListFile(self, filename, filelist):
-        """"""
+        """ """
         fn = os.path.join(self.__sessionPath, filename)
         f = open(fn, "w")
         for entryfile in filelist:

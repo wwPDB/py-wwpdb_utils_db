@@ -407,7 +407,7 @@ class MyDbQuery(object):
         return []
 
     def simpleQuery(self, selectList=None, fromList=None, condition="", orderList=None, returnObj=None):
-        """"""
+        """ """
         if selectList is None:
             selectList = []
         if fromList is None:

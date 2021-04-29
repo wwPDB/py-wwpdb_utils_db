@@ -216,7 +216,7 @@ class StatusHistory(object):
             return False
 
     def nextRecord(self, statusCodeNext="AUTH", dateNext=None, annotator=None, details=None):
-        """"""
+        """ """
         try:
             statusLast, dateLast, _ordinalLast, pdbId = self.__lastStatusAndDate()
             if statusCodeNext == statusLast:

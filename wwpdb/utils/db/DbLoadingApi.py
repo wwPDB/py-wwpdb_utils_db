@@ -28,10 +28,10 @@ from wwpdb.utils.db.SqlLoader import SqlLoader
 
 
 class DbLoadingApi(object):
-    """"""
+    """ """
 
     def __init__(self, log=sys.stderr, verbose=False):
-        """"""
+        """ """
         self.__lfh = log
         self.__verbose = verbose
         self.__debug = True

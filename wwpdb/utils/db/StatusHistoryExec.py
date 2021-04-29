@@ -62,7 +62,7 @@ class StatusHistoryExec(object):
         #
 
     def doCreateStatusHistory(self, numProc=1, overWrite=False):
-        """"""
+        """ """
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             entryIdList = shu.getEntryIdList()
@@ -75,7 +75,7 @@ class StatusHistoryExec(object):
             traceback.print_exc(file=self.__lfh)
 
     def doLoadStatusHistory(self, numProc=1, newTable=False):
-        """"""
+        """ """
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             if numProc > 1:
@@ -97,7 +97,7 @@ class StatusHistoryExec(object):
         return False
 
     def doCreateEntryStatusHistory(self, entryId, overWrite=False):
-        """"""
+        """ """
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             rL = shu.createHistory([entryId], overWrite=overWrite)
