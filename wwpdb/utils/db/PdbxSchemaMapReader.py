@@ -34,7 +34,6 @@ class PdbxSchemaMapReader(object):
     def __init__(self, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
-        self.__pathSchemaMapFile = None
         self.__tableNameList = []
         self.__atDefList = []
         self.__atMapList = []
@@ -42,7 +41,6 @@ class PdbxSchemaMapReader(object):
         self.__attribAbbrev = {}
 
     def read(self, schemaMapFile):
-        self.__pathSchemaMapFile = schemaMapFile
         self.__tableNameList, self.__atDefList, self.__atMapList, self.__tableAbbrev, self.__attribAbbrev = self.__readSchemaMap(schemaMapFile)
         # self.dump(self.__lfh)
         return True

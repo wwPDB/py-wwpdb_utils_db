@@ -27,10 +27,10 @@ import copy
 import scandir
 import traceback
 
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
+# try:
+#     from itertools import zip_longest
+# except ImportError:
+#     from itertools import izip_longest as zip_longest
 
 from wwpdb.utils.db.StatusHistory import StatusHistory
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
@@ -67,13 +67,9 @@ class StatusHistoryUtils(MyConnectionBase):
         # Information injected from the request object -
         #
         self.__reqObj = reqObj
-        self.__topPath = self.__reqObj.getValue("TopPath")
-        self.__topSessionPath = self.__reqObj.getValue("TopSessionPath")
         #
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionPath = self.__sObj.getPath()
-        self.__sessionRelativePath = self.__sObj.getRelativePath()
-        self.__sessionId = self.__sObj.getId()
         #
         self.__ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
         #
@@ -416,9 +412,9 @@ class StatusHistoryUtils(MyConnectionBase):
         logger.debug("StatusHistoryUtils(__schemaCreate) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         return ret
 
-    def __makeSubLists(self, n, iterable):
-        args = [iter(iterable)] * n
-        return ([e for e in t if e is not None] for t in zip_longest(*args))
+    # def __makeSubLists(self, n, iterable):
+    #     args = [iter(iterable)] * n
+    #     return ([e for e in t if e is not None] for t in zip_longest(*args))
 
     def loadBatchFilesWorker(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
         """Load tabular batch files created for the chemical component definitions into the database server."""

@@ -53,7 +53,6 @@ from wwpdb.utils.testing.Features import Features
 class SchemaDefLoaderDbTests(unittest.TestCase):
     def __init__(self, methodName="runTest"):
         super(SchemaDefLoaderDbTests, self).__init__(methodName)
-        self.__loadPathList = []
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__debug = False

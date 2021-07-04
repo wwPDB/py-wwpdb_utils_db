@@ -11,8 +11,7 @@ import pprint
 
 
 class MysqlSchemaImporter(object):
-    def __init__(self, dbUser, dbPw, dbHost, mysqlPath="/opt/local/bin/mysql", verbose=True, log=sys.stderr):
-        self.__verbose = verbose
+    def __init__(self, dbUser, dbPw, dbHost, mysqlPath="/opt/local/bin/mysql", verbose=True, log=sys.stderr):  # pylint:  disable=unused-argument
         self.__lfh = log
         self.__mysqlPath = mysqlPath
         self.__dbUser = dbUser

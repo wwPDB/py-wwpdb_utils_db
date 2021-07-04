@@ -23,7 +23,6 @@ import datetime
 import traceback
 from mmcif_utils.pdbx.PdbxIo import PdbxStatusHistoryIo
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 
 
 class StatusHistory(object):
@@ -53,8 +52,6 @@ class StatusHistory(object):
             self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
         else:
             self.__pI = PathInfo(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
-        #
-        self.__cI = ConfigInfo(self.__siteId)
         #
         self.__inpFilePath = None
         self.__entryId = None
@@ -169,14 +166,14 @@ class StatusHistory(object):
     def __getRowCount(self):
         return self.__pio.getRowCount(catName=self.__statusCategory)
 
-    def __updatePriorEndDate(self, dateEnd=None):
-        """Update the 'end-date' value for the previous status history record."""
-        nRows = self.__getRowCount()
-        if nRows > 0 and dateEnd is not None:
-            ok = self.__pio.updateAttribute(catName=self.__statusCategory, attribName="date_end", value=dateEnd, iRow=nRows - 1)
-            return ok
-        else:
-            return False
+    # def __updatePriorEndDate(self, dateEnd=None):
+    #     """Update the 'end-date' value for the previous status history record."""
+    #     nRows = self.__getRowCount()
+    #     if nRows > 0 and dateEnd is not None:
+    #         ok = self.__pio.updateAttribute(catName=self.__statusCategory, attribName="date_end", value=dateEnd, iRow=nRows - 1)
+    #         return ok
+    #     else:
+    #         return False
 
     def get(self):
         return self.__pio.getAttribDictList(catName=self.__statusCategory)
@@ -206,14 +203,14 @@ class StatusHistory(object):
             traceback.print_exc(file=self.__lfh)
             return (None, None, None, None)
 
-    def __testValueExists(self, value, key="status_code_begin"):
-        try:
-            dList = self.__pio.getAttribDictList(catName=self.__statusCategory)
-            for _ii, d in enumerate(dList):
-                if d[key] == value:
-                    return True
-        except:  # noqa: E722  pylint: disable=bare-except
-            return False
+    # def __testValueExists(self, value, key="status_code_begin"):
+    #     try:
+    #         dList = self.__pio.getAttribDictList(catName=self.__statusCategory)
+    #         for _ii, d in enumerate(dList):
+    #             if d[key] == value:
+    #                 return True
+    #     except:  # noqa: E722  pylint: disable=bare-except
+    #         return False
 
     def nextRecord(self, statusCodeNext="AUTH", dateNext=None, annotator=None, details=None):
         """ """

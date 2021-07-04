@@ -9,7 +9,6 @@
 Simple tests of various schema
 """
 
-import sys
 import unittest
 
 from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
@@ -19,10 +18,6 @@ from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
 
 
 class MiscSchemaReportTests(unittest.TestCase):
-    def setUp(self):
-        self.__lfh = sys.stdout
-        self.__verbose = True
-
     def tearDown(self):
         pass
 

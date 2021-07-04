@@ -1925,8 +1925,6 @@ class BirdSchemaDef(SchemaDefBase):
     def __init__(self,verbose=True,log=sys.stderr):
         super(BirdSchemaDef,self).__init__(databaseName=BirdSchemaDef._databaseName,schemaDefDict=BirdSchemaDef._schemaDefDict,
                                            verbose=verbose,log=log)
-        self.__verbose=verbose
-        self.__lfh=log
         
 
 if __name__ == "__main__":

@@ -41,13 +41,10 @@ from wwpdb.utils.config.ConfigInfo import ConfigInfo  # noqa: E402
 
 
 class MyConnectionBase(object):
-    def __init__(self, siteId=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         #
         self.__siteId = siteId
         self._cI = ConfigInfo(self.__siteId)
-        self.__db = None
         self._dbCon = None
         self.__authD = {}
         self.__databaseName = None

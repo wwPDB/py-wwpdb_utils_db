@@ -55,8 +55,8 @@ class MyDbConnect(object):
 
     """Class to encapsulate RDBMS DBI connection."""
 
-    def __init__(self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
+    def __init__(self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None,
+                 dbPort=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         self.__lfh = log
 
         if dbName is None:
@@ -183,10 +183,10 @@ class MyDbQuery(object):
         self.__dbcon = dbcon
         self.__lfh = log
         self.__verbose = verbose
-        self.__ops = ["EQ", "GE", "GT", "LT", "LE", "LIKE", "NOT LIKE"]
-        self.__opDict = {"EQ": "=", "GE": ">=", "GT": ">", "LT": "<", "LE": "<=", "LIKE": "LIKE", "NOT LIKE": "NOT LIKE"}
-        self.__logOps = ["AND", "OR", "NOT"]
-        self.__grpOps = ["BEGIN", "END"]
+        # self.__ops = ["EQ", "GE", "GT", "LT", "LE", "LIKE", "NOT LIKE"]
+        # self.__opDict = {"EQ": "=", "GE": ">=", "GT": ">", "LT": "<", "LE": "<=", "LIKE": "LIKE", "NOT LIKE": "NOT LIKE"}
+        # self.__logOps = ["AND", "OR", "NOT"]
+        # self.__grpOps = ["BEGIN", "END"]
         self.__warningAction = "default"
 
     def sqlBatchTemplateCommand(self, templateValueList, prependSqlList=None):
@@ -357,14 +357,14 @@ class MyDbQuery(object):
                 traceback.print_exc(file=self.__lfh)
         return []
 
-    def __fetchIter(self, cursor, rowSize=1000):
-        """Chunked iterator to manage results fetches to mysql server"""
-        while True:
-            results = cursor.fetchmany(rowSize)
-            if not results:
-                break
-            for result in results:
-                yield result
+    # def __fetchIter(self, cursor, rowSize=1000):
+    #     """Chunked iterator to manage results fetches to mysql server"""
+    #     while True:
+    #         results = cursor.fetchmany(rowSize)
+    #         if not results:
+    #             break
+    #         for result in results:
+    #             yield result
 
     def selectRows(self, queryString):
         """Execute SQL command and return list of lists for the result set."""

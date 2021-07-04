@@ -18,7 +18,6 @@ import sys
 import os
 import traceback
 
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
@@ -35,10 +34,8 @@ class StatusLoadWrapper(object):
         """
         self.__verbose = verbose
         self.__lfh = log
-        self.__debug = True
         self.__siteId = siteId
         #
-        self.__cI = ConfigInfo(self.__siteId)
         self.__pI = PathInfo(siteId=self.__siteId, sessionPath=".", verbose=self.__verbose, log=self.__lfh)
 
     def dbLoad(self, depSetId, fileSource="deposit", versionId="latest", mileStone="deposit"):

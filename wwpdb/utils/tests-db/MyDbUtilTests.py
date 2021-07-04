@@ -35,7 +35,6 @@ from wwpdb.utils.testing.Features import Features
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class MyDbUtilTests(unittest.TestCase):
     def setUp(self):
-        self.__dbName = "stat"
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__dbCon = None

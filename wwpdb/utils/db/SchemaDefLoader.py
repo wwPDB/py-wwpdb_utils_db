@@ -50,7 +50,6 @@ class SchemaDefLoader(object):
         #
         self.__dbCon = dbCon
         self.__workingPath = workPath
-        self.__pathList = []
         self.__cleanUp = cleanUp
         #
         self.__colSep = "&##&\t"

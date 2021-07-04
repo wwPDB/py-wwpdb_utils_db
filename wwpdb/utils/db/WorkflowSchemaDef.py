@@ -418,8 +418,6 @@ class WorkflowSchemaDef(SchemaDefBase):
 
     def __init__(self, verbose=True, log=sys.stderr):
         super(WorkflowSchemaDef, self).__init__(databaseName=WorkflowSchemaDef._databaseName, schemaDefDict=WorkflowSchemaDef._schemaDefDict, verbose=verbose, log=log)
-        self.__verbose = verbose
-        self.__lfh = log
 
 if __name__ == "__main__":
     wfsd = WorkflowSchemaDef()

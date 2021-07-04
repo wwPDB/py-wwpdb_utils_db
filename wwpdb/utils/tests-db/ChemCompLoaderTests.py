@@ -43,7 +43,6 @@ class ChemCompLoaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stderr
         self.__verbose = False
-        self.__loadPathList = []
         self.__ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
         self.__topCachePath = "/data/components/ligand-dict-v3"
         self.__dbCon = None

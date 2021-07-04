@@ -43,10 +43,8 @@ class MyDbAdminSqlGen(object):
     Note:
     """
 
-    def __init__(self, verbose=False, log=sys.stderr):
-
-        self.__lfh = log
-        self.__verbose = verbose
+    def __init__(self, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        pass
 
     def truncateTableSQL(self, databaseName, tableName):
         """Return the SQL string require to truncate (remove all rows) from the input table."""
@@ -367,14 +365,12 @@ class MyDbQuerySqlGen(object):
 
     """Builds an the SQL command string for a selection query."""
 
-    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):
+    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         """Input:
 
         schemaDef is instance of class derived from SchemaDefBase().
         """
         self.__schemaDefObj = schemaDefObj
-        self.__lfh = log
-        self.__verbose = verbose
         #
         self.__databaseName = None
         self.__conditionObj = None
@@ -497,10 +493,10 @@ class MyDbConditionSqlGen(object):
         self.__schemaDefObj = schemaDefObj
         self.__lfh = log
         self.__verbose = verbose
-        self.__ops = ["EQ", "NE", "GE", "GT", "LT", "LE", "LIKE", "NOT LIKE", "IS", "IS NOT"]
+        # self.__ops = ["EQ", "NE", "GE", "GT", "LT", "LE", "LIKE", "NOT LIKE", "IS", "IS NOT"]
         self.__opDict = {"EQ": "=", "NE": "!=", "GE": ">=", "GT": ">", "LT": "<", "LE": "<=", "LIKE": "LIKE", "NOT LIKE": "NOT LIKE", "IS": "IS", "IS NOT": "IS NOT"}
-        self.__logOps = ["AND", "OR", "NOT"]
-        self.__grpOps = ["BEGIN", "END"]
+        # self.__logOps = ["AND", "OR", "NOT"]
+        # self.__grpOps = ["BEGIN", "END"]
         #
         self.__cList = []
         self.__tableIdList = []

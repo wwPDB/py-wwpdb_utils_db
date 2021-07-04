@@ -7,5 +7,5 @@ sys.modules["wwpdb.utils.dp.RcsbDpUtility"] = mock.MagicMock()
 
 
 class mocksetup(object):
-    def __init(self):
+    def __init__(self):
         pass

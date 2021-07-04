@@ -55,9 +55,8 @@ class StatusHistoryExec(object):
         if sessionId is not None:
             self.__reqObj.setValue("sessionid", sessionId)
 
-        self.__sessionId = self.__reqObj.getSessionId()
-        self.__sessionObj = self.__reqObj.newSessionObj()
-        self.__sessionPath = self.__sessionObj.getPath()
+        # retained due to side effects
+        _sessionObj = self.__reqObj.newSessionObj()  # noqa: F841
         self.__reqObj.printIt(ofh=self.__lfh)
         #
 

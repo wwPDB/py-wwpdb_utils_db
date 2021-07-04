@@ -107,9 +107,7 @@ class TableDef(object):
 
     """Wrapper class for table schema definition."""
 
-    def __init__(self, tableDefDict=None, verbose=True, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, tableDefDict=None, verbose=True, log=sys.stderr):  # pylint: disable=unused-argument
         if tableDefDict is None:
             tableDefDict = {}
         self.__tD = tableDefDict

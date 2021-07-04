@@ -31,7 +31,6 @@ import platform
 from wwpdb.utils.db.StatusHistory import StatusHistory
 from wwpdb.utils.config.ConfigInfo import getSiteId
 from wwpdb.io.file.DataFile import DataFile
-from mmcif.io.IoAdapterPy import IoAdapterPy
 
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 
@@ -51,14 +50,10 @@ class StatusHistoryTests(unittest.TestCase):
         #
         self.__verbose = True
         self.__lfh = sys.stdout
-        self.__pathExamplesRel = "./tests"
         self.__testFile1 = "./tests/D_1000200183_model-annotate_P1.cif.V1"
         self.__testFile2 = "./tests/D_1000200183_model-release_P1.cif.V1"
-        self.__pathExamples = os.path.abspath(self.__pathExamplesRel)
         self.__siteId = getSiteId(defaultSiteId="WWPDB_DEPLOY_TEST")
-        self.__io = IoAdapterPy()
         self.__sessionPath = "."
-        self.__fileSource = "session"
 
     def tearDown(self):
         pass

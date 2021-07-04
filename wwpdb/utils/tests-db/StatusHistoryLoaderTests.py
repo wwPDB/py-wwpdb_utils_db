@@ -41,8 +41,6 @@ from wwpdb.utils.testing.Features import Features
 class StatusHistoryLoaderTests(unittest.TestCase):
     def __init__(self, methodName="runTest"):
         super(StatusHistoryLoaderTests, self).__init__(methodName)
-        self.__loadPathList = []
-        self.__tddFileList = []
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__ioObj = IoAdapterPy(verbose=self.__verbose, log=self.__lfh)

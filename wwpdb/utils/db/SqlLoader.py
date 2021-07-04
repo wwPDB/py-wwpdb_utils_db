@@ -28,8 +28,8 @@ import sqlparse
 class _DbConnection(object):
     """Internal class for connecting to mysql server without connection pool present in MyDbUtil"""
 
-    def __init__(self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
+    def __init__(self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None,
+                 dbSocket=None, dbPort=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         self.__lfh = log
 
         self.__dbName = dbName
@@ -107,7 +107,6 @@ class SqlLoader(object):
     def __init__(self, siteId=None, resource="DA_INTERNAL", log=sys.stderr, verbose=False):
         self.__lfh = log
         self.__verbose = verbose
-        self.__resources = resource
         self.__siteId = siteId
 
         self.__dbServer = None
