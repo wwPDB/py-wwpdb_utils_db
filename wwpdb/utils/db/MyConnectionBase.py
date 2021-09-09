@@ -32,7 +32,7 @@ if True:  # pylint: disable=using-constant-test
     try:
         import sqlalchemy.pool as pool
 
-        MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True)
+        MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True, recycle=1800)
     except:  # noqa: E722 pylint: disable=bare-except
         logger.exception("Creating MYSQL connection pool failing")
 
