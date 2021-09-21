@@ -62,7 +62,7 @@ class PdbxSchemaMapReader(object):
 
     def __convertDataType(self, dtype, width=0, precision=0):  # pylint:  disable=unused-argument
         if dtype.lower() in ["char", "varchar", "text"]:
-            if width < 65000:
+            if width < 32000:
                 retType = "VARCHAR"
             else:
                 retType = "TEXT"
