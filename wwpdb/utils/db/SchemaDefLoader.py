@@ -187,7 +187,7 @@ class SchemaDefLoader(object):
             )
         return ok
 
-    def fetch(self, inputPathList):
+    def fetch(self, inputPathList, **kwargs):
         """Return a dictionary of loadable data for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
         """
