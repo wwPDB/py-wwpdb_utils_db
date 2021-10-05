@@ -245,6 +245,15 @@ class SchemaDefLoader(object):
             self.__lfh.write("+SchemaDefLoader(__process) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
         return tableDataDict, containerNameList
+    
+    def export(self, tableDict, append=False, partName="1"):
+        """Method to create a loadable file from the table dictionary returned
+        from __fetch.
+
+        Returns:
+            [type]: [description]
+        """
+        return self.__export(tableDict=tableDict, append=append, partName=partName)
 
     def __export(self, tableDict, colSep="&##&\t", rowSep="$##$\n", append=False, partName="1"):
         modeOpt = "a" if append else "w"
