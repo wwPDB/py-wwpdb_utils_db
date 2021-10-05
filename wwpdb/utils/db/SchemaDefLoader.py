@@ -186,8 +186,12 @@ class SchemaDefLoader(object):
                 "+SchemaDefLoader(loadBatchFiles) completed with status %r at %s (%.3f seconds)\n" % (ok, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
             )
         return ok
+    
+    def fetchMulti(self, dataList, procName, optionsD, workingDir):
+        tableDataDict, containerNameList = self.__fetch(loadPathList=dataList)
+        return dataList, containerNameList, [tableDataDict], []
 
-    def fetch(self, inputPathList, **kwargs):
+    def fetch(self, inputPathList):
         """Return a dictionary of loadable data for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
         """
