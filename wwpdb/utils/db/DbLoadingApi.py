@@ -39,7 +39,6 @@ class DbLoadingApi(object):
         self.__siteId = getSiteId()
         cI = ConfigInfo()
         cIcommon = ConfigInfoAppCommon(self.__siteId)
-        self.__pkgPath = cIcommon.get_site_packages_path()
         self.__schemaPath = cIcommon.get_site_da_internal_schema_path()
         self.__dbHost = cI.get("SITE_DB_HOST_NAME")
         self.__dbUser = cI.get("SITE_DB_USER_NAME")
