@@ -50,7 +50,7 @@ class DbLoadingApi(object):
 
         self.__dbName = "da_internal"
         self.__workPath = os.path.join(self.__archivePath, "archive")
-        self.__mysql = "/usr/bin/mysql "
+        self.__mysql = "mysql "
         self.__dbLoader = cIcommon.get_db_loader_path()
 
         self.__mapping = self.__schemaPath
