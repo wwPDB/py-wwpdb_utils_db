@@ -20,6 +20,7 @@ import sys
 import traceback
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=import-error,no-name-in-module
 from wwpdb.utils.db.SqlLoader import SqlLoader
 
@@ -42,6 +43,7 @@ class DBLoadUtil(object):
         self.__sessionPath = None
         self.__siteId = str(self.__reqObj.getValue("WWPDB_SITE_ID"))
         self.__cI = ConfigInfo(self.__siteId)
+        self.__cIcommon = ConfigInfoAppCommon(self.__siteId)
         #
         self.__getSession()
 
@@ -95,7 +97,7 @@ class DBLoadUtil(object):
 
         fn = os.path.join(self.__sessionPath, listfile)
 
-        mapping = self.__cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
+        mapping = self.__cIcommon.get_site_da_internal_schema_path()
 
         self.__lfh.write("DbLoadUtil::__getLoadFile(): listfile %s sqlfile %s logfile %s\n" % (fn, sqlfile, logfile))
         try:

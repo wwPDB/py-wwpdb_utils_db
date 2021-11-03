@@ -21,6 +21,7 @@ import traceback
 
 #
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=no-name-in-module,import-error
 from wwpdb.utils.db.SqlLoader import SqlLoader
 
@@ -37,8 +38,9 @@ class DbLoadingApi(object):
         self.__debug = True
         self.__siteId = getSiteId()
         cI = ConfigInfo()
-        self.__pkgPath = cI.get("SITE_PACKAGES_PATH")
-        self.__schemaPath = cI.get("SITE_DA_INTERNAL_SCHEMA_PATH")
+        cIcommon = ConfigInfoAppCommon(self.__siteId)
+        self.__pkgPath = cIcommon.get_site_packages_path()
+        self.__schemaPath = cIcommon.get_site_da_internal_schema_path()
         self.__dbHost = cI.get("SITE_DB_HOST_NAME")
         self.__dbUser = cI.get("SITE_DB_USER_NAME")
         self.__dbPw = cI.get("SITE_DB_PASSWORD")
@@ -49,7 +51,7 @@ class DbLoadingApi(object):
         self.__dbName = "da_internal"
         self.__workPath = os.path.join(self.__archivePath, "archive")
         self.__mysql = "/usr/bin/mysql "
-        self.__dbLoader = os.path.join(self.__pkgPath, "dbloader", "bin", "db-loader")
+        self.__dbLoader = cIcommon.get_db_loader_path()
 
         self.__mapping = self.__schemaPath
 
