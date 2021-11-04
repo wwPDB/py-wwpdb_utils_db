@@ -186,7 +186,7 @@ class SchemaDefLoader(object):
                 "+SchemaDefLoader(loadBatchFiles) completed with status %r at %s (%.3f seconds)\n" % (ok, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
             )
         return ok
-    
+
     def fetchMulti(self, dataList, procName, optionsD, workingDir):
         tableDataDict, containerNameList = self.__fetch(loadPathList=dataList)
         return dataList, containerNameList, [tableDataDict], []
@@ -249,7 +249,7 @@ class SchemaDefLoader(object):
             self.__lfh.write("+SchemaDefLoader(__process) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
         return tableDataDict, containerNameList
-    
+
     def export(self, tableDict, append=False, partName="1"):
         """Method to create a loadable file from the table dictionary returned
         from __fetch.
