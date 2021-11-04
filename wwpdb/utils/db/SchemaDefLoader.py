@@ -187,7 +187,7 @@ class SchemaDefLoader(object):
             )
         return ok
 
-    def fetchMulti(self, dataList, procName, optionsD, workingDir):
+    def fetchMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
         tableDataDict, containerNameList = self.__fetch(loadPathList=dataList)
         return dataList, containerNameList, [tableDataDict], []
 
