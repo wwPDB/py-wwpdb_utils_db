@@ -188,6 +188,9 @@ class SchemaDefLoader(object):
         return ok
 
     def fetchMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+        """Method to comply with the MultiProcPoolUtil interface. This method should only
+        be used with MultiProcPoolUtil, passing its name through the argument 'workerMethod'.
+        """
         tableDataDict, containerNameList = self.__fetch(loadPathList=dataList)
         return dataList, containerNameList, [tableDataDict], []
 
