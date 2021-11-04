@@ -187,6 +187,10 @@ class SchemaDefLoader(object):
             )
         return ok
 
+    def fetchMulti(self, dataList, procName, optionsD, workingDir):
+        tableDataDict, containerNameList = self.__fetch(loadPathList=dataList)
+        return dataList, containerNameList, [tableDataDict], []
+
     def fetch(self, inputPathList):
         """Return a dictionary of loadable data for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
@@ -245,6 +249,15 @@ class SchemaDefLoader(object):
             self.__lfh.write("+SchemaDefLoader(__process) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
 
         return tableDataDict, containerNameList
+
+    def export(self, tableDict, append=False, partName="1"):
+        """Method to create a loadable file from the table dictionary returned
+        from __fetch.
+
+        Returns:
+            [type]: [description]
+        """
+        return self.__export(tableDict=tableDict, append=append, partName=partName)
 
     def __export(self, tableDict, colSep="&##&\t", rowSep="$##$\n", append=False, partName="1"):
         modeOpt = "a" if append else "w"
