@@ -49,6 +49,7 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
         self.__pathPrdSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_prd_v5.cif")
         self.__pathPdbxSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_v40.cif")
         self.__pathCcSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_cc.cif")
+        self.__pathPrdCcSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_cc.cif")
 
     def tearDown(self):
         pass
@@ -58,6 +59,9 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
 
     def testReadCcMap(self):
         self.__readMap(self.__pathCcSchemaMapFile, os.path.join(TESTOUTPUT, "cc-def.out"))
+
+    def testReadPrdCcMap(self):
+        self.__readMap(self.__pathCcSchemaMapFile, os.path.join(TESTOUTPUT, "prdcc-def.out"))
 
     def testReadPdbxMap(self):
         self.__readMap(self.__pathPdbxSchemaMapFile, os.path.join(TESTOUTPUT, "pdbx-def.out"))
@@ -90,6 +94,7 @@ def schemaSuite():  # pragma: no cover
     suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadPrdMap"))
     suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadCcMap"))
     suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadPdbxMap"))
+    suiteSelect.addTest(PdbxSchemaMapReaderTests("testReadPrdCcMap"))    
     return suiteSelect
 
 
