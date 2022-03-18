@@ -44,8 +44,7 @@ class SchemaDefLoaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stderr
         self.__verbose = False
-        self.__loadPathList = [os.path.join(HERE, "data", "PRD", "PRD_000001.cif"),
-                               os.path.join(HERE, "data", "PRD", "PRD_000012.cif")]
+        self.__loadPathList = [os.path.join(HERE, "data", "PRD", "PRD_000001.cif"), os.path.join(HERE, "data", "PRD", "PRD_000012.cif")]
         self.__ioObj = IoAdapterPy(verbose=self.__verbose, log=self.__lfh)
 
     def tearDown(self):

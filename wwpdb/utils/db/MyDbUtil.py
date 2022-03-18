@@ -55,8 +55,9 @@ class MyDbConnect(object):
 
     """Class to encapsulate RDBMS DBI connection."""
 
-    def __init__(self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None,
-                 dbPort=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(
+        self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr
+    ):  # pylint: disable=unused-argument
         self.__lfh = log
 
         if dbName is None:
