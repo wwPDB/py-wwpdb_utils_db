@@ -44,8 +44,8 @@ class SchemaDefLoaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stderr
         self.__verbose = False
-        mockTopPath = os.path.join(TOPDIR, "wwpdb", "mock-data")
-        self.__loadPathList = [os.path.join(mockTopPath, "PRD", "PRD_000001.cif"), os.path.join(mockTopPath, "PRD", "PRD_000012.cif")]
+        self.__loadPathList = [os.path.join(HERE, "data", "PRD", "PRD_000001.cif"),
+                               os.path.join(HERE, "data", "PRD", "PRD_000012.cif")]
         self.__ioObj = IoAdapterPy(verbose=self.__verbose, log=self.__lfh)
 
     def tearDown(self):
@@ -62,7 +62,7 @@ class SchemaDefLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        self.assertNotEqual(containerNameList, [], "Loading files")
+        self.assertNotEqual(containerNameList, [], "Loading files %s" % self.__loadPathList)
         for tId, fn in tList:
             self.__lfh.write("\nCreated table %s load file %s\n" % (tId, fn))
 
