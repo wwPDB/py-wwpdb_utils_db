@@ -26,6 +26,7 @@ import time
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbQuerySqlGen, MyDbConditionSqlGen
 from wwpdb.utils.db.MessageSchemaDef import MessageSchemaDef
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
+from wwpdb.utils.db.PrdChemCompSchemaDef import PrdChemCompSchemaDef
 from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -115,6 +116,31 @@ class MyDbSqlGenTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write("\nCompleted MyDbSqlGenTests testBirdSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+
+    def testPrdChemCompSchemaCreate(self):
+        """Test case -  create table schema using message schema definition as an example"""
+        startTime = time.time()
+        self.__lfh.write("\nStarting MyDbSqlGenTests testPrdChemCompSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
+        try:
+            msd = PrdChemCompSchemaDef(verbose=self.__verbose, log=self.__lfh)
+            tableIdList = msd.getTableIdList()
+            myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
+            sqlL = []
+            for tableId in tableIdList:
+                tableDefObj = msd.getTable(tableId)
+                sqlL.extend(myAd.createTableSQL(databaseName=msd.getDatabaseName(), tableDefObj=tableDefObj))
+
+                if self.__verbose:  # pragma: no cover
+                    self.__lfh.write("\n\n+MyDbSqlGenTests table creation SQL string\n %s\n\n" % "\n".join(sqlL))
+
+        except:  # noqa: E722  pylint: disable=bare-except  # pragma: no cover
+            traceback.print_exc(file=self.__lfh)
+            self.fail()
+
+        endTime = time.time()
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testPrdChemCompSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testBirdImportExport(self):
         """Test case -  import and export commands --"""
@@ -245,6 +271,7 @@ def suiteMessageSchema():  # pragma: no cover
 def suiteBirdSchema():  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyDbSqlGenTests("testBirdSchemaCreate"))
+    suiteSelect.addTest(MyDbSqlGenTests("testPrdChemCompSchemaCreate"))
     suiteSelect.addTest(MyDbSqlGenTests("testBirdImportExport"))
     return suiteSelect
 

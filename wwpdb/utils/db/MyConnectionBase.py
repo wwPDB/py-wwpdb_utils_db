@@ -67,6 +67,15 @@ class MyConnectionBase(object):
             self.__dbUser = self._cI.get("SITE_REFDATA_DB_USER_NAME")
             self.__dbPw = self._cI.get("SITE_REFDATA_DB_PASSWORD")
 
+        elif resourceName == "PRDCC":
+            self.__databaseName = self._cI.get("SITE_REFDATA_PRDCC_DB_NAME")
+            self.__dbHost = self._cI.get("SITE_REFDATA_DB_HOST_NAME")
+            self.__dbSocket = self._cI.get("SITE_REFDATA_DB_SOCKET")
+            self.__dbPort = self._cI.get("SITE_REFDATA_DB_PORT_NUMBER")
+
+            self.__dbUser = self._cI.get("SITE_REFDATA_DB_USER_NAME")
+            self.__dbPw = self._cI.get("SITE_REFDATA_DB_PASSWORD")
+
         elif resourceName == "CC":
             self.__databaseName = self._cI.get("SITE_REFDATA_CC_DB_NAME")
             self.__dbHost = self._cI.get("SITE_REFDATA_DB_HOST_NAME")
