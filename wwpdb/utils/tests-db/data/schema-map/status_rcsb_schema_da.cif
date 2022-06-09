@@ -1,0 +1,1128 @@
+data_rcsb_schema
+# 
+_rcsb_table_abbrev.table_name     cell 
+_rcsb_table_abbrev.table_abbrev   cell1 
+# 
+loop_
+_rcsb_attribute_abbrev.table_name 
+_rcsb_attribute_abbrev.attribute_name 
+_rcsb_attribute_abbrev.attribute_abbrev 
+diffrn_source             take-off_angle take_off_angle 
+pdbx_audit_revision_group group          content_group
+symmetry                  space_group_name_H-M                    space_group_name_H_M
+symmetry                  pdbx_full_space_group_name_H-M          pdbx_full_space_group_name_H_M
+#
+loop_
+_rcsb_table.table_name 
+_rcsb_table.table_type 
+_rcsb_table.group_name 
+_rcsb_table.www_select 
+_rcsb_table.www_report 
+rcsb_status                  0 'STATUS INFORMATION'            1 1 
+pdbx_contact_author          0 'CONTACT AUTHOR'                1 1 
+audit_author                 0 'STATUS INFORMATION'            1 1 
+struct                       0 'STRUCTURE INFORMATION'         1 1 
+pdbx_prerelease_seq          0 'STATUS INFORMATION'            1 1 
+entity_poly                  0 entity_group                    1 1 
+citation                     0 citation_group                  1 1 
+PDB_status_information       0 'PDB STATUS INFORMATION'        1 1 
+processing_status            0 'PROCESSING STATUS INFORMATION' 1 1 
+chem_comp                    0 chem_comp_group                 1 1 
+citation_author              0 citation_group                  1 1 
+pdbx_molecule                0 pdbx_group                      1 1 
+pdbx_molecule_features       0 pdbx_group                      1 1 
+entity                       0 entity_group                    1 1 
+pdbx_database_PDB_obs_spr    0 pdbx_group                      1 1 
+pdbx_depui_entry_details     0 pdbx_group                      1 1 
+em_admin                     0 emdb_admin_group                1 1
+database_2                   0 database_group                  1 1 
+pdbx_database_related        0 pdbx_group                      1 1 
+pdbx_entity_nonpoly          0 rcsb_group                      1 1 
+diffrn_source                0 diffrn_group                    1 1 
+struct_keywords              0 struct_group                    1 1 
+struct_site_keywords         0 struct_group                    1 1 
+ndb_struct_conf_na           0 ndb_group                       1 1 
+pdbx_deposit_group           0 pdbx_group                      1 1 
+pdbx_audit_revision_history  0 pdbx_group                      1 1 
+pdbx_audit_revision_group    0 pdbx_group                      1 1 
+pdbx_audit_revision_category 0 pdbx_group                      1 1 
+pdbx_audit_revision_details  0 pdbx_group                      1 1 
+pdbx_audit_revision_item     0 pdbx_group                      1 1 
+exptl                        0 exptl_group                     1 1 
+cell                         0 cell_group                      1 1
+pdbx_struct_oper_list        0 pdbx_group                      1 1
+pdbx_struct_assembly_gen     0 pdbx_group                      1 1
+symmetry                     0 symmetry_group                  1 1
+pdbx_struct_assembly         0 pdbx_group                      1 1
+em_depui                     0 emdb_admin_group                1 1
+em_author_list               0 emdb_admin_group                1 1
+#
+loop_
+_rcsb_attribute_def.table_name 
+_rcsb_attribute_def.attribute_name 
+_rcsb_attribute_def.data_type 
+_rcsb_attribute_def.index_flag 
+_rcsb_attribute_def.null_flag 
+_rcsb_attribute_def.width 
+_rcsb_attribute_def.precision 
+_rcsb_attribute_def.populated 
+rcsb_status                  Structure_ID                   char     1 1 15    0 Y 
+rcsb_status                  pdb_id                         char     0 0 9     0 Y 
+rcsb_status                  rcsb_annotator                 char     0 0 10    0 Y 
+rcsb_status                  status_code                    char     0 0 10    0 Y 
+rcsb_status                  author_release_status_code     char     0 0 10    0 Y 
+rcsb_status                  deposit_site                   char     0 0 10    0 Y 
+rcsb_status                  process_site                   char     0 0 10    0 Y 
+rcsb_status                  initial_deposition_date        date     0 0 19    0 Y 
+rcsb_status                  date_author_approval           date     0 0 19    0 Y 
+rcsb_status                  recvd_author_approval          char     0 0 1     0 Y 
+rcsb_status                  author_approval_type           char     0 0 10    0 Y 
+rcsb_status                  date_hold_coordinates          date     0 0 19    0 Y 
+rcsb_status                  date_hold_struct_fact          date     0 0 19    0 Y 
+rcsb_status                  date_hold_nmr_constraints      date     0 0 19    0 Y 
+rcsb_status                  date_of_RCSB_release           date     0 0 19    0 Y 
+rcsb_status                  date_deposition_form           date     0 0 19    0 Y 
+rcsb_status                  date_coordinates               date     0 0 19    0 Y 
+rcsb_status                  date_struct_fact               date     0 0 19    0 Y 
+rcsb_status                  date_manuscript                date     0 0 19    0 Y 
+rcsb_status                  date_nmr_constraints           date     0 0 19    0 Y 
+rcsb_status                  replaced_entry_id              char     0 0 10    0 Y 
+rcsb_status                  revision_description           char     0 0 255   0 Y 
+rcsb_status                  author_list                    char     0 0 1000  0 Y 
+rcsb_status                  title                          char     0 0 500   0 Y 
+rcsb_status                  titleUC                        char     0 0 500   0 Y 
+rcsb_status                  date_last_update               datetime 0 0 19    0 Y 
+rcsb_status                  author_release_sequence        char     0 0 20    0 Y 
+rcsb_status                  status_code_sf                 char     0 0 10    0 Y 
+rcsb_status                  status_code_mr                 char     0 0 10    0 Y 
+rcsb_status                  SG_entry                       char     0 0 50    0 Y 
+rcsb_status                  date_of_sf_release             date     0 0 19    0 Y 
+rcsb_status                  date_of_mr_release             date     0 0 19    0 Y 
+rcsb_status                  exp_method                     char     0 0 80    0 Y 
+rcsb_status                  header                         char     0 0 80    0 Y 
+rcsb_status                  keywords                       char     0 0 1100  0 Y 
+rcsb_status                  ebi_id                         char     0 0 10    0 Y 
+rcsb_status                  ndb_id                         char     0 0 10    0 Y 
+rcsb_status                  suppressed_title_Y_N           char     0 0 2     0 Y 
+rcsb_status                  status_code_cs                 char     0 0 10    0 Y 
+rcsb_status                  date_chemical_shifts           date     0 0 19    0 Y 
+rcsb_status                  date_hold_chemical_shifts      date     0 0 19    0 Y 
+rcsb_status                  date_of_cs_release             date     0 0 19    0 Y 
+rcsb_status                  date_begin_deposition          date     0 0 19    0 Y 
+rcsb_status                  date_author_release_request    date     0 0 19    0 Y 
+rcsb_status                  date_begin_release_preparation date     0 0 19    0 Y 
+rcsb_status                  date_begin_processing          date     0 0 19    0 Y 
+rcsb_status                  date_end_processing            date     0 0 19    0 Y 
+rcsb_status                  recvd_coordinates              char     0 0 1     0 Y 
+rcsb_status                  recvd_struct_fact              char     0 0 1     0 Y 
+rcsb_status                  recvd_nmr_constraints          char     0 0 1     0 Y 
+rcsb_status                  recvd_chemical_shifts          char     0 0 1     0 Y 
+rcsb_status                  methods_development_category   char     0 0 20    0 Y 
+rcsb_status                  pdb_format_compatible          char     0 0 2     0 Y 
+rcsb_status                  post_rel_status                char     0 0 10    0 Y 
+rcsb_status                  post_rel_recvd_coord           char     0 0 1     0 Y 
+rcsb_status                  post_rel_recvd_coord_date      date     0 0 19    0 Y 
+rcsb_status                  status_code_nmr_data           char     0 0 10    0 Y
+rcsb_status                  recvd_nmr_data                 char     0 0 1     0 Y
+rcsb_status                  date_nmr_data                  date     0 0 19    0 Y 
+rcsb_status                  date_hold_nmr_data             date     0 0 19    0 Y 
+rcsb_status                  dep_release_code_nmr_data      char     0 0 24    0 Y  
+rcsb_status                  date_of_nmr_data_release       date     0 0 19    0 Y 
+pdbx_contact_author          Structure_ID                   char     1 1 15    0 Y 
+pdbx_contact_author          name_salutation                char     0 0 15    0 Y 
+pdbx_contact_author          name_first                     char     0 0 60    0 Y 
+pdbx_contact_author          name_last                      char     0 1 65    0 Y 
+pdbx_contact_author          name_mi                        char     0 0 50    0 Y 
+pdbx_contact_author          role                           char     0 1 50    0 Y 
+pdbx_contact_author          email                          char     0 0 255   0 Y 
+pdbx_contact_author          address_1                      char     0 0 520   0 Y 
+pdbx_contact_author          address_2                      char     0 0 255   0 Y 
+pdbx_contact_author          address_3                      char     0 0 255   0 Y 
+pdbx_contact_author          city                           char     0 0 60    0 Y 
+pdbx_contact_author          state_province                 char     0 0 70    0 Y 
+pdbx_contact_author          postal_code                    char     0 0 128   0 Y 
+pdbx_contact_author          country                        char     0 1 50    0 Y 
+pdbx_contact_author          phone                          char     0 0 60    0 Y 
+pdbx_contact_author          fax                            char     0 0 60    0 Y 
+pdbx_contact_author          organization_type              char     0 0 40    0 Y 
+pdbx_contact_author          continent                      char     0 0 20    0 Y 
+pdbx_contact_author          identifier_ORCID               char     0 0 20    0 Y 
+struct                       Structure_ID                   char     1 1 15    0 Y 
+struct                       pdb_id                         char     0 0 9     0 Y 
+struct                       title                          char     0 0 600   0 Y 
+struct                       pdbx_title_text                char     0 0 255   0 Y 
+struct                       pdbx_descriptor                text     0 0 1100  0 Y 
+struct                       pdbx_details                   text     0 0 4095  0 Y 
+struct                       pdbx_model_details             text     0 0 16383 0 Y 
+struct                       pdbx_CASP_flag                 char     0 0 2     0 Y 
+struct                       pdbx_center_of_mass_x          float    0 0 10    6 Y
+struct                       pdbx_center_of_mass_y          float    0 0 10    6 Y
+struct                       pdbx_center_of_mass_z          float    0 0 10    6 Y
+audit_author                 Structure_ID                   char     1 1 15    0 Y
+audit_author                 name                           char     0 1 128   0 Y
+audit_author                 pdbx_ordinal                   int      1 1 10    0 Y 
+audit_author                 identifier_ORCID               char     0 0 20    0 Y 
+status_information           Structure_ID                   char     1 1 15    0 Y 
+status_information           Status_Code                    char     0 0 6     0 Y 
+status_information           Received_Depos_Form_Y_N        char     0 0 1     0 Y 
+status_information           Received_Depos_Form_Date       date     0 0 19    0 Y 
+status_information           Received_Coordinates_Y_N       char     0 0 1     0 Y 
+status_information           Received_Coordinates_Date      date     0 0 19    0 Y 
+status_information           Received_Struct_Factor_Y_N     char     0 0 1     0 Y 
+status_information           Received_Struct_Factor_Date    date     0 0 19    0 Y 
+status_information           Received_Internal_Approval_Y_N char     0 0 1     0 Y 
+status_information           Received_Manuscript_Y_N        char     0 0 1     0 Y 
+status_information           Received_Manuscript_Date       date     0 0 19    0 Y 
+status_information           Received_Author_Approval_Y_N   char     0 0 1     0 Y 
+status_information           Received_Author_Approval_Date  date     0 0 19    0 Y 
+status_information           Initial_Deposition_Date        date     0 0 19    0 Y 
+status_information           Received_Complete_Depos_Date   date     0 0 19    0 Y 
+status_information           PDB_Release_Date               date     0 0 10    0 Y 
+status_information           Deposit_Site                   char     0 0 10    0 Y 
+status_information           Process_Site                   char     0 0 10    0 Y 
+status_information           Depositor_Name                 char     0 0 20    0 Y 
+status_information           Coordinate_On_Hold_Until_Date  date     0 0 19    0 Y 
+status_information           Struct_F_On_Hold_Until_Date    date     0 0 19    0 Y 
+status_information           Hold_Until_Publication_Y_N     char     0 0 1     0 Y 
+pdbx_prerelease_seq          Structure_ID                   char     1 1 15    0 Y 
+pdbx_prerelease_seq          entity_id                      char     1 1 10    0 Y 
+pdbx_prerelease_seq          seq_one_letter_code            text     0 0 16400 0 Y 
+entity_poly                  Structure_ID                   char     1 1 15    0 Y 
+entity_poly                  entity_id                      char     1 1 10    0 Y 
+entity_poly                  nstd_linkage                   int      0 0 1     0 Y 
+entity_poly                  nstd_monomer                   int      0 0 1     0 Y 
+entity_poly                  type                           char     0 0 200   0 Y 
+entity_poly                  pdbx_seq_one_letter_code       text     0 0 33000 0 Y 
+entity_poly                  pdbx_seq_one_letter_code_can   text     0 0 33000 0 Y 
+entity_poly                  pdbx_description               char     0 0 1023  0 Y 
+entity_poly                  pdbx_strand_id                 char     0 0 5000  0 Y 
+entity_poly                  number_of_monomers             int      0 0 10    0 Y 
+entity_poly                  pdbx_target_identifier         char     0 0 150   0 Y 
+citation                     Structure_ID                   char     1 1 15    0 Y 
+citation                     Title                          text     0 0 511   0 Y 
+citation                     Publication                    char     0 0 255   0 Y 
+citation                     Volume_No                      char     0 0 44    0 Y 
+citation                     First_Page                     char     0 0 31    0 Y 
+citation                     Year                           int      0 0 10    0 Y 
+citation                     Last_Page                      char     0 0 16    0 Y 
+citation                     Publisher                      char     0 0 255   0 Y 
+citation                     ASTM                           char     0 0 5     0 Y 
+citation                     ASTM_List                      char     0 0 9     0 Y 
+citation                     Country                        char     0 0 6     0 Y 
+citation                     ISBN_ISSN                      char     0 0 5     0 Y 
+citation                     ISSN_ISBN_No                   char     0 0 26    0 Y 
+citation                     CODEN_List                     char     0 0 5     0 Y 
+citation                     Editor                         char     0 0 255   0 Y 
+citation                     Jrnl_Serial_No                 int      1 1 10    0 Y 
+citation                     pdbx_database_id_PubMed        int      0 0 11    0 Y 
+citation                     pdbx_database_id_DOI           char     0 0 128   0 Y 
+PDB_status_information       Structure_ID                   char     1 1 15    0 Y 
+PDB_status_information       Revision_Number                int      1 1 10    0 Y 
+PDB_status_information       Revision_Date                  date     0 0 19    0 Y 
+PDB_status_information       Revision_Type                  int      0 0 10    0 Y 
+PDB_status_information       Revision_Records               char     0 0 255   0 Y 
+processing_status            Structure_ID                   char     1 1 15    0 Y 
+processing_status            Serial_No                      int      1 1 10    0 Y 
+processing_status            Start_Date                     date     0 0 19    0 Y 
+processing_status            End_Date                       date     0 0 19    0 Y 
+processing_status            Process_Description            char     0 0 32000 0 Y 
+chem_comp                    Structure_ID                   char     1 1 15    0 Y 
+chem_comp                    id                             char     1 1 23    0 Y 
+chem_comp                    name                           char     0 0 1023  0 Y 
+chem_comp                    pdbx_synonyms                  char     0 0 520   0 Y 
+chem_comp                    formula                        char     0 0 200   0 Y 
+chem_comp                    formula_weight                 float    0 0 10    6 Y 
+chem_comp                    pdbx_component_no              int      0 0 10    0 Y 
+citation_author              Structure_ID                   char     1 1 15    0 Y 
+citation_author              citation_id                    char     1 1 16    0 Y 
+citation_author              name                           char     0 1 80    0 Y 
+citation_author              ordinal                        int      1 1 10    0 Y 
+citation_author              identifier_ORCID               char     0 0 20    0 Y
+pdbx_molecule                Structure_ID                   char     1 1 15    0 Y 
+pdbx_molecule                prd_id                         char     1 1 10    0 Y 
+pdbx_molecule                instance_id                    int      1 1 10    0 Y 
+pdbx_molecule                asym_id                        char     1 1 10    0 Y 
+pdbx_molecule_features       Structure_ID                   char     1 1 15    0 Y 
+pdbx_molecule_features       prd_id                         char     1 1 10    0 Y 
+pdbx_molecule_features       class                          char     0 0 200   0 Y 
+pdbx_molecule_features       type                           char     0 0 80    0 Y 
+pdbx_molecule_features       name                           char     0 0 200   0 Y 
+pdbx_molecule_features       details                        char     0 0 200   0 Y 
+entity                       Structure_ID                   char     1 1 15    0 Y 
+entity                       id                             char     1 1 10    0 Y 
+entity                       type                           char     0 0 12    0 Y 
+entity                       src_method                     char     0 0 10    0 Y 
+entity                       pdbx_description               char     0 0 1023  0 Y 
+entity                       pdbx_number_of_molecules       float    0 0 10    6 Y 
+entity                       formula_weight                 float    0 0 10    6 Y 
+pdbx_database_PDB_obs_spr    Structure_ID                   char     1 1 15    0 Y 
+pdbx_database_PDB_obs_spr    id                             char     0 1 10    0 Y 
+pdbx_database_PDB_obs_spr    date                           date     0 0 19    0 Y 
+pdbx_database_PDB_obs_spr    pdb_id                         char     1 1 30    0 Y 
+pdbx_database_PDB_obs_spr    replace_pdb_id                 char     1 1 80    0 Y 
+pdbx_database_PDB_obs_spr    details                        char     0 0 550   0 Y 
+pdbx_depui_entry_details     Structure_ID                   char     1 1 15    0 Y 
+pdbx_depui_entry_details     experimental_methods           char     0 1 80    0 Y 
+pdbx_depui_entry_details     requested_accession_types      char     0 1 20    0 Y 
+pdbx_depui_entry_details     validated_contact_email        char     0 1 100   0 Y 
+pdbx_depui_entry_details     country                        char     0 1 50    0 Y 
+pdbx_depui_entry_details     replace_pdb_id                 char     0 0 40    0 Y 
+pdbx_depui_entry_details     related_database_name          char     0 0 10    0 Y 
+pdbx_depui_entry_details     related_database_code          char     0 0 20    0 Y 
+pdbx_depui_entry_details     structural_genomics_flag       char     0 0 2     0 Y 
+pdbx_depui_entry_details     wwpdb_site_id                  char     0 0 40    0 Y 
+em_admin                     Structure_ID                   char     1 1 15    0 Y 
+em_admin                     entry_id                       char     0 1 15    0 Y 
+em_admin                     current_status                 char     0 0 24    0 Y 
+em_admin                     deposition_date                date     0 0 19    0 Y 
+em_admin                     deposition_site                char     0 0 24    0 Y 
+em_admin                     last_update                    date     0 0 19    0 Y 
+em_admin                     map_release_date               date     0 0 19    0 Y 
+em_admin                     obsoleted_date                 date     0 0 19    0 Y 
+em_admin                     replace_existing_entry_flag    char     0 0 10    0 Y 
+em_admin                     title                          char     0 0 600   0 Y 
+em_admin                     details                        char     0 0 200   0 Y 
+em_admin                     header_release_date            date     0 0 19    0 Y 
+em_admin                     author_list                    char     0 0 700   0 Y 
+em_admin                     map_hold_date                  date     0 0 19    0 Y 
+database_2                   Structure_ID                   char     1 1 15    0 Y
+database_2                   database_id                    char     1 1 10    0 Y 
+database_2                   database_code                  char     1 1 80    0 Y 
+pdbx_database_related        Structure_ID                   char     1 1 15    0 Y 
+pdbx_database_related        db_name                        char     1 1 12    0 Y 
+pdbx_database_related        details                        char     0 0 5000  0 Y 
+pdbx_database_related        db_id                          char     1 1 80    0 Y 
+pdbx_database_related        content_type                   char     1 1 80    0 Y 
+pdbx_entity_nonpoly          Structure_ID                   char     1 1 15    0 Y 
+pdbx_entity_nonpoly          entity_id                      char     1 1 10    0 Y 
+pdbx_entity_nonpoly          comp_id                        char     0 0 10    0 Y 
+pdbx_entity_nonpoly          name                           char     0 0 1023  0 Y 
+diffrn_source                Structure_ID                   char     1 1 15    0 Y 
+diffrn_source                diffrn_id                      char     1 1 10    0 Y 
+diffrn_source                current                        float    0 0 10    6 Y 
+diffrn_source                details                        char     0 0 200   0 Y 
+diffrn_source                power                          float    0 0 10    6 Y 
+diffrn_source                size                           char     0 0 200   0 Y 
+diffrn_source                source                         char     0 0 200   0 Y 
+diffrn_source                target                         char     0 0 10    0 Y 
+diffrn_source                type                           char     0 0 200   0 Y 
+diffrn_source                voltage                        float    0 0 10    6 Y 
+diffrn_source                take-off_angle                 float    0 0 10    6 Y 
+diffrn_source                pdbx_wavelength_list           char     0 0 80    0 Y 
+diffrn_source                pdbx_wavelength                char     0 0 80    0 Y 
+diffrn_source                pdbx_synchrotron_beamline      char     0 0 80    0 Y 
+diffrn_source                pdbx_synchrotron_site          char     0 0 80    0 Y 
+struct_keywords              Structure_ID                   char     1 1 15    0 Y 
+struct_keywords              entry_id                       char     1 1 15    0 Y 
+struct_keywords              text                           char     0 0 1023  0 Y 
+struct_keywords              pdbx_keywords                  char     0 0 80    0 Y 
+struct_site_keywords         Structure_ID                   char     1 1 15    0 Y 
+struct_site_keywords         site_id                        char     1 1 80    0 Y 
+struct_site_keywords         text                           char     1 1 200   0 Y 
+ndb_struct_conf_na           Structure_ID                   char     1 1 15    0 Y 
+ndb_struct_conf_na           entry_id                       char     1 1 15    0 Y 
+ndb_struct_conf_na           feature                        char     1 1 80    0 Y 
+ndb_struct_conf_na           feature_count                  int      0 0 10    0 Y 
+pdbx_deposit_group           Structure_ID                   char     1 1 15    0 Y 
+pdbx_deposit_group           group_id                       char     1 1 12    0 Y 
+pdbx_deposit_group           group_title                    char     0 0 200   0 Y
+pdbx_deposit_group           group_description              char     0 0 200   0 Y
+pdbx_audit_revision_history  Structure_ID                   char     1 1 15    0 Y 
+pdbx_audit_revision_history  ordinal                        int      1 1 10    0 Y 
+pdbx_audit_revision_history  'data_content_type'            char     1 1 30    0 Y 
+pdbx_audit_revision_history  major_revision                 int      0 0 10    0 Y 
+pdbx_audit_revision_history  minor_revision                 int      0 0 10    0 Y 
+pdbx_audit_revision_history  revision_date                  date     0 0 15    0 Y 
+pdbx_audit_revision_history  internal_version               int      0 0 10    0 Y 
+pdbx_audit_revision_history  internal_deposition_id         char     0 0 20    0 Y 
+pdbx_audit_revision_group    Structure_ID                   char     1 1 15    0 Y 
+pdbx_audit_revision_group    ordinal                        int      1 1 10    0 Y 
+pdbx_audit_revision_group    revision_ordinal               int      1 1 10    0 Y 
+pdbx_audit_revision_group    'data_content_type'            char     1 1 30    0 Y 
+pdbx_audit_revision_group    group                          char     0 0 80    0 Y 
+pdbx_audit_revision_category Structure_ID                   char     1 1 15    0 Y 
+pdbx_audit_revision_category ordinal                        int      1 1 10    0 Y 
+pdbx_audit_revision_category revision_ordinal               int      1 1 10    0 Y 
+pdbx_audit_revision_category 'data_content_type'            char     1 1 30    0 Y 
+pdbx_audit_revision_category category                       char     0 0 50    0 Y 
+pdbx_audit_revision_details  Structure_ID                   char     1 1 15    0 Y 
+pdbx_audit_revision_details  ordinal                        int      1 1 10    0 Y 
+pdbx_audit_revision_details  revision_ordinal               int      1 1 10    0 Y 
+pdbx_audit_revision_details  'data_content_type'            char     1 1 30    0 Y 
+pdbx_audit_revision_details  provider                       char     0 0 30    0 Y 
+pdbx_audit_revision_details  type                           char     0 0 50    0 Y 
+pdbx_audit_revision_details  description                    char     0 0 200   0 Y 
+pdbx_audit_revision_item     Structure_ID                   char     1 1 15    0 Y 
+pdbx_audit_revision_item     ordinal                        int      1 1 10    0 Y 
+pdbx_audit_revision_item     revision_ordinal               int      1 1 10    0 Y 
+pdbx_audit_revision_item     'data_content_type'            char     1 1 30    0 Y 
+pdbx_audit_revision_item     item                           char     0 0 30    0 Y 
+exptl                        Structure_ID                   char     1 1 15    0 Y 
+exptl                        entry_id                       char     0 0 15     0 Y 
+exptl                        crystals_number                int      0 0 10     0 Y 
+exptl                        details                        char     0 0 1100   0 Y 
+exptl                        method                         char     1 1 80     0 Y 
+exptl                        method_details                 char     0 0 200    0 Y 
+pdbx_struct_oper_list        Structure_ID                   char     1 1 15    0 Y
+pdbx_struct_oper_list        id                             char     1 1 10    0 Y
+pdbx_struct_oper_list        type                           char     0 0 80    0 Y
+pdbx_struct_oper_list        name                           char     0 0 80    0 Y
+pdbx_struct_oper_list        symmetry_operation             char     0 0 80    0 Y
+cell                         Structure_ID                   char     1 1 15    0 Y
+cell                         angle_alpha                    float    0 0 10    6 Y
+cell                         angle_beta                     float    0 0 10    6 Y
+cell                         angle_gamma                    float    0 0 10    6 Y
+cell                         entry_id                       char     1 1 15    0 Y
+cell                         details                        char     0 0 200   0 Y
+cell                         length_a                       float    0 0 10    6 Y
+cell                         length_b                       float    0 0 10    6 Y
+cell                         length_c                       float    0 0 10    6 Y
+cell                         volume                         float    0 0 10    6 Y
+cell                         Z_PDB                          int      0 0 10    0 Y
+cell                         pdbx_unique_axis               char     0 0 200   0 Y
+pdbx_struct_assembly_gen     Structure_ID                   char     1 1 15    0 Y
+pdbx_struct_assembly_gen     assembly_id                    char     1 1 80    0 Y
+pdbx_struct_assembly_gen     entity_inst_id                 char     0 0 10    0 Y
+pdbx_struct_assembly_gen     asym_id_list                   char     1 1 32000 0 Y
+pdbx_struct_assembly_gen     auth_asym_id_list              char     0 0 80    0 Y
+pdbx_struct_assembly_gen     oper_expression                char     1 1 511   0 Y
+symmetry                     Structure_ID                   char     1 1 15    0 Y
+symmetry                     entry_id                       char     1 1 15    0 Y
+symmetry                     cell_setting                   char     0 0 13    0 Y
+symmetry                     Int_Tables_number              int      0 0 10    0 Y
+symmetry                     space_group_name_Hall          char     0 0 80    0 Y
+symmetry                     space_group_name_H-M           char     0 0 80    0 Y
+symmetry                     pdbx_full_space_group_name_H-M   char     0 0 80    0 Y
+pdbx_struct_assembly         Structure_ID                   char     1 1 15    0 Y
+pdbx_struct_assembly         method_details                 char     0 0 200   0 Y
+pdbx_struct_assembly         oligomeric_details             char     0 0 255   0 Y
+pdbx_struct_assembly         oligomeric_count               int      0 0 10    0 Y
+pdbx_struct_assembly         details                        char     0 0 200   0 Y
+pdbx_struct_assembly         id                             char     1 1 80    0 Y
+em_depui                     Structure_ID                   char     1 1 15    0 Y
+em_depui                     depositor_hold_instructions    char     0 0 80    0 Y
+em_depui                     macromolecule_description      char     0 0 10    0 Y
+em_depui                     obsolete_instructions          char     0 0 200   0 Y
+em_depui                     same_authors_as_pdb            char     0 0 5    0 Y
+em_depui                     same_title_as_pdb              char     0 0 5    0 Y
+em_author_list               Structure_ID                   char     1 1 15    0 Y
+em_author_list               author                         char     0 0 150    0 Y
+em_author_list               ordinal                        int      1 1 10    0 Y
+em_author_list               identifier_ORCID               char     0 0 20    0 Y
+#
+loop_
+_rcsb_attribute_view.table_name 
+_rcsb_attribute_view.attribute_name 
+_rcsb_attribute_view.format_type 
+_rcsb_attribute_view.www_select 
+_rcsb_attribute_view.www_report 
+rcsb_status                  Structure_ID                   3 1 1 
+rcsb_status                  pdb_id                         3 1 1 
+rcsb_status                  rcsb_annotator                 3 1 1 
+rcsb_status                  status_code                    3 1 1 
+rcsb_status                  author_release_status_code     3 1 1 
+rcsb_status                  deposit_site                   3 1 1 
+rcsb_status                  process_site                   3 1 1 
+rcsb_status                  initial_deposition_date        7 1 1 
+rcsb_status                  date_author_approval           7 1 1 
+rcsb_status                  recvd_author_approval          3 1 1 
+rcsb_status                  author_approval_type           3 1 1 
+rcsb_status                  date_hold_coordinates          7 1 1 
+rcsb_status                  date_hold_struct_fact          7 1 1 
+rcsb_status                  date_hold_nmr_constraints      7 1 1 
+rcsb_status                  date_of_RCSB_release           7 1 1 
+rcsb_status                  date_deposition_form           7 1 1 
+rcsb_status                  date_coordinates               7 1 1 
+rcsb_status                  date_struct_fact               7 1 1 
+rcsb_status                  date_manuscript                7 1 1 
+rcsb_status                  date_nmr_constraints           7 1 1 
+rcsb_status                  replaced_entry_id              3 1 1 
+rcsb_status                  revision_description           5 1 1 
+rcsb_status                  author_list                    5 1 1 
+rcsb_status                  title                          5 1 1 
+rcsb_status                  titleUC                        5 1 1 
+rcsb_status                  date_last_update               7 1 1 
+rcsb_status                  author_release_sequence        5 1 1 
+rcsb_status                  status_code_sf                 3 1 1 
+rcsb_status                  status_code_mr                 3 1 1 
+rcsb_status                  SG_entry                       3 1 1 
+rcsb_status                  date_of_sf_release             7 1 1 
+rcsb_status                  date_of_mr_release             7 1 1 
+rcsb_status                  exp_method                     5 1 1 
+rcsb_status                  header                         5 1 1 
+rcsb_status                  keywords                       5 1 1 
+rcsb_status                  ebi_id                         3 1 1 
+rcsb_status                  ndb_id                         3 1 1 
+rcsb_status                  suppressed_title_Y_N           3 1 1 
+rcsb_status                  status_code_cs                 3 1 1 
+rcsb_status                  date_chemical_shifts           7 1 1 
+rcsb_status                  date_hold_chemical_shifts      7 1 1 
+rcsb_status                  date_of_cs_release             7 1 1 
+rcsb_status                  date_begin_deposition          7 1 1 
+rcsb_status                  date_author_release_request    7 1 1 
+rcsb_status                  date_begin_release_preparation 7 1 1 
+rcsb_status                  date_begin_processing          7 1 1 
+rcsb_status                  date_end_processing            7 1 1 
+rcsb_status                  recvd_coordinates              3 1 1 
+rcsb_status                  recvd_struct_fact              3 1 1 
+rcsb_status                  recvd_nmr_constraints          3 1 1 
+rcsb_status                  recvd_chemical_shifts          3 1 1 
+rcsb_status                  methods_development_category   3 1 1 
+rcsb_status                  pdb_format_compatible          3 1 1 
+rcsb_status                  post_rel_status                3 1 1 
+rcsb_status                  post_rel_recvd_coord           3 1 1
+rcsb_status                  post_rel_recvd_coord_date      7 1 1 
+rcsb_status                  status_code_nmr_data           3 1 1
+rcsb_status                  recvd_nmr_data                 3 1 1
+rcsb_status                  date_nmr_data                  7 1 1
+rcsb_status                  date_hold_nmr_data             7 1 1
+rcsb_status                  dep_release_code_nmr_data      5 1 1 
+rcsb_status                  date_of_nmr_data_release       7 1 1 
+pdbx_contact_author          Structure_ID                   3 1 1 
+pdbx_contact_author          name_salutation                3 1 1 
+pdbx_contact_author          name_first                     5 1 1 
+pdbx_contact_author          name_last                      5 1 1 
+pdbx_contact_author          name_mi                        5 1 1 
+pdbx_contact_author          role                           5 1 1 
+pdbx_contact_author          email                          3 1 1 
+pdbx_contact_author          address_1                      5 1 1 
+pdbx_contact_author          address_2                      5 1 1 
+pdbx_contact_author          address_3                      5 1 1 
+pdbx_contact_author          city                           5 1 1 
+pdbx_contact_author          state_province                 5 1 1 
+pdbx_contact_author          postal_code                    5 1 1 
+pdbx_contact_author          country                        5 1 1 
+pdbx_contact_author          phone                          5 1 1 
+pdbx_contact_author          fax                            5 1 1 
+pdbx_contact_author          organization_type              5 1 1 
+pdbx_contact_author          continent                      5 1 1 
+pdbx_contact_author          identifier_ORCID               3 1 1 
+struct                       Structure_ID                   3 1 1 
+struct                       pdb_id                         3 1 1 
+struct                       title                          3 1 1 
+struct                       pdbx_title_text                3 1 1 
+struct                       pdbx_descriptor                3 1 1 
+struct                       pdbx_details                   5 1 1 
+struct                       pdbx_model_details             5 1 1 
+struct                       pdbx_CASP_flag                 3 1 1 
+struct                       pdbx_center_of_mass_x          2 1 1
+struct                       pdbx_center_of_mass_y          2 1 1
+struct                       pdbx_center_of_mass_z          2 1 1
+audit_author                 Structure_ID                   3 1 1
+audit_author                 name                           3 1 1 
+audit_author                 pdbx_ordinal                   1 1 1 
+audit_author                 identifier_ORCID               3 1 1
+status_information           Structure_ID                   3 0 0 
+status_information           Status_Code                    5 0 0 
+status_information           Received_Depos_Form_Y_N        3 0 0 
+status_information           Received_Depos_Form_Date       7 0 0 
+status_information           Received_Coordinates_Y_N       3 0 0 
+status_information           Received_Coordinates_Date      7 0 0 
+status_information           Received_Struct_Factor_Y_N     3 0 0 
+status_information           Received_Struct_Factor_Date    7 0 0 
+status_information           Received_Internal_Approval_Y_N 3 0 0 
+status_information           Received_Manuscript_Y_N        3 0 0 
+status_information           Received_Manuscript_Date       7 0 0 
+status_information           Received_Author_Approval_Y_N   3 0 0 
+status_information           Received_Author_Approval_Date  7 0 0 
+status_information           Initial_Deposition_Date        7 0 0 
+status_information           Received_Complete_Depos_Date   7 1 1 
+status_information           PDB_Release_Date               7 0 0 
+status_information           Deposit_Site                   5 0 0 
+status_information           Process_Site                   5 0 0 
+status_information           Depositor_Name                 5 0 0 
+status_information           Coordinate_On_Hold_Until_Date  7 0 0 
+status_information           Struct_F_On_Hold_Until_Date    7 0 0 
+status_information           Hold_Until_Publication_Y_N     3 0 0 
+pdbx_prerelease_seq          Structure_ID                   3 1 1 
+pdbx_prerelease_seq          entity_id                      3 1 1 
+pdbx_prerelease_seq          seq_one_letter_code            5 1 1 
+entity_poly                  Structure_ID                   3 1 1 
+entity_poly                  entity_id                      3 1 1 
+entity_poly                  nstd_linkage                   3 1 1 
+entity_poly                  nstd_monomer                   3 1 1 
+entity_poly                  number_of_monomers             1 1 1 
+entity_poly                  type                           3 1 1 
+entity_poly                  pdbx_strand_id                 5 1 1 
+entity_poly                  pdbx_seq_one_letter_code       5 1 1 
+entity_poly                  pdbx_seq_one_letter_code_can   5 1 1 
+entity_poly                  pdbx_description               5 1 1 
+entity_poly                  pdbx_target_identifier         5 1 1 
+citation                     Structure_ID                   3 1 1 
+citation                     Authors                        5 1 1 
+citation                     Title                          5 1 1 
+citation                     Publication                    5 1 1 
+citation                     Volume_No                      3 1 1 
+citation                     First_Page                     3 1 1 
+citation                     Year                           1 1 1 
+citation                     Last_Page                      3 1 1 
+citation                     Publisher                      5 1 1 
+citation                     ASTM                           3 1 1 
+citation                     ASTM_List                      3 1 1 
+citation                     Country                        5 1 1 
+citation                     ISBN_ISSN                      3 1 1 
+citation                     ISSN_ISBN_No                   3 1 1 
+citation                     CODEN_List                     3 1 1 
+citation                     Editor                         5 1 1 
+citation                     Jrnl_Serial_No                 1 1 1 
+citation                     pdbx_database_id_PubMed        1 1 1 
+citation                     pdbx_database_id_DOI           3 1 1 
+PDB_status_information       Structure_ID                   3 1 1 
+PDB_status_information       Revision_Number                1 1 1 
+PDB_status_information       Revision_Date                  7 1 1 
+PDB_status_information       Revision_Type                  1 1 1 
+PDB_status_information       Revision_Records               5 1 1 
+processing_status            Structure_ID                   3 1 1 
+processing_status            Serial_No                      1 1 1 
+processing_status            Start_Date                     7 1 1 
+processing_status            End_Date                       7 1 1 
+processing_status            Process_Description            5 1 1 
+chem_comp                    Structure_ID                   3 1 1 
+chem_comp                    id                             3 1 1 
+chem_comp                    name                           5 1 1 
+chem_comp                    pdbx_synonyms                  5 1 1 
+chem_comp                    formula                        5 1 1 
+chem_comp                    formula_weight                 2 1 1 
+chem_comp                    ndb_component_no               1 1 1 
+citation_author              Structure_ID                   3 1 1 
+citation_author              citation_id                    3 1 1 
+citation_author              name                           5 1 1 
+citation_author              ordinal                        1 1 1 
+citation_author              identifier_ORCID               3 1 1
+pdbx_molecule                Structure_ID                   3 1 1 
+pdbx_molecule                prd_id                         3 1 1 
+pdbx_molecule                instance_id                    1 1 1 
+pdbx_molecule                asym_id                        3 1 1 
+pdbx_molecule_features       Structure_ID                   3 1 1 
+pdbx_molecule_features       prd_id                         3 1 1 
+pdbx_molecule_features       class                          5 1 1 
+pdbx_molecule_features       type                           5 1 1 
+pdbx_molecule_features       name                           5 1 1 
+pdbx_molecule_features       details                        5 1 1 
+entity                       Structure_ID                   3 1 1 
+entity                       id                             3 1 1 
+entity                       type                           3 1 1 
+entity                       src_method                     3 1 1 
+entity                       pdbx_description               5 1 1 
+entity                       pdbx_number_of_molecules       2 1 1 
+entity                       formula_weight                 2 1 1 
+pdbx_database_PDB_obs_spr    Structure_ID                   3 1 1 
+pdbx_database_PDB_obs_spr    id                             3 1 1 
+pdbx_database_PDB_obs_spr    date                           7 1 1 
+pdbx_database_PDB_obs_spr    pdb_id                         3 1 1 
+pdbx_database_PDB_obs_spr    replace_pdb_id                 3 1 1 
+pdbx_database_PDB_obs_spr    details                        5 1 1 
+pdbx_depui_entry_details     Structure_ID                   3 1 1 
+pdbx_depui_entry_details     experimental_methods           3 1 1 
+pdbx_depui_entry_details     requested_accession_types      3 1 1 
+pdbx_depui_entry_details     validated_contact_email        3 1 1 
+pdbx_depui_entry_details     country                        3 1 1 
+pdbx_depui_entry_details     replace_pdb_id                 3 1 1 
+pdbx_depui_entry_details     related_database_name          3 1 1 
+pdbx_depui_entry_details     related_database_code          3 1 1 
+pdbx_depui_entry_details     structural_genomics_flag       3 1 1 
+em_admin                     Structure_ID                   3 1 1 
+em_admin                     entry_id                       3 1 1 
+em_admin                     current_status                 3 1 1 
+em_admin                     deposition_date                7 1 1 
+em_admin                     deposition_site                3 1 1 
+em_admin                     last_update                    7 1 1 
+em_admin                     map_release_date               7 1 1 
+em_admin                     obsoleted_date                 7 1 1 
+em_admin                     replace_existing_entry_flag    3 1 1 
+em_admin                     title                          5 1 1 
+em_admin                     details                        5 1 1 
+em_admin                     header_release_date            7 1 1 
+em_admin                     author_list                    5 1 1 
+em_admin                     map_hold_date                  7 1 1 
+#
+database_2                   Structure_ID                   3 1 1
+database_2                   database_id                    3 1 1 
+database_2                   database_code                  5 1 1 
+pdbx_database_related        Structure_ID                   3 1 1 
+pdbx_database_related        db_name                        3 1 1 
+pdbx_database_related        details                        5 1 1 
+pdbx_database_related        db_id                          5 1 1 
+pdbx_database_related        content_type                   5 1 1 
+pdbx_entity_nonpoly          Structure_ID                   3 1 1 
+pdbx_entity_nonpoly          entity_id                      3 1 1 
+pdbx_entity_nonpoly          comp_id                        3 1 1 
+pdbx_entity_nonpoly          name                           5 1 1 
+diffrn_source                Structure_ID                   3 1 1 
+diffrn_source                diffrn_id                      3 1 1 
+diffrn_source                current                        2 1 1 
+diffrn_source                details                        5 1 1 
+diffrn_source                power                          2 1 1 
+diffrn_source                size                           5 1 1 
+diffrn_source                source                         5 1 1 
+diffrn_source                target                         3 1 1 
+diffrn_source                type                           5 1 1 
+diffrn_source                voltage                        2 1 1 
+diffrn_source                take-off_angle                 2 1 1 
+diffrn_source                pdbx_wavelength_list           5 1 1 
+diffrn_source                pdbx_wavelength                5 1 1 
+diffrn_source                pdbx_synchrotron_beamline      5 1 1 
+diffrn_source                pdbx_synchrotron_site          5 1 1 
+struct_keywords              Structure_ID                   3 1 1 
+struct_keywords              entry_id                       3 1 1 
+struct_keywords              text                           5 1 1 
+struct_keywords              pdbx_keywords                  5 1 1 
+struct_site_keywords         Structure_ID                   3 1 1 
+struct_site_keywords         site_id                        5 1 1 
+struct_site_keywords         text                           5 1 1 
+ndb_struct_conf_na           Structure_ID                   3 1 1 
+ndb_struct_conf_na           entry_id                       3 1 1 
+ndb_struct_conf_na           feature                        5 1 1 
+ndb_struct_conf_na           feature_count                  1 1 1 
+pdbx_deposit_group           Structure_ID                   3 1 1 
+pdbx_deposit_group           group_id                       3 1 1 
+pdbx_deposit_group           group_title                    5 1 1 
+pdbx_deposit_group           group_description              5 1 1 
+pdbx_audit_revision_history  Structure_ID                   3 1 1 
+pdbx_audit_revision_history  ordinal                        1 1 1 
+pdbx_audit_revision_history  'data_content_type'            5 1 1 
+pdbx_audit_revision_history  major_revision                 1 1 1 
+pdbx_audit_revision_history  minor_revision                 1 1 1 
+pdbx_audit_revision_history  revision_date                  7 1 1 
+pdbx_audit_revision_history  internal_version               1 1 1 
+pdbx_audit_revision_history  internal_deposition_id         3 1 1 
+pdbx_audit_revision_group    Structure_ID                   3 1 1 
+pdbx_audit_revision_group    ordinal                        1 1 1 
+pdbx_audit_revision_group    revision_ordinal               1 1 1 
+pdbx_audit_revision_group    'data_content_type'            5 1 1 
+pdbx_audit_revision_group    group                          3 1 1 
+pdbx_audit_revision_category Structure_ID                   3 1 1 
+pdbx_audit_revision_category ordinal                        1 1 1 
+pdbx_audit_revision_category revision_ordinal               1 1 1 
+pdbx_audit_revision_category 'data_content_type'            5 1 1 
+pdbx_audit_revision_category category                       3 1 1 
+pdbx_audit_revision_details  Structure_ID                   3 1 1 
+pdbx_audit_revision_details  ordinal                        1 1 1 
+pdbx_audit_revision_details  revision_ordinal               1 1 1 
+pdbx_audit_revision_details  'data_content_type'            5 1 1 
+pdbx_audit_revision_details  provider                       5 1 1 
+pdbx_audit_revision_details  type                           5 1 1 
+pdbx_audit_revision_details  description                    5 1 1 
+pdbx_audit_revision_item     Structure_ID                   3 1 1 
+pdbx_audit_revision_item     ordinal                        1 1 1 
+pdbx_audit_revision_item     revision_ordinal               1 1 1 
+pdbx_audit_revision_item     'data_content_type'            5 1 1 
+pdbx_audit_revision_item     item                           3 1 1 
+exptl                        Structure_ID                   3 1 1 
+exptl                        entry_id                       3 1 1 
+exptl                        crystals_number                1 1 1 
+exptl                        details                        5 1 1 
+exptl                        method                         5 1 1 
+exptl                        method_details                 5 1 1 
+pdbx_struct_oper_list        Structure_ID                   3 1 1
+pdbx_struct_oper_list        id                             3 1 1
+pdbx_struct_oper_list        type                           5 1 1
+pdbx_struct_oper_list        name                           5 1 1
+pdbx_struct_oper_list        symmetry_operation             5 1 1
+cell                         Structure_ID                   3 1 1
+cell                         angle_alpha                    2 1 1
+cell                         angle_beta                     2 1 1
+cell                         angle_gamma                    2 1 1
+cell                         entry_id                       3 1 1
+cell                         details                        5 1 1
+cell                         length_a                       2 1 1
+cell                         length_b                       2 1 1
+cell                         length_c                       2 1 1
+cell                         volume                         2 1 1
+cell                         Z_PDB                          1 1 1
+cell                         pdbx_unique_axis               5 1 1
+pdbx_struct_assembly_gen     Structure_ID                   3 1 1
+pdbx_struct_assembly_gen     assembly_id                    5 1 1
+pdbx_struct_assembly_gen     entity_inst_id                 3 1 1
+pdbx_struct_assembly_gen     asym_id_list                   5 1 1
+pdbx_struct_assembly_gen     auth_asym_id_list              5 1 1
+pdbx_struct_assembly_gen     oper_expression                3 1 1
+symmetry                     Structure_ID                   3 1 1
+symmetry                     entry_id                       3 1 1
+symmetry                     cell_setting                   3 1 1
+symmetry                     Int_Tables_number              1 1 1
+symmetry                     space_group_name_Hall          5 1 1
+symmetry                     space_group_name_H-M           5 1 1
+symmetry                     pdbx_full_space_group_name_H-M   5 1 1
+pdbx_struct_assembly         Structure_ID                   3 1 1
+pdbx_struct_assembly         method_details                 5 1 1
+pdbx_struct_assembly         oligomeric_details             5 1 1
+pdbx_struct_assembly         oligomeric_count               1 1 1
+pdbx_struct_assembly         details                        5 1 1
+pdbx_struct_assembly         id                             5 1 1
+em_depui                     Structure_ID                   3 1 1
+em_depui                     depositor_hold_instructions    5 1 1
+em_depui                     macromolecule_description      3 1 1
+em_depui                     obsolete_instructions          5 1 1
+em_depui                     same_authors_as_pdb            3 1 1
+em_depui                     same_title_as_pdb              3 1 1
+em_author_list               Structure_ID                   3 1 1
+em_author_list               author                         3 1 1
+em_author_list               ordinal                        3 1 1
+em_author_list               identifier_ORCID               3 1 1
+#
+data_rcsb_schema_map
+# 
+loop_
+_rcsb_map_condition.condition_id 
+_rcsb_map_condition.attribute_name 
+_rcsb_map_condition.attribute_value 
+C1 entry_id    'datablockid()'            
+C2 database_id PDB                        
+C3 database_id NDB                        
+C4 rev_num     'valueof(Revision_Number)' 
+C5 id          'valueof(entity_id)'       
+C6 entity_id   'valueof(entity_id)'       
+C7 citation_id 'valueof(Jrnl_Serial_No)'  
+C8 citation_id primary                    
+# 
+loop_
+_rcsb_attribute_map.target_table_name 
+_rcsb_attribute_map.target_attribute_name 
+_rcsb_attribute_map.source_item_name 
+_rcsb_attribute_map.condition_id 
+_rcsb_attribute_map.function_id 
+rcsb_status                  Structure_ID                   ?                                                      ?  'datablockid()'         
+rcsb_status                  pdb_id                         '_database_2.database_code'                            C2 ?                       
+rcsb_status                  rcsb_annotator                 '_pdbx_database_status.pdbx_annotator'                 ?  ?                       
+rcsb_status                  status_code                    '_pdbx_database_status.status_code'                    ?  ?                       
+rcsb_status                  author_release_status_code     '_pdbx_database_status.author_release_status_code'     ?  ?                       
+rcsb_status                  deposit_site                   '_pdbx_database_status.deposit_site'                   ?  ?                       
+rcsb_status                  process_site                   '_pdbx_database_status.process_site'                   ?  ?                       
+rcsb_status                  initial_deposition_date        '_pdbx_database_status.recvd_initial_deposition_date'  ?  'datecnv(sybase)'       
+rcsb_status                  date_author_approval           '_pdbx_database_status.date_author_approval'           ?  'datecnv(sybase)'       
+rcsb_status                  recvd_author_approval          '_pdbx_database_status.recvd_author_approval'          ?  ?                       
+rcsb_status                  author_approval_type           '_pdbx_database_status.author_approval_type'           ?  ?                       
+rcsb_status                  date_hold_coordinates          '_pdbx_database_status.date_hold_coordinates'          ?  'datecnv(sybase)'       
+rcsb_status                  date_hold_struct_fact          '_pdbx_database_status.date_hold_struct_fact'          ?  'datecnv(sybase)'       
+rcsb_status                  date_hold_nmr_constraints      '_pdbx_database_status.date_hold_nmr_constraints'      ?  'datecnv(sybase)'       
+rcsb_status                  date_of_RCSB_release           '_pdbx_database_status.date_of_NDB_release'            ?  'datecnv(sybase)'       
+rcsb_status                  date_deposition_form           '_pdbx_database_status.date_deposition_form'           ?  'datecnv(sybase)'       
+rcsb_status                  date_coordinates               '_pdbx_database_status.date_coordinates'               ?  'datecnv(sybase)'       
+rcsb_status                  date_struct_fact               '_pdbx_database_status.date_struct_fact'               ?  'datecnv(sybase)'       
+rcsb_status                  date_manuscript                '_pdbx_database_status.date_manuscript'                ?  'datecnv(sybase)'       
+rcsb_status                  date_nmr_constraints           '_pdbx_database_status.date_nmr_constraints'           ?  'datecnv(sybase)'       
+rcsb_status                  replaced_entry_id              '_pdbx_database_status.replaced_entry_id'              ?  ?                       
+rcsb_status                  revision_description           '_pdbx_database_status.revision_description'           ?  ?                       
+rcsb_status                  author_list                    '_audit_author.name'                                   ?  'collapse(comma)'       
+rcsb_status                  title                          '_struct.title'                                        ?  ?                       
+rcsb_status                  titleUC                        '_struct.title'                                        ?  'toupper()'             
+rcsb_status                  date_last_update               ?                                                      ?  'today()'               
+rcsb_status                  author_release_sequence        '_pdbx_database_status.dep_release_code_sequence'      ?  ?                       
+rcsb_status                  status_code_sf                 '_pdbx_database_status.status_code_sf'                 ?  ?                       
+rcsb_status                  status_code_mr                 '_pdbx_database_status.status_code_mr'                 ?  ?                       
+rcsb_status                  SG_entry                       '_pdbx_database_status.SG_entry'                       ?  ?                       
+rcsb_status                  date_of_sf_release             '_pdbx_database_status.date_of_sf_release'             ?  ?                       
+rcsb_status                  date_of_mr_release             '_pdbx_database_status.date_of_mr_release'             ?  ?                       
+rcsb_status                  exp_method                     '_exptl.method'                                        ?  'collapse(comma)'       
+rcsb_status                  header                         '_struct_keywords.pdbx_keywords'                       ?  ?                       
+rcsb_status                  keywords                       '_struct_keywords.text'                                ?  ?                       
+rcsb_status                  ebi_id                         ?                                                      ?  ?                       
+rcsb_status                  ndb_id                         '_database_2.database_code'                            C3 ?                       
+rcsb_status                  suppressed_title_Y_N           '_pdbx_database_status.title_suppression'              ?  ?                       
+rcsb_status                  status_code_cs                 '_pdbx_database_status.status_code_cs'                 ?  ?                       
+rcsb_status                  date_chemical_shifts           '_pdbx_database_status.date_chemical_shifts'           ?  ?                       
+rcsb_status                  date_hold_chemical_shifts      '_pdbx_database_status.date_hold_chemical_shifts'      ?  ?                       
+rcsb_status                  date_of_cs_release             '_pdbx_database_status.date_of_cs_release'             ?  ?                       
+rcsb_status                  date_begin_deposition          '_pdbx_database_status.date_begin_deposition'          ?  ?                       
+rcsb_status                  date_author_release_request    '_pdbx_database_status.date_author_release_request'    ?  ?                       
+rcsb_status                  date_begin_release_preparation '_pdbx_database_status.date_begin_release_preparation' ?  ?                       
+rcsb_status                  date_begin_processing          '_pdbx_database_status.date_begin_processing'          ?  ?                       
+rcsb_status                  date_end_processing            '_pdbx_database_status.date_end_processing'            ?  ?                       
+rcsb_status                  recvd_coordinates              '_pdbx_database_status.recvd_coordinates'              ?  ?                       
+rcsb_status                  recvd_struct_fact              '_pdbx_database_status.recvd_struct_fact'              ?  ?                       
+rcsb_status                  recvd_nmr_constraints          '_pdbx_database_status.recvd_nmr_constraints'          ?  ?                       
+rcsb_status                  recvd_chemical_shifts          '_pdbx_database_status.recvd_chemical_shifts'          ?  ?                       
+rcsb_status                  methods_development_category   '_pdbx_database_status.methods_development_category'   ?  ?                       
+rcsb_status                  pdb_format_compatible          '_pdbx_database_status.pdb_format_compatible'          ?  ?                       
+rcsb_status                  post_rel_status                '_pdbx_database_status.post_rel_status'                ?  ?
+rcsb_status                  post_rel_recvd_coord           '_pdbx_database_status.post_rel_recvd_coord'           ?  ?
+rcsb_status                  post_rel_recvd_coord_date      '_pdbx_database_status.post_rel_recvd_coord_date'      ?  'datecnv(sybase)'
+rcsb_status                  status_code_nmr_data           '_pdbx_database_status.status_code_nmr_data'           ?  ?
+rcsb_status                  recvd_nmr_data                 '_pdbx_database_status.recvd_nmr_data'                 ?  ?
+rcsb_status                  date_nmr_data                  '_pdbx_database_status.date_nmr_data'                  ?  'datecnv(sybase)'
+rcsb_status                  date_hold_nmr_data             '_pdbx_database_status.date_hold_nmr_data'             ?  'datecnv(sybase)'
+rcsb_status                  dep_release_code_nmr_data      '_pdbx_database_status.dep_release_code_nmr_data'      ?  ? 
+rcsb_status                  date_of_nmr_data_release       '_pdbx_database_status.date_of_nmr_data_release'       ?  'datecnv(sybase)'
+pdbx_contact_author          Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_contact_author          name_salutation                '_pdbx_contact_author.name_salutation'                 ?  ?                       
+pdbx_contact_author          name_first                     '_pdbx_contact_author.name_first'                      ?  ?                       
+pdbx_contact_author          name_last                      '_pdbx_contact_author.name_last'                       ?  ?                       
+pdbx_contact_author          name_mi                        '_pdbx_contact_author.name_mi'                         ?  ?                       
+pdbx_contact_author          role                           '_pdbx_contact_author.role'                            ?  ?                       
+pdbx_contact_author          email                          '_pdbx_contact_author.email'                           ?  ?                       
+pdbx_contact_author          address_1                      '_pdbx_contact_author.address_1'                       ?  ?                       
+pdbx_contact_author          address_2                      '_pdbx_contact_author.address_2'                       ?  ?                       
+pdbx_contact_author          address_3                      '_pdbx_contact_author.address_3'                       ?  ?                       
+pdbx_contact_author          city                           '_pdbx_contact_author.city'                            ?  ?                       
+pdbx_contact_author          state_province                 '_pdbx_contact_author.state_province'                  ?  ?                       
+pdbx_contact_author          postal_code                    '_pdbx_contact_author.postal_code'                     ?  ?                       
+pdbx_contact_author          country                        '_pdbx_contact_author.country'                         ?  ?                       
+pdbx_contact_author          phone                          '_pdbx_contact_author.phone'                           ?  ?                       
+pdbx_contact_author          fax                            '_pdbx_contact_author.fax'                             ?  ?                       
+pdbx_contact_author          organization_type              '_pdbx_contact_author.organization_type'               ?  ?                       
+pdbx_contact_author          continent                      '_pdbx_contact_author.continent'                       ?  ?                       
+pdbx_contact_author          identifier_ORCID               '_pdbx_contact_author.identifier_ORCID'                ?  ?                       
+struct                       Structure_ID                   ?                                                      ?  'datablockid()'         
+struct                       pdb_id                         '_database_2.database_code'                            C2 ?                       
+struct                       title                          '_struct.title'                                        ?  ?                       
+struct                       pdbx_title_text                '_struct.pdbx_title_text'                               ?  ?                       
+struct                       pdbx_details                   '_struct.pdbx_details'                                  ?  ?                       
+struct                       pdbx_descriptor                '_struct.pdbx_descriptor'                               ?  ?                       
+struct                       pdbx_model_details             '_struct.pdbx_model_details'                           ?  ?                       
+struct                       pdbx_CASP_flag                 '_struct.pdbx_CASP_flag'                               ?  ?                       
+struct                       pdbx_center_of_mass_x          '_struct.pdbx_center_of_mass_x'                        ?  ?
+struct                       pdbx_center_of_mass_y          '_struct.pdbx_center_of_mass_y'                        ?  ?
+struct                       pdbx_center_of_mass_z          '_struct.pdbx_center_of_mass_z'                        ?  ?
+audit_author                 Structure_ID                   ?                                                      ?  'datablockid()'
+audit_author                 name                           '_audit_author.name'                                   ?  ?                       
+audit_author                 pdbx_ordinal                   '_audit_author.pdbx_ordinal'                           ?  ?                       
+audit_author                 identifier_ORCID               '_audit_author.identifier_ORCID'                       ?  ?                
+status_information           Structure_ID                   ?                                                      ?  'datablockid()'         
+status_information           Status_Code                    '_pdbx_database_status.status_code'                    ?  ?                       
+status_information           Received_Depos_Form_Y_N        '_pdbx_database_status.recvd_deposit_form'             ?  ?                       
+status_information           Received_Depos_Form_Date       '_pdbx_database_status.date_deposition_form'           ?  'datecnv(sybase-short)' 
+status_information           Received_Coordinates_Y_N       '_pdbx_database_status.recvd_coordinates'              ?  ?                       
+status_information           Received_Coordinates_Date      '_pdbx_database_status.date_coordinates'               ?  'datecnv(sybase-short)' 
+status_information           Received_Struct_Factor_Y_N     '_pdbx_database_status.recvd_struct_fact'              ?  ?                       
+status_information           Received_Struct_Factor_Date    '_pdbx_database_status.date_struct_fact'               ?  'datecnv(sybase-short)' 
+status_information           Received_Internal_Approval_Y_N '_pdbx_database_status.recvd_internal_approval'        ?  ?                       
+status_information           Received_Manuscript_Y_N        '_pdbx_database_status.recvd_manuscript'               ?  ?                       
+status_information           Received_Manuscript_Date       '_pdbx_database_status.date_manuscript'                ?  'datecnv(sybase-short)' 
+status_information           Received_Author_Approval_Y_N   '_pdbx_database_status.recvd_author_approval'          ?  ?                       
+status_information           Received_Author_Approval_Date  '_pdbx_database_status.date_author_approval'           ?  'datecnv(sybase-short)' 
+status_information           Initial_Deposition_Date        '_pdbx_database_status.recvd_initial_deposition_date'  ?  ?                       
+status_information           Received_Complete_Depos_Date   '_pdbx_database_status.date_submitted'                 ?  'datecnv(sybase-short)' 
+status_information           PDB_Release_Date               '_pdbx_database_status.date_of_PDB_release'            ?  'datecnv(sybase-short)' 
+status_information           Deposit_Site                   '_pdbx_database_status.deposit_site'                   ?  ?                       
+status_information           Process_Site                   '_pdbx_database_status.process_site'                   ?  ?                       
+status_information           Depositor_Name                 '_pdbx_database_status.name_depositor'                 ?  ?                       
+status_information           Coordinate_On_Hold_Until_Date  '_pdbx_database_status.date_hold_coordinates'          ?  'datecnv(sybase-short)' 
+status_information           Struct_F_On_Hold_Until_Date    '_pdbx_database_status.date_hold_struct_fact'          ?  'datecnv(sybase-short)' 
+status_information           Hold_Until_Publication_Y_N     '_pdbx_database_status.hold_for_publication'           ?  ?                       
+pdbx_prerelease_seq          Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_prerelease_seq          entity_id                      '_pdbx_prerelease_seq.entity_id'                       ?  ?                       
+pdbx_prerelease_seq          seq_one_letter_code            '_pdbx_prerelease_seq.seq_one_letter_code'             ?  ?                       
+entity_poly                  Structure_ID                   ?                                                      ?  'datablockid()'         
+entity_poly                  entity_id                      '_entity_poly.entity_id'                               ?  ?                       
+entity_poly                  nstd_linkage                   '_entity_poly.nstd_linkage'                            ?  'tobool()'              
+entity_poly                  nstd_monomer                   '_entity_poly.nstd_monomer'                            ?  'tobool()'              
+entity_poly                  number_of_monomers             '_entity_poly_seq.mon_id'                              C6 'count()'               
+entity_poly                  type                           '_entity_poly.type'                                    ?  'toupper()'             
+entity_poly                  pdbx_strand_id                 '_entity_poly.pdbx_strand_id'                          ?  ?                       
+entity_poly                  pdbx_seq_one_letter_code       '_entity_poly.pdbx_seq_one_letter_code'                ?  ?                       
+entity_poly                  pdbx_seq_one_letter_code_can   '_entity_poly.pdbx_seq_one_letter_code_can'            ?  ?                       
+entity_poly                  pdbx_description               '_entity.pdbx_description'                             C5 ?                       
+entity_poly                  pdbx_target_identifier         '_entity_poly.pdbx_target_identifier'                  ?  ?                       
+citation                     Structure_ID                   ?                                                      ?  'datablockid()'         
+citation                     Title                          '_citation.title'                                      ?  ?                       
+citation                     Publication                    '_citation.journal_abbrev'                             ?  ?                       
+citation                     Volume_No                      '_citation.journal_volume'                             ?  ?                       
+citation                     First_Page                     '_citation.page_first'                                 ?  ?                       
+citation                     Year                           '_citation.year'                                       ?  ?                       
+citation                     Last_Page                      '_citation.page_last'                                  ?  ?                       
+citation                     Publisher                      '_citation.book_publisher'                             ?  ?                       
+citation                     ASTM                           ?                                                      ?  ?                       
+citation                     ASTM_List                      '_citation.journal_id_ASTM'                            ?  ?                       
+citation                     Country                        '_citation.country'                                    ?  ?                       
+citation                     ISBN_ISSN                      ?                                                      ?  ?                       
+citation                     ISSN_ISBN_No                   '_citation.journal_id_ISSN'                            ?  ?                       
+citation                     CODEN_List                     '_citation.journal_id_CSD'                             ?  ?                       
+citation                     Editor                         ?                                                      ?  ?                       
+citation                     Jrnl_Serial_No                 '_citation.id'                                         ?  'tointegerplus()'       
+citation                     pdbx_database_id_PubMed        '_citation.pdbx_database_id_PubMed'                    ?  ?                       
+citation                     pdbx_database_id_DOI           '_citation.pdbx_database_id_DOI'                       ?  ?                       
+PDB_status_information       Structure_ID                   ?                                                      ?  'datablockid()'         
+PDB_status_information       Revision_Number                '_database_PDB_rev.num'                                ?  ?                       
+PDB_status_information       Revision_Date                  '_database_PDB_rev.date'                               ?  ?                       
+PDB_status_information       Revision_Type                  '_database_PDB_rev.mod_type'                           ?  ?                       
+PDB_status_information       Revision_Records               '_database_PDB_rev_record.type'                        C4 'collapse(comma)'       
+processing_status            Structure_ID                   ?                                                      ?  'datablockid()'         
+processing_status            Serial_No                      '_pdbx_database_proc.cycle_id'                         ?  ?                       
+processing_status            Start_Date                     '_pdbx_database_proc.date_begin_cycle'                 ?  ?                       
+processing_status            End_Date                       '_pdbx_database_proc.date_end_cycle'                   ?  ?                       
+processing_status            Process_Description            '_pdbx_database_proc.details'                          ?  ?                       
+chem_comp                    Structure_ID                   ?                                                      ?  'datablockid()'         
+chem_comp                    id                             '_chem_comp.id'                                        ?  ?                       
+chem_comp                    name                           '_chem_comp.name'                                      ?  ?                       
+chem_comp                    pdbx_synonyms                  '_chem_comp.pdbx_synonyms'                             ?  ?                       
+chem_comp                    formula                        '_chem_comp.formula'                                   ?  ?                       
+chem_comp                    formula_weight                 '_chem_comp.formula_weight'                            ?  ?                       
+chem_comp                    pdbx_component_no              '_chem_comp.pdbx_component_no'                         ?  ?                       
+citation_author              Structure_ID                   ?                                                      ?  'datablockid()'         
+citation_author              citation_id                    '_citation_author.citation_id'                         ?  ?                       
+citation_author              name                           '_citation_author.name'                                ?  ?                       
+citation_author              ordinal                        '_citation_author.ordinal'                             ?  ?                       
+citation_author              identifier_ORCID               '_citation_author.identifier_ORCID'                    ? ?
+pdbx_molecule                Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_molecule                prd_id                         '_pdbx_molecule.prd_id'                                ?  ?                       
+pdbx_molecule                instance_id                    '_pdbx_molecule.instance_id'                           ?  ?                       
+pdbx_molecule                asym_id                        '_pdbx_molecule.asym_id'                               ?  ?                       
+pdbx_molecule_features       Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_molecule_features       prd_id                         '_pdbx_molecule_features.prd_id'                       ?  ?                       
+pdbx_molecule_features       class                          '_pdbx_molecule_features.class'                        ?  ?                       
+pdbx_molecule_features       type                           '_pdbx_molecule_features.type'                         ?  ?                       
+pdbx_molecule_features       name                           '_pdbx_molecule_features.name'                         ?  ?                       
+pdbx_molecule_features       details                        '_pdbx_molecule_features.details'                      ?  ?                       
+entity                       Structure_ID                   ?                                                      ?  'datablockid()'         
+entity                       id                             '_entity.id'                                           ?  ?                       
+entity                       type                           '_entity.type'                                         ?  ?                       
+entity                       src_method                     '_entity.src_method'                                   ?  ?                       
+entity                       pdbx_description               '_entity.pdbx_description'                             ?  ?                       
+entity                       pdbx_number_of_molecules       '_entity.pdbx_number_of_molecules'                     ?  ?                       
+entity                       formula_weight                 '_entity.formula_weight'                               ?  ?                       
+pdbx_database_PDB_obs_spr    Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_database_PDB_obs_spr    id                             '_pdbx_database_PDB_obs_spr.id'                        ?  ?                       
+pdbx_database_PDB_obs_spr    date                           '_pdbx_database_PDB_obs_spr.date'                      ?  ?                       
+pdbx_database_PDB_obs_spr    pdb_id                         '_pdbx_database_PDB_obs_spr.pdb_id'                    ?  ?                       
+pdbx_database_PDB_obs_spr    replace_pdb_id                 '_pdbx_database_PDB_obs_spr.replace_pdb_id'            ?  ?                       
+pdbx_database_PDB_obs_spr    details                        '_pdbx_database_PDB_obs_spr.details'                   ?  ?                       
+pdbx_depui_entry_details     Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_depui_entry_details     experimental_methods           '_pdbx_depui_entry_details.experimental_methods'       ?  ?                       
+pdbx_depui_entry_details     requested_accession_types      '_pdbx_depui_entry_details.requested_accession_types'  ?  ?                       
+pdbx_depui_entry_details     validated_contact_email        '_pdbx_depui_entry_details.validated_contact_email'    ?  ?                       
+pdbx_depui_entry_details     country                        '_pdbx_depui_entry_details.country'                    ?  ?                       
+pdbx_depui_entry_details     replace_pdb_id                 '_pdbx_depui_entry_details.replace_pdb_id'             ?  ?                       
+pdbx_depui_entry_details     related_database_name          '_pdbx_depui_entry_details.related_database_name'      ?  ?                       
+pdbx_depui_entry_details     related_database_code          '_pdbx_depui_entry_details.related_database_code'      ?  ?                       
+pdbx_depui_entry_details     structural_genomics_flag       '_pdbx_depui_entry_details.structural_genomics_flag'   ?  ?                       
+pdbx_depui_entry_details     wwpdb_site_id                  '_pdbx_depui_entry_details.wwpdb_site_id'              ?  ?                       
+em_admin                     Structure_ID                   ?                                                      ?  'datablockid()'         
+em_admin                     entry_id                       '_em_admin.entry_id'                                   ?  ?                       
+em_admin                     current_status                 '_em_admin.current_status'                             ?  ?                       
+em_admin                     deposition_date                '_em_admin.deposition_date'                            ?  ?                       
+em_admin                     deposition_site                '_em_admin.deposition_site'                            ?  ?                       
+em_admin                     last_update                    '_em_admin.last_update'                                ?  ?                       
+em_admin                     map_release_date               '_em_admin.map_release_date'                           ?  ?                       
+em_admin                     obsoleted_date                 '_em_admin.obsoleted_date'                             ?  ?                       
+em_admin                     replace_existing_entry_flag    '_em_admin.replace_existing_entry_flag'                ?  ?                       
+em_admin                     title                          '_em_admin.title'                                      ?  ?
+em_admin                     details                        '_em_admin.details'                                    ?  ?                       
+em_admin                     header_release_date            '_em_admin.header_release_date'                        ?  ?                       
+em_admin                     author_list                    '_em_author_list.author'                               ?  'collapse(comma)'       
+em_admin                     map_hold_date                  '_em_admin.map_hold_date'                              ?  ?
+database_2                   Structure_ID                   ?                                                      ?  'datablockid()'
+database_2                   database_id                    '_database_2.database_id'                              ?  ?                       
+database_2                   database_code                  '_database_2.database_code'                            ?  ?                       
+pdbx_database_related        Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_database_related        db_name                        '_pdbx_database_related.db_name'                       ?  ?                       
+pdbx_database_related        details                        '_pdbx_database_related.details'                       ?  ?                       
+pdbx_database_related        db_id                          '_pdbx_database_related.db_id'                         ?  ?                       
+pdbx_database_related        content_type                   '_pdbx_database_related.content_type'                  ?  ?                       
+pdbx_entity_nonpoly          Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_entity_nonpoly          entity_id                      '_pdbx_entity_nonpoly.entity_id'                       ?  ?                       
+pdbx_entity_nonpoly          comp_id                        '_pdbx_entity_nonpoly.comp_id'                         ?  ?                       
+pdbx_entity_nonpoly          name                           '_pdbx_entity_nonpoly.name'                            ?  ?                       
+diffrn_source                Structure_ID                   ?                                                      ?  'datablockid()'         
+diffrn_source                diffrn_id                      '_diffrn_source.diffrn_id'                             ?  ?                       
+diffrn_source                current                        '_diffrn_source.current'                               ?  ?                       
+diffrn_source                details                        '_diffrn_source.details'                               ?  ?                       
+diffrn_source                power                          '_diffrn_source.power'                                 ?  ?                       
+diffrn_source                size                           '_diffrn_source.size'                                  ?  ?                       
+diffrn_source                source                         '_diffrn_source.source'                                ?  ?                       
+diffrn_source                target                         '_diffrn_source.target'                                ?  ?                       
+diffrn_source                type                           '_diffrn_source.type'                                  ?  ?                       
+diffrn_source                voltage                        '_diffrn_source.voltage'                               ?  ?                       
+diffrn_source                take-off_angle                 '_diffrn_source.take-off_angle'                        ?  ?                       
+diffrn_source                pdbx_wavelength_list           '_diffrn_source.pdbx_wavelength_list'                  ?  ?                       
+diffrn_source                pdbx_wavelength                '_diffrn_source.pdbx_wavelength'                       ?  ?                       
+diffrn_source                pdbx_synchrotron_beamline      '_diffrn_source.pdbx_synchrotron_beamline'             ?  ?                       
+diffrn_source                pdbx_synchrotron_site          '_diffrn_source.pdbx_synchrotron_site'                 ?  ?                       
+struct_keywords              Structure_ID                   ?                                                      ?  'datablockid()'         
+struct_keywords              entry_id                       '_struct_keywords.entry_id'                            ?  ?                       
+struct_keywords              text                           '_struct_keywords.text'                                ?  ?                       
+struct_keywords              pdbx_keywords                  '_struct_keywords.pdbx_keywords'                       ?  ?                       
+struct_site_keywords         Structure_ID                   ?                                                      ?  'datablockid()'         
+struct_site_keywords         site_id                        '_struct_site_keywords.site_id'                        ?  ?                       
+struct_site_keywords         text                           '_struct_site_keywords.text'                           ?  ?                       
+ndb_struct_conf_na           Structure_ID                   ?                                                      ?  'datablockid()'         
+ndb_struct_conf_na           entry_id                       '_ndb_struct_conf_na.entry_id'                         ?  ?                       
+ndb_struct_conf_na           feature                        '_ndb_struct_conf_na.feature'                          ?  ?                       
+ndb_struct_conf_na           feature_count                  '_ndb_struct_conf_na.feature_count'                    ?  ?                       
+pdbx_deposit_group           Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_deposit_group           group_id                       '_pdbx_deposit_group.group_id'                         ?  ?                       
+pdbx_deposit_group           group_title                    '_pdbx_deposit_group.group_title'                      ?  ?               
+pdbx_deposit_group           group_description              '_pdbx_deposit_group.group_description'                ?  ?   
+pdbx_audit_revision_history  Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_audit_revision_history  ordinal                        '_pdbx_audit_revision_history.ordinal'                 ?  ?                       
+pdbx_audit_revision_history  'data_content_type'            '_pdbx_audit_revision_history.data_content_type'       ?  ?                       
+pdbx_audit_revision_history  major_revision                 '_pdbx_audit_revision_history.major_revision'          ?  ?                       
+pdbx_audit_revision_history  minor_revision                 '_pdbx_audit_revision_history.minor_revision'          ?  ?                       
+pdbx_audit_revision_history  revision_date                  '_pdbx_audit_revision_history.revision_date'           ?  ?                       
+pdbx_audit_revision_history  internal_version               '_pdbx_audit_revision_history.internal_version'        ?  ?                       
+pdbx_audit_revision_history  internal_deposition_id         '_pdbx_audit_revision_history.internal_deposition_id'  ?  ?                       
+pdbx_audit_revision_group    Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_audit_revision_group    ordinal                        '_pdbx_audit_revision_group.ordinal'                   ?  ?                       
+pdbx_audit_revision_group    revision_ordinal               '_pdbx_audit_revision_group.revision_ordinal'          ?  ?                       
+pdbx_audit_revision_group    'data_content_type'            '_pdbx_audit_revision_group.data_content_type'         ?  ?                       
+pdbx_audit_revision_group    group                          '_pdbx_audit_revision_group.group'                     ?  ?                       
+pdbx_audit_revision_category Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_audit_revision_category ordinal                        '_pdbx_audit_revision_category.ordinal'                ?  ?                       
+pdbx_audit_revision_category revision_ordinal               '_pdbx_audit_revision_category.revision_ordinal'       ?  ?                       
+pdbx_audit_revision_category 'data_content_type'            '_pdbx_audit_revision_category.data_content_type'      ?  ?                       
+pdbx_audit_revision_category category                       '_pdbx_audit_revision_category.category'               ?  ?                       
+pdbx_audit_revision_details  Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_audit_revision_details  ordinal                        '_pdbx_audit_revision_details.ordinal'                 ?  ?                       
+pdbx_audit_revision_details  revision_ordinal               '_pdbx_audit_revision_details.revision_ordinal'        ?  ?                       
+pdbx_audit_revision_details  'data_content_type'            '_pdbx_audit_revision_details.data_content_type'       ?  ?                       
+pdbx_audit_revision_details  provider                       '_pdbx_audit_revision_details.provider'                ?  ?                       
+pdbx_audit_revision_details  type                           '_pdbx_audit_revision_details.type'                    ?  ?                       
+pdbx_audit_revision_details  description                    '_pdbx_audit_revision_details.description'             ?  ?                       
+pdbx_audit_revision_item     Structure_ID                   ?                                                      ?  'datablockid()'         
+pdbx_audit_revision_item     ordinal                        '_pdbx_audit_revision_item.ordinal'                    ?  ?                       
+pdbx_audit_revision_item     revision_ordinal               '_pdbx_audit_revision_item.revision_ordinal'           ?  ?                       
+pdbx_audit_revision_item     'data_content_type'            '_pdbx_audit_revision_item.data_content_type'          ?  ?                       
+pdbx_audit_revision_item     item                           '_pdbx_audit_revision_item.item'                       ?  ?                       
+exptl                        Structure_ID                   ?                                                      ? 'datablockid()' 
+exptl                        entry_id                       '_database_2.database_code'                            C2 ?              
+exptl                        crystals_number                '_exptl.crystals_number'                               ? ?               
+exptl                        details                        '_exptl.details'                                       ? ?               
+exptl                        method                         '_exptl.method'                                        ? ?               
+exptl                        method_details                 '_exptl.method_details'                                ? ?               
+pdbx_struct_oper_list        Structure_ID                   ?                                                      ? 'datablockid()'
+pdbx_struct_oper_list        id                             '_pdbx_struct_oper_list.id'                            ? ?
+pdbx_struct_oper_list        type                           '_pdbx_struct_oper_list.type'                          ? ?
+pdbx_struct_oper_list        name                           '_pdbx_struct_oper_list.name'                          ? ?
+pdbx_struct_oper_list        symmetry_operation             '_pdbx_struct_oper_list.symmetry_operation'            ? ?
+cell                         Structure_ID                   ?                                                      ? 'datablockid()'
+cell                         angle_alpha                    '_cell.angle_alpha'                                    ? ?
+cell                         angle_beta                     '_cell.angle_beta'                                     ? ?
+cell                         angle_gamma                    '_cell.angle_gamma'                                    ? ?
+cell                         entry_id                       '_cell.entry_id'                                       ? ?
+cell                         details                        '_cell.details'                                        ? ?
+cell                         length_a                       '_cell.length_a'                                       ? ?
+cell                         length_b                       '_cell.length_b'                                       ? ?
+cell                         length_c                       '_cell.length_c'                                       ? ?
+cell                         volume                         '_cell.volume'                                         ? ?
+cell                         Z_PDB                          '_cell.Z_PDB'                                          ? ?
+cell                         pdbx_unique_axis               '_cell.pdbx_unique_axis'                               ? ?
+pdbx_struct_assembly_gen     Structure_ID                   ?                                                      ? 'datablockid()'
+pdbx_struct_assembly_gen     assembly_id                    '_pdbx_struct_assembly_gen.assembly_id'                ? ?
+pdbx_struct_assembly_gen     entity_inst_id                 '_pdbx_struct_assembly_gen.entity_inst_id'             ? ?
+pdbx_struct_assembly_gen     asym_id_list                   '_pdbx_struct_assembly_gen.asym_id_list'               ? ?
+pdbx_struct_assembly_gen     auth_asym_id_list              '_pdbx_struct_assembly_gen.auth_asym_id_list'          ? ?
+pdbx_struct_assembly_gen     oper_expression                '_pdbx_struct_assembly_gen.oper_expression'            ? ?
+symmetry                     Structure_ID                   ?                                                      ? 'datablockid()'
+symmetry                     entry_id                       '_symmetry.entry_id'                                   ? ?
+symmetry                     cell_setting                   '_symmetry.cell_setting'                               ? ?
+symmetry                     Int_Tables_number              '_symmetry.Int_Tables_number'                          ? ?
+symmetry                     space_group_name_Hall          '_symmetry.space_group_name_Hall'                      ? ?
+symmetry                     space_group_name_H-M           '_symmetry.space_group_name_H-M'                       ? ?
+symmetry                     pdbx_full_space_group_name_H-M    '_symmetry.pdbx_full_space_group_name_H-M'          ? ?
+pdbx_struct_assembly         Structure_ID                   ?                                                      ? 'datablockid()'
+pdbx_struct_assembly         method_details                 '_pdbx_struct_assembly.method_details'                 ? ?
+pdbx_struct_assembly         oligomeric_details             '_pdbx_struct_assembly.oligomeric_details'             ? ?
+pdbx_struct_assembly         oligomeric_count               '_pdbx_struct_assembly.oligomeric_count'               ? ?
+pdbx_struct_assembly         details                        '_pdbx_struct_assembly.details'                        ? ?
+pdbx_struct_assembly         id                             '_pdbx_struct_assembly.id'                             ? ?
+em_depui                     Structure_ID                   ?                                                      ? 'datablockid()'
+em_depui                     depositor_hold_instructions    '_em_depui.depositor_hold_instructions'                ? ?
+em_depui                     macromolecule_description      '_em_depui.macromolecule_description'                  ? ?
+em_depui                     obsolete_instructions          '_em_depui.obsolete_instructions'                      ? ?
+em_depui                     same_authors_as_pdb            '_em_depui.same_authors_as_pdb'                        ? ?
+em_depui                     same_title_as_pdb              '_em_depui.same_title_as_pdb'                          ? ?
+em_author_list               Structure_ID                   ?                                                                          ? 'datablockid()'
+em_author_list               author                         '_em_author_list.author'                                                   ? ?
+em_author_list               ordinal                        '_em_author_list.ordinal'                              ? ?
+em_author_list               identifier_ORCID               '_em_author_list.identifier_ORCID'                     ? ?
+#

@@ -49,6 +49,7 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
         self.__pathPdbxSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_v40.cif")
         self.__pathCcSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_cc.cif")
         self.__pathPrdCcSchemaMapFile = os.path.join(schemaPath, "schema_map_pdbx_cc.cif")
+        self.__pathDaInternalSchemaMapFile = os.path.join(schemaPath, "status_rcsb_schema_da.cif")
 
     def tearDown(self):
         pass
@@ -64,6 +65,9 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
 
     def testReadPdbxMap(self):
         self.__readMap(self.__pathPdbxSchemaMapFile, os.path.join(TESTOUTPUT, "pdbx-def.out"))
+
+    def testReadDaInternalMap(self):
+        self.__readMap(self.__pathDaInternalSchemaMapFile, os.path.join(TESTOUTPUT, "dainternal-def.out"))
 
     def __readMap(self, mapFilePath, defFilePath):
         """Test case -  read input schema map file and write python schema def data structure -"""
