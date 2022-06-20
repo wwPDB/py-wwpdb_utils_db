@@ -104,6 +104,9 @@ class DBLoadUtil(object):
             dp.imp(fn)
             dp.addInput(name="mapping_file", value=mapping, type="file")
             dp.addInput(name="file_list", value=True)
+            # This code handles model files
+            dp.addInput(name="first_block", value=True)
+
             dp.op("db-loader")
             dp.expLog(logfile)
             dp.exp(sqlfile)
