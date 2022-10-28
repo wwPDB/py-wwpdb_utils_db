@@ -142,6 +142,9 @@ class DbLoadingApi(object):
             dp = RcsbDpUtility(tmpPath=tmpPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(filePath)
             dp.addInput(name="mapping_file", value=self.__mapping, type="file")
+            # This code handles model files - first block
+            dp.addInput(name="first_block", value=True)
+
             dp.op("db-loader")
             dp.expLog(logFile)
             dp.exp(sql_file)
