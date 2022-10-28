@@ -271,7 +271,7 @@ class ChemCompSchemaDef(SchemaDefBase):
                                                                'PRECISION': 0,
                                                                'PRIMARY_KEY': False,
                                                                'SQL_TYPE': 'VARCHAR',
-                                                               'WIDTH': 5},
+                                                               'WIDTH': 6},
                                          'TYPE': {'NULLABLE': True,
                                                   'ORDER': 18,
                                                   'PRECISION': 0,
@@ -1765,7 +1765,6 @@ class ChemCompSchemaDef(SchemaDefBase):
                                     'TABLE_ID': 'PDBX_CHEM_COMP_SYNONYMS',
                                     'TABLE_NAME': 'pdbx_chem_comp_synonyms',
                                     'TABLE_TYPE': 'transactional'}}
-
     
 
     def __init__(self,verbose=True,log=sys.stderr):

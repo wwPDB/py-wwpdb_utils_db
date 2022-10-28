@@ -270,7 +270,7 @@ class PrdChemCompSchemaDef(SchemaDefBase):
                                                                'PRECISION': 0,
                                                                'PRIMARY_KEY': False,
                                                                'SQL_TYPE': 'VARCHAR',
-                                                               'WIDTH': 5},
+                                                               'WIDTH': 6},
                                          'TYPE': {'NULLABLE': True,
                                                   'ORDER': 18,
                                                   'PRECISION': 0,
@@ -1763,15 +1763,14 @@ class PrdChemCompSchemaDef(SchemaDefBase):
                                     'TABLE_DELETE_ATTRIBUTE': 'COMPONENT_ID',
                                     'TABLE_ID': 'PDBX_CHEM_COMP_SYNONYMS',
                                     'TABLE_NAME': 'pdbx_chem_comp_synonyms',
-
-                             'TABLE_TYPE': 'transactional'}
-        }
+                                    'TABLE_TYPE': 'transactional'}
+    }
 
 
 
     def __init__(self,verbose=True,log=sys.stderr):
         super(PrdChemCompSchemaDef,self).__init__(databaseName=PrdChemCompSchemaDef._databaseName,schemaDefDict=PrdChemCompSchemaDef._schemaDefDict,
-                                           verbose=verbose,log=log)
+                                                  verbose=verbose,log=log)
         
 
 if __name__ == "__main__":

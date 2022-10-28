@@ -270,7 +270,7 @@ class BirdSchemaDef(SchemaDefBase):
                                                                'PRECISION': 0,
                                                                'PRIMARY_KEY': False,
                                                                'SQL_TYPE': 'VARCHAR',
-                                                               'WIDTH': 4},
+                                                               'WIDTH': 6},
                                          'TYPE': {'NULLABLE': True,
                                                   'ORDER': 18,
                                                   'PRECISION': 0,

@@ -44,7 +44,7 @@ chem_comp                 name                                char     0 0 1024 
 chem_comp                 number_atoms_all                    int      0 0 10  0 
 chem_comp                 number_atoms_nh                     int      0 0 10  0 
 chem_comp                 one_letter_code                     char     0 0 5   0 
-chem_comp                 three_letter_code                   char     0 0 5   0 
+chem_comp                 three_letter_code                   char     0 0 6   0 
 chem_comp                 type                                char     0 0 80  0 
 chem_comp                 pdbx_synonyms                       char     0 0 512  0 
 chem_comp                 pdbx_modification_details           char     0 0 80  0 

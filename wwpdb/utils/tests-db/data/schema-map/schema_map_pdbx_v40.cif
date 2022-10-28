@@ -913,7 +913,7 @@ chem_comp                                  name                                 
 chem_comp                                  number_atoms_all                               int      0 0 10     0 Y 
 chem_comp                                  number_atoms_nh                                int      0 0 10     0 Y 
 chem_comp                                  one_letter_code                                char     0 0 10     0 Y 
-chem_comp                                  three_letter_code                              char     0 0 4      0 Y 
+chem_comp                                  three_letter_code                              char     0 0 6      0 Y 
 chem_comp                                  type                                           char     0 0 80     0 Y 
 chem_comp                                  pdbx_synonyms                                  char     0 0 511    0 Y 
 chem_comp                                  pdbx_modification_details                      char     0 0 200    0 Y 
