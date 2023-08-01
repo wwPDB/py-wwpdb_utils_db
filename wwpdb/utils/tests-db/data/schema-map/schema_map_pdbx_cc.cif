@@ -114,6 +114,9 @@ chem_comp_atom              pdbx_stereo_config                  char     0 0 10 
 chem_comp_atom              pdbx_aromatic_flag                  char     0 0 10  0 
 chem_comp_atom              pdbx_leaving_atom_flag              char     0 0 10  0 
 chem_comp_atom              pdbx_stnd_atom_id                   char     0 0 6   0 
+chem_comp_atom              pdbx_backbone_atom_flag             char     0 0 10  0 
+chem_comp_atom              pdbx_n_terminal_atom_flag           char     0 0 10  0 
+chem_comp_atom              pdbx_c_terminal_atom_flag           char     0 0 10  0 
 chem_comp_bond              Component_ID                        char     1 1 10  0 
 chem_comp_bond              comp_id                             char     1 1 10  0 
 chem_comp_bond              atom_id_1                           char     1 1 6   0 
@@ -691,6 +694,9 @@ chem_comp_atom              pdbx_stnd_atom_id
  IUPAC/IUBMB nomenclature exists for labeling atoms.
 ;
 'Missing example'                                                                                                                                                                                 
+chem_comp_atom              pdbx_backbone_atom_flag             'A flag indicating the backbone atoms in polypeptide units.' 'Missing example' 
+chem_comp_atom              pdbx_n_terminal_atom_flag           'A flag indicating the N-terminal amino-group atoms in polypeptide units.' 'Missing example' 
+chem_comp_atom              pdbx_c_terminal_atom_flag           'A flag indicating the C-terminal carboxyl-group atoms in polypeptide units.' 'Missing example' 
 chem_comp_bond              Component_ID                        'Structure identifier' 'Structure identifier' 
 chem_comp_bond              comp_id                             
 ; This data item is a pointer to _chem_comp.id in the CHEM_COMP
@@ -1175,6 +1181,9 @@ chem_comp_atom              pdbx_stereo_config                  3 1 1
 chem_comp_atom              pdbx_aromatic_flag                  3 1 1 
 chem_comp_atom              pdbx_leaving_atom_flag              3 1 1 
 chem_comp_atom              pdbx_stnd_atom_id                   5 1 1 
+chem_comp_atom              pdbx_backbone_atom_flag             3 1 1 
+chem_comp_atom              pdbx_n_terminal_atom_flag           3 1 1 
+chem_comp_atom              pdbx_c_terminal_atom_flag           3 1 1 
 chem_comp_bond              Component_ID                        3 1 1 
 chem_comp_bond              comp_id                             3 1 1 
 chem_comp_bond              atom_id_1                           3 1 1 
@@ -1383,6 +1392,9 @@ chem_comp_atom              pdbx_stereo_config                  '_chem_comp_atom
 chem_comp_atom              pdbx_aromatic_flag                  '_chem_comp_atom.pdbx_aromatic_flag'             ? ?               
 chem_comp_atom              pdbx_leaving_atom_flag              '_chem_comp_atom.pdbx_leaving_atom_flag'         ? ?               
 chem_comp_atom              pdbx_stnd_atom_id                   '_chem_comp_atom.pdbx_stnd_atom_id'              ? ?               
+chem_comp_atom              pdbx_backbone_atom_flag             '_chem_comp_atom.pdbx_backbone_atom_flag'        ? ?               
+chem_comp_atom              pdbx_n_terminal_atom_flag           '_chem_comp_atom.pdbx_n_terminal_atom_flag'      ? ?               
+chem_comp_atom              pdbx_c_terminal_atom_flag           '_chem_comp_atom.pdbx_c_terminal_atom_flag'      ? ?               
 chem_comp_bond              Component_ID                        ?                                                ? 'datablockid()' 
 chem_comp_bond              comp_id                             '_chem_comp_bond.comp_id'                        ? ?               
 chem_comp_bond              atom_id_1                           '_chem_comp_bond.atom_id_1'                      ? ?               
