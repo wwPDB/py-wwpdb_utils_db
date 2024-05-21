@@ -44,7 +44,8 @@ class MyDbAdminSqlGen(object):
     """
 
     def __init__(self, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
-        pass
+        self.__lfh = log
+        self.__verbose = verbose
 
     def truncateTableSQL(self, databaseName, tableName):
         """Return the SQL string require to truncate (remove all rows) from the input table."""
@@ -269,7 +270,9 @@ class MyDbAdminSqlGen(object):
                 sW = "%-s(%d,%d)" % (sqlType, width, precision)
                 tS = "%-40s %-16s  %s" % (name, sW, notNull)
             else:
-                pass
+                if self.__verbose:
+                    self.__lfh.write("+MyDbAdminSqlGen.__createTable unknown sqlType %s\n" % sqlType)
+                continue
             #
             # if ii < len(attributeIdList) -1:
             #    oL.append(tS+",")

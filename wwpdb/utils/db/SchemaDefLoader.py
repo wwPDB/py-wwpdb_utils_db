@@ -101,6 +101,8 @@ class SchemaDefLoader(object):
             tableDataDict, containerNameList = self.__fetch(inputPathList)
         elif containerList is not None:
             tableDataDict, containerNameList = self.__process(containerList)
+        else:
+            tableDataDict = containerNameList = []
         #
         #
         if self.__verbose:
@@ -318,6 +320,8 @@ class SchemaDefLoader(object):
                     rowList = self.__mapInstanceCategory(tObj, mapCategoryNameList[0], myContainer)
                 elif numMapCategories >= 1:
                     rowList = self.__mapInstanceCategoryList(tObj, mapCategoryNameList, myContainer)
+                else:
+                    rowList = []
 
                 for atId in otherAttributeIdList:
                     fName = tObj.getMapAttributeFunction(atId)
