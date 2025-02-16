@@ -1,10 +1,25 @@
+##
+# File:    FileActivityUtil.py
+# Author:  Vivek Reddy Chithari
+# Email:   vivek.chithari@rcsb.org
+# Date:    2025-02-16
+#
+# Updates:
+#
+##
 """
-FileActivityUtil Module
---------------------
+Utility module for file activity database operations.
 
-This module provides utility methods for FileActivityDb operations.
-It processes command line arguments and delegates to the appropriate FileActivityDb methods.
+This module provides high-level interface for:
+- Managing file activity database operations
+- Querying and displaying file changes
+- Loading and purging file metadata
 """
+
+__docformat__ = "restructuredtext en"
+__author__ = "Vivek Reddy Chithari"
+__email__ = "vivek.chithari@rcsb.org"
+__license__ = "Apache 2.0"
 
 import argparse
 import sys
