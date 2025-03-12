@@ -2,18 +2,17 @@
 # File:    FileActivityDb.py
 # Author:  Vivek Reddy Chithari
 # Email:   vivek.chithari@rcsb.org
-# Date:    2025-02-16
+# Date:    2025-03-07
 #
 # Updates:
-#   - Added a __closed flag to prevent reinitialization after close()
-#   - Modified __connection and __initializeDbConnection to check for closed status
-#   - Tightened deposition ID validation in purgeDepositionData to only allow IDs starting with "D_100" followed by 7 digits.
+#   - Added configuration check methods
+#   - Improved error handling and logging
 ##
 """
-Module implementing file activity database operations.
+Enhanced module implementing file activity database operations.
 
 This module provides support for tracking and managing file activities
-in the OneDep system database.
+in the OneDep system database with improved integration capabilities.
 """
 
 __docformat__ = "restructuredtext en"
@@ -24,20 +23,21 @@ __license__ = "Apache 2.0"
 import logging
 import os
 import re
-import socket
 import sys
 from datetime import datetime
 from contextlib import contextmanager
-from typing import List, Optional, Tuple, Dict, Any, Union, NoReturn, Generator
+from typing import List, Optional, Tuple, Dict, Any, Generator, ClassVar, TextIO
 
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.io.locator.PathInfo import PathInfo
 
 logger = logging.getLogger(__name__)
 
 class FileActivityDb:
     """
-    A class to manage file activity database operations in the OneDep system.
+    An enhanced class to manage file activity database operations in the OneDep system.
 
     This class provides methods for:
     - Loading file metadata into the database
@@ -45,21 +45,37 @@ class FileActivityDb:
     - Displaying formatted database contents
     - Purging database records
 
+    New features include:
+    - Error handling
+    - Connection management improvements
+
     The class maintains a connection to the OneDep metadata database and provides
     both high-level operations and utility methods for database interactions.
     """
 
-    def __init__(self) -> None:
+    # Class-level constants
+    TABLE_NAME: ClassVar[str] = "file_activity_log"
+    DEFAULT_DB_NAME: ClassVar[str] = "onedep_metadata"  # Default database name
+
+    def __init__(self, siteId: Optional[str] = None, verbose: bool = False, log: TextIO = sys.stderr) -> None:
         """
         Initialize the FileActivityDb instance.
 
         The database connection is not established during initialization.
         It will be established on first use.
+
+        Args:
+            siteId (Optional[str]): Site identifier. If None, it will be determined automatically.
+            verbose (bool): Enable verbose output
+            log (TextIO): Log file handle for verbose output
         """
         self.__myQuery: Optional[MyDbQuery] = None
-        self.__debug: bool = False
+        self.__verbose: bool = verbose
         self.__dbcon = None
-        self.__closed: bool = False
+        self.__closed: bool = True  # Start with no connection
+        self.__siteId = siteId if siteId is not None else getSiteId()
+        self.__path_info = PathInfo(siteId=self.__siteId, verbose=verbose)
+        self.__lfh = log
 
     def __initializeDbConnection(self) -> None:
         """
@@ -70,30 +86,32 @@ class FileActivityDb:
         This is called lazily when the connection is first needed.
 
         Raises:
-            Exception: If database connection fails, configuration is invalid,
-                       or the connection has already been closed.
+            Exception: If database connection fails or configuration is invalid.
         """
-        if self.__closed:
-            raise Exception("Database connection is closed")
-        if self.__myQuery is not None:
-            return
+        if not self.__closed:
+            return  # Connection already open
 
         try:
             config = ConfigInfo()
+
+            # Get the database name from site configuration
+            db_name = self.DEFAULT_DB_NAME
+
             myC = MyDbConnect(
                 dbServer="mysql",
                 dbHost=config.get("SITE_DB_HOST_NAME"),
-                dbName="onedep_metadata",
+                dbName=db_name,
                 dbUser=config.get("SITE_DB_USER_NAME"),
                 dbPw=config.get("SITE_DB_PASSWORD"),
                 dbPort=str(config.get("SITE_DB_PORT_NUMBER")),
                 dbSocket=config.get("SITE_DB_SOCKET"),
-                verbose=True,
-                log=sys.stderr
+                verbose=self.__verbose,
+                log=self.__lfh
             )
             self.__dbcon = myC.connect()
             if self.__dbcon:
-                self.__myQuery = MyDbQuery(dbcon=self.__dbcon, verbose=True, log=sys.stderr)
+                self.__myQuery = MyDbQuery(dbcon=self.__dbcon, verbose=self.__verbose, log=self.__lfh)
+                self.__closed = False  # Mark connection as open
             else:
                 raise Exception("Failed to establish database connection")
         except Exception as err:
@@ -112,11 +130,9 @@ class FileActivityDb:
             None
 
         Raises:
-            Exception: If the database connection is closed or cannot be established.
+            Exception: If the database connection cannot be established.
         """
-        if self.__closed:
-            raise Exception("Database connection is closed")
-        need_close = self.__myQuery is None  # Only close if we created the connection
+        need_close = self.__closed  # Only close if we created the connection
         try:
             self.__initializeDbConnection()
             yield
@@ -129,18 +145,17 @@ class FileActivityDb:
         Close the database connection.
 
         This should be called when done with database operations to free up resources.
-        Once closed, the FileActivityDb instance cannot be reused.
+        The connection will be reestablished automatically if needed.
         """
-        if self.__myQuery is not None:
+        if not self.__closed and self.__dbcon is not None:
             try:
-                if hasattr(self.__myQuery, 'close'):
-                    self.__myQuery.close()
+                self.__dbcon.close()
             except Exception as err:
                 logger.warning("Error closing database connection: %s", err)
             finally:
                 self.__myQuery = None
                 self.__dbcon = None
-        self.__closed = True
+                self.__closed = True
 
     def __enter__(self) -> 'FileActivityDb':
         """
@@ -160,63 +175,60 @@ class FileActivityDb:
         """
         self.close()
 
-    def setDebug(self, flag: bool = True) -> None:
-        """Set debug mode for the database operations.
-
-        Args:
-            flag (bool): Debug mode flag
+    def isTrackingEnabled(self) -> bool:
         """
-        self.__debug = flag
-
-    def getDebug(self) -> bool:
-        """Get current debug mode status.
+        Check if file activity tracking is enabled in the site configuration.
 
         Returns:
-            bool: Current debug mode status
+            bool: True if file activity tracking is enabled, False otherwise
         """
-        return self.__debug
+        try:
+            config_app = ConfigInfoAppCommon(self.__siteId)
+            return config_app.get_file_activity_db_support()
+        except Exception as e:
+            logger.warning(f"Error checking file activity configuration: {str(e)}")
+            return False
 
-    @staticmethod
-    def parseFileMetadata(file_name: str) -> Optional[Tuple[str, str, str, int, int, str]]:
+    def logActivity(self, file_path: str, timestamp: Optional[datetime] = None) -> bool:
         """
-        Parse metadata from a filename following OneDep naming conventions.
+        Log a file activity.
 
-        Expected format:
-          D_XXXXXXXXXX_<content_type>-<milestone>_P<part>.<format>.V<version>[.gz]
+        This method checks if tracking is enabled, then records the file activity
+        in the database using a context manager to ensure proper connection handling.
 
         Args:
-            file_name (str): The name of the file to parse
+            file_path (str): Path to the file to log
+            timestamp (Optional[datetime]): File timestamp. If None, will use
+                                            the file's modification time.
 
         Returns:
-            Optional[Tuple[str, str, str, int, int, str]]: A tuple containing:
-                - deposition_id: The D_XXXXXXXX identifier
-                - content_type: The type of content
-                - format_type: The file format
-                - part_number: The part number as integer
-                - version_number: The version number as integer
-                - milestone: The milestone identifier
-            Returns None if the filename doesn't match the expected pattern
+            bool: True if logging was successful or if logging is disabled,
+                  False if an error occurred during logging
         """
-        if not file_name:
-            return None
-        pattern = re.compile(
-            r"(D_\d+)_([a-zA-Z0-9-_]+)_P(\d+)\.(\w+)(?:\.V(\d+))?(?:\.(gz))?$"
-        )
-        match = pattern.match(file_name)
-        if match:
-            deposition_id, content_type_with_milestone, part_number, format_type, version_number, _ = match.groups()
-            version_number = int(version_number) if version_number else 1
-            parts = content_type_with_milestone.split("-")
-            if len(parts) > 1:
-                milestone = parts[-1]
-                content_type = "-".join(parts[:-1])
-            else:
-                content_type = content_type_with_milestone
-                milestone = "unknown"
-            return deposition_id, content_type, format_type, int(part_number), version_number, milestone
-        return None
+        # Check if tracking is enabled
+        if not self.isTrackingEnabled():
+            return True
 
-    def populateFileActivityDb(self, directory: str) -> None:
+        try:
+            # Use a context manager to ensure proper connection handling
+            with self.__connection():
+                # Log the file directly
+                result = self.addFileRecord(file_path, timestamp)
+
+                if self.__verbose and self.__lfh:
+                    if result:
+                        self.__lfh.write(f"+FileActivityDb.logActivity Successfully logged: {file_path}\n")
+                    else:
+                        self.__lfh.write(f"+FileActivityDb.logActivity Failed to log: {file_path}\n")
+
+                return result
+        except Exception as e:
+            if self.__verbose and self.__lfh:
+                self.__lfh.write(f"+FileActivityDb.logActivity Error logging file: {str(e)}\n")
+            logger.error(f"Error logging file activity: {str(e)}")
+            return False
+
+    def populateFileActivityDb(self, directory: str, site_id: Optional[str] = None) -> None:
         """
         Populate the database with file metadata from the given directory.
 
@@ -226,17 +238,26 @@ class FileActivityDb:
 
         Args:
             directory (str): Path to the directory containing files to process
+            site_id (Optional[str]): Site ID to use. If None, uses instance site_id.
 
         Raises:
             ValueError: If the directory is invalid or inaccessible
             Exception: For database operation failures
         """
+        # Check if tracking is enabled
+        if not self.isTrackingEnabled():
+            logger.info("File activity tracking is disabled in site configuration")
+            return
+
         try:
             with self.__connection():
                 if not os.path.isdir(directory):
                     raise ValueError(f"Invalid directory: {directory}")
 
-                site_id = None  # Initialize site_id to None for now
+                # Use the instance's site_id if none is provided
+                if site_id is None:
+                    site_id = self.__siteId
+
                 logger.debug("Scanning directory: %s", directory)
 
                 for subdir_entry in os.scandir(directory):
@@ -246,9 +267,20 @@ class FileActivityDb:
                         for file_entry in os.scandir(subdir_entry.path):
                             if file_entry.is_file():
                                 logger.debug("Processing file: %s", file_entry.name)
-                                metadata = self.parseFileMetadata(file_entry.name)
-                                if metadata:
-                                    deposition_id, content_type, format_type, part_number, version_number, milestone = metadata
+                                try:
+                                    file_name = os.path.basename(file_entry.path)
+                                    metadata_tuple = self.__path_info.splitFileName(file_name)
+                                    deposition_id, content_type, format_type, part_number, version_number = metadata_tuple
+
+                                    if None in (deposition_id, content_type, format_type, part_number):
+                                        logger.warning("Skipping unrecognized file: %s", file_entry.path)
+                                        continue
+
+                                    # PathInfo doesn't parse milestone
+                                    milestone = "unknown"
+                                    if version_number is None:
+                                        version_number = 1
+
                                     key = (deposition_id, content_type, format_type, part_number)
                                     created_date = datetime.fromtimestamp(file_entry.stat().st_ctime).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -264,8 +296,8 @@ class FileActivityDb:
                                             'created_date': created_date
                                         }
                                         logger.debug("Updated group_files with: %s", group_files[key])
-                                else:
-                                    logger.warning("Skipping unrecognized file: %s", file_entry.path)
+                                except Exception as e:
+                                    logger.warning("Error processing file %s: %s", file_entry.path, str(e))
 
                         self.__updateDbRecords(group_files, site_id)
 
@@ -280,41 +312,60 @@ class FileActivityDb:
 
         Args:
             record (Dict[str, Any]): Dictionary containing the file record data
-            site_id (Optional[str]): The site identifier for recording file location. Defaults to None.
+            site_id (Optional[str]): The site identifier for recording file location. Defaults to instance site_id.
 
         Raises:
             Exception: For database operation failures
         """
-        check_sql = """
-            SELECT version_number, created_date FROM file_activity_log
-            WHERE deposition_id = '{}' AND content_type = '{}'
-            AND format_type = '{}' AND part_number = {};
-        """.format(
-            record['deposition_id'], record['content_type'],
-            record['format_type'], record['part_number']
-        )
-        if self.__debug:
+        # Use the instance's site_id if none is provided
+        if site_id is None:
+            site_id = self.__siteId
+
+        # Query to check for existing record
+        check_sql = f"""
+            SELECT version_number, created_date FROM {self.TABLE_NAME}
+            WHERE deposition_id = '{record['deposition_id']}'
+            AND content_type = '{record['content_type']}'
+            AND format_type = '{record['format_type']}'
+            AND part_number = {record['part_number']};
+        """
+
+        if self.__verbose:
             logger.debug("Executing check SQL: %s", check_sql)
+
+        # Execute the SQL directly
         existing_record = self.__myQuery.selectRows(check_sql)
 
         if not existing_record or existing_record[0][0] < record['version_number']:
-            insert_sql = """
-                INSERT INTO file_activity_log
+            # Use the new record's timestamp since we're updating to latest version
+            created_date = record['created_date']
+
+            # Create the SQL statement for insert/update operation
+            insert_sql = f"""
+                INSERT INTO {self.TABLE_NAME}
                 (deposition_id, content_type, format_type, part_number,
                  version_number, milestone, location, site_id, metadata_json, created_date)
-                VALUES ('{}', '{}', '{}', {}, {}, '{}', '{}', {}, NULL, '{}')
+                VALUES (
+                    '{record['deposition_id']}',
+                    '{record['content_type']}',
+                    '{record['format_type']}',
+                    {record['part_number']},
+                    {record['version_number']},
+                    '{record['milestone']}',
+                    '{record['file_path'].replace("'", "''")}',
+                    '{site_id if site_id else ""}',
+                    NULL,
+                    '{created_date}'
+                )
                 ON DUPLICATE KEY UPDATE
                     version_number = VALUES(version_number),
-                    location = VALUES(location);
-            """.format(
-                record['deposition_id'], record['content_type'], record['format_type'],
-                record['part_number'], record['version_number'], record['milestone'],
-                record['file_path'],
-                f"'{site_id}'" if site_id is not None else 'NULL',
-                existing_record[0][1] if existing_record else record['created_date']
-            )
-            if self.__debug:
+                    location = VALUES(location),
+                    created_date = VALUES(created_date);
+            """
+
+            if self.__verbose:
                 logger.debug("Executing insert SQL: %s", insert_sql)
+
             self.__myQuery.sqlCommand([insert_sql])
 
     def __updateDbRecords(self, group_files: Dict[Tuple[str, str, str, int], Dict[str, Any]], site_id: Optional[str] = None) -> None:
@@ -343,7 +394,7 @@ class FileActivityDb:
         Args:
             hours (Optional[int]): Time range in hours
             days (Optional[int]): Time range in days
-            site_id (Optional[str]): Site ID to filter results
+            site_id (Optional[str]): Site ID to filter results. If None, uses instance site_id.
             deposition_ids (str): Deposition IDs to filter (ALL, single ID, range, or comma-separated list)
             file_types (str): File types to filter (ALL or comma-separated list)
             formats (str): File formats to filter (ALL or comma-separated list)
@@ -354,9 +405,26 @@ class FileActivityDb:
         Raises:
             Exception: If there's an error processing the query
         """
-        total_hours = hours if hours is not None else days * 24
-        base_query = f"SELECT location FROM file_activity_log WHERE created_date >= DATE_SUB(NOW(), INTERVAL {total_hours} HOUR)"
+        # Check if tracking is enabled
+        if not self.isTrackingEnabled():
+            logger.info("File activity tracking is disabled in site configuration")
+            return []
 
+        # Use the instance's site_id if none is provided
+        if site_id is None:
+            site_id = self.__siteId
+
+        # Calculate total hours from either hours or days parameter
+        if hours is not None:
+            total_hours = hours
+        elif days is not None:
+            total_hours = days * 24
+        else:
+            total_hours = 24  # Default to last 24 hours if neither specified
+
+        base_query = f"SELECT location FROM {self.TABLE_NAME} WHERE created_date >= DATE_SUB(NOW(), INTERVAL {total_hours} HOUR)"
+
+        # Add site_id filter if provided
         if site_id:
             base_query += f" AND site_id = '{site_id}'"
 
@@ -427,8 +495,8 @@ class FileActivityDb:
 
         with self.__connection():
             try:
-                self.__myQuery.sqlCommand(["TRUNCATE TABLE file_activity_log;"])
-                logger.info("Successfully purged all data from file_activity_log table.")
+                self.__myQuery.sqlCommand([f"TRUNCATE TABLE {self.TABLE_NAME};"])
+                logger.info(f"Successfully purged all data from {self.TABLE_NAME} table.")
             except Exception as err:
                 logger.error("Failed to purge database: %s", err)
                 raise
@@ -452,16 +520,16 @@ class FileActivityDb:
             logger.error("Must provide confirmed=True to purge deposition data")
             raise ValueError("Confirmation required for purge operation")
 
-        # Validate deposition ID format - must be D_ followed by "100" and exactly 7 digits
-        if not re.match(r"^D_100\d{7}$", deposition_id):
-            logger.error("Invalid deposition ID format: %s. Expected format: D_100XXXXXXXX", deposition_id)
+        # Validate deposition ID format - must be D_ followed by any 10 digits
+        if not re.match(r"^D_\d{10}$", deposition_id):
+            logger.error("Invalid deposition ID format: %s. Expected format: D_XXXXXXXXXX", deposition_id)
             raise ValueError(f"Invalid deposition ID format: {deposition_id}")
 
         with self.__connection():
             try:
                 # First, get count of records to be deleted
                 count_sql = f"""
-                    SELECT COUNT(*) FROM file_activity_log
+                    SELECT COUNT(*) FROM {self.TABLE_NAME}
                     WHERE deposition_id = '{deposition_id}';
                 """
                 count_result = self.__myQuery.selectRows(count_sql)
@@ -469,7 +537,7 @@ class FileActivityDb:
 
                 # Execute the delete
                 delete_sql = f"""
-                    DELETE FROM file_activity_log
+                    DELETE FROM {self.TABLE_NAME}
                     WHERE deposition_id = '{deposition_id}';
                 """
                 self.__myQuery.sqlCommand([delete_sql])
@@ -489,21 +557,29 @@ class FileActivityDb:
         Prints a formatted table of database records matching the time and site criteria.
         Output format:
             site_id, dep_id, file_type, last_timestamp
-        If site_id is not provided, it's omitted from the output.
 
         Args:
             hours (Optional[int]): Time range in hours
             days (Optional[int]): Time range in days
-            site_id (Optional[str]): Site ID to filter results
+            site_id (Optional[str]): Site ID to filter results. If None, uses instance site_id.
 
         Raises:
             Exception: For database operation failures
         """
+        # Check if tracking is enabled
+        if not self.isTrackingEnabled():
+            logger.info("File activity tracking is disabled in site configuration")
+            return
+
+        # Use the instance's site_id if none is provided
+        if site_id is None:
+            site_id = self.__siteId
+
         total_hours = hours if hours is not None else (days * 24 if days is not None else 24)
 
         query = f"""
             SELECT DISTINCT site_id, deposition_id, content_type, created_date
-            FROM file_activity_log
+            FROM {self.TABLE_NAME}
             WHERE created_date >= DATE_SUB(NOW(), INTERVAL {total_hours} HOUR)
         """
 
@@ -554,18 +630,47 @@ class FileActivityDb:
         Raises:
             Exception: For database operation failures
         """
+        # Check if tracking is enabled
+        if not self.isTrackingEnabled():
+            logger.debug("File activity tracking is disabled in site configuration")
+            return True
+
         # Get timestamp from filesystem if not provided
         if timestamp is None and os.path.exists(file_path):
             timestamp = datetime.fromtimestamp(os.path.getmtime(file_path))
 
-        # Parse file metadata
-        metadata = self.parseFileMetadata(file_path)
-        if not metadata:
-            logger.warning(f"File {file_path} doesn't follow OneDep naming convention, can't add to database")
+        # Try using PathInfo first for parsing metadata
+        try:
+            file_name = os.path.basename(file_path)
+            metadata_tuple = self.__path_info.splitFileName(file_name)
+            deposition_id, content_type, format_type, part_number, version_number = metadata_tuple
+
+            if None in (deposition_id, content_type, format_type, part_number):
+                logger.warning(f"File {file_path} doesn't follow OneDep naming convention, can't add to database")
+                return False
+            else:
+                # Use PathInfo result but add milestone
+                milestone = "unknown"  # PathInfo doesn't parse milestone
+                if version_number is None:
+                    version_number = 1
+        except Exception as e:
+            logger.warning(f"File {file_path} couldn't be parsed: {str(e)}")
             return False
 
-        # Create record from metadata
-        record = self.createFileRecord(file_path, metadata, timestamp)
+        # Format timestamp for database
+        timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
+        # Create the record dictionary
+        record = {
+            'deposition_id': deposition_id,
+            'content_type': content_type,
+            'format_type': format_type,
+            'part_number': part_number,
+            'version_number': version_number,
+            'milestone': milestone,
+            'file_path': file_path,
+            'created_date': timestamp_str
+        }
 
         # Update the database
         try:
@@ -583,6 +688,8 @@ class FileActivityDb:
         This method retrieves the timestamp for a file from the database
         based on the file's metadata extracted from its path.
 
+        Note: This method does not check if tracking is enabled.
+
         Args:
             file_path (str): Path to the file
 
@@ -592,22 +699,27 @@ class FileActivityDb:
         Raises:
             Exception: For database operation failures
         """
-        metadata = self.parseFileMetadata(file_path)
-        if not metadata:
-            logger.warning(f"File {file_path} doesn't follow OneDep naming convention")
+        try:
+            file_name = os.path.basename(file_path)
+            metadata_tuple = self.__path_info.splitFileName(file_name)
+            deposition_id, content_type, format_type, part_number, _ = metadata_tuple
+
+            if None in (deposition_id, content_type, format_type, part_number):
+                logger.warning(f"File {file_path} doesn't follow OneDep naming convention")
+                return None
+        except Exception as e:
+            logger.warning(f"Failed to parse file path {file_path}: {str(e)}")
             return None
 
-        deposition_id, content_type, format_type, part_number, _, _ = metadata
-
-        query = """
-            SELECT created_date FROM file_activity_log
-            WHERE deposition_id = '{}' AND content_type = '{}'
-            AND format_type = '{}' AND part_number = {};
-        """.format(deposition_id, content_type, format_type, part_number)
+        query = f"""
+            SELECT created_date FROM {self.TABLE_NAME}
+            WHERE deposition_id = '{deposition_id}' AND content_type = '{content_type}'
+            AND format_type = '{format_type}' AND part_number = {part_number};
+        """
 
         try:
             with self.__connection():
-                if self.__debug:
+                if self.__verbose:
                     logger.debug(f"Executing query: {query}")
                 result = self.__myQuery.selectRows(query)
 
@@ -637,77 +749,49 @@ class FileActivityDb:
         Raises:
             Exception: For database operation failures
         """
-        metadata = self.parseFileMetadata(file_path)
-        if not metadata:
-            logger.warning(f"File {file_path} doesn't follow OneDep naming convention")
-            return False
+        # Check if tracking is enabled
+        if not self.isTrackingEnabled():
+            logger.debug("File activity tracking is disabled in site configuration")
+            return True
 
-        deposition_id, content_type, format_type, part_number, _, _ = metadata
+        # Try using PathInfo first for parsing metadata
+        try:
+            file_name = os.path.basename(file_path)
+            metadata_tuple = self.__path_info.splitFileName(file_name)
+            deposition_id, content_type, format_type, part_number, _ = metadata_tuple
+
+            if None in (deposition_id, content_type, format_type, part_number):
+                logger.warning(f"File {file_path} doesn't follow OneDep naming convention")
+                return False
+        except Exception as e:
+            logger.warning(f"Failed to parse file path {file_path}: {str(e)}")
+            return False
 
         # Format timestamp for SQL
         timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
-        update_sql = """
-            UPDATE file_activity_log
-            SET created_date = '{}'
-            WHERE deposition_id = '{}' AND content_type = '{}'
-            AND format_type = '{}' AND part_number = {};
-        """.format(timestamp_str, deposition_id, content_type, format_type, part_number)
+        update_sql = f"""
+            UPDATE {self.TABLE_NAME}
+            SET created_date = '{timestamp_str}'
+            WHERE deposition_id = '{deposition_id}' AND content_type = '{content_type}'
+            AND format_type = '{format_type}' AND part_number = {part_number};
+        """
 
         try:
             with self.__connection():
-                if self.__debug:
+                if self.__verbose:
                     logger.debug(f"Executing update: {update_sql}")
                 self.__myQuery.sqlCommand([update_sql])
 
-                # Check if the record exists instead of checking affected rows
-                check_sql = """
-                    SELECT COUNT(*) FROM file_activity_log
-                    WHERE deposition_id = '{}' AND content_type = '{}'
-                    AND format_type = '{}' AND part_number = {};
-                """.format(deposition_id, content_type, format_type, part_number)
+                # Check if the record exists after update
+                check_sql = f"""
+                    SELECT COUNT(*) FROM {self.TABLE_NAME}
+                    WHERE deposition_id = '{deposition_id}' AND content_type = '{content_type}'
+                    AND format_type = '{format_type}' AND part_number = {part_number};
+                """
 
                 result = self.__myQuery.selectRows(check_sql)
                 return result and result[0][0] > 0
         except Exception as e:
             logger.error(f"Failed to update timestamp for {file_path}: {str(e)}")
             return False
-
-    def createFileRecord(self, file_path: str, metadata: Tuple, timestamp: datetime) -> Dict[str, Any]:
-        """
-        Create a database record object from file metadata.
-
-        This method standardizes record creation for consistent database entries.
-
-        Args:
-            file_path (str): Path to the file
-            metadata (Tuple): Metadata tuple from parseFileMetadata
-            timestamp (datetime): File timestamp
-
-        Returns:
-            Dict[str, Any]: Dictionary containing record data ready for database insertion
-
-        Raises:
-            ValueError: If metadata tuple doesn't have the expected format
-        """
-        if len(metadata) != 6:
-            raise ValueError(f"Invalid metadata format: {metadata}")
-
-        deposition_id, content_type, format_type, part_number, version_number, milestone = metadata
-
-        # Format timestamp for database
-        timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-
-        # Create the record dictionary
-        record = {
-            'deposition_id': deposition_id,
-            'content_type': content_type,
-            'format_type': format_type,
-            'part_number': part_number,
-            'version_number': version_number,
-            'milestone': milestone,
-            'file_path': file_path,
-            'created_date': timestamp_str
-        }
-
-        return record
