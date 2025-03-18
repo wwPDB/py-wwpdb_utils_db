@@ -58,6 +58,12 @@ setup(
     },
     # Added for
     command_options={"build_sphinx": {"project": ("setup.py", thisPackage), "version": ("setup.py", version), "release": ("setup.py", version)}},
+    # Entry points for command-line scripts
+    entry_points={
+        'console_scripts': [
+            'file-activity=wwpdb.utils.db.FileActivityUtil:main',
+        ],
+    },
     # This setting for namespace package support -
     zip_safe=False,
 )
