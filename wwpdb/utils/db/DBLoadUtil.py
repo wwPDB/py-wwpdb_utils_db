@@ -20,8 +20,10 @@ import sys
 import traceback
 
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=import-error,no-name-in-module
-from wwpdb.utils.db.SqlLoader import SqlLoader
+# from wwpdb.utils.db.SqlLoader import SqlLoader
 
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
@@ -41,6 +43,7 @@ class DBLoadUtil(object):
         self.__sessionId = None
         self.__sessionPath = None
         self.__siteId = str(self.__reqObj.getValue("WWPDB_SITE_ID"))
+        self.__cI = ConfigInfo(self.__siteId)
         self.__cIcommon = ConfigInfoAppCommon(self.__siteId)
         #
         self.__getSession()
@@ -58,11 +61,13 @@ class DBLoadUtil(object):
         #
         self.__genListFile(listfile, fileList)
         self.__getLoadFile(self.__sessionPath, listfile, sqlfile, logfile1)
+
         try:
             if os.path.exists(sqlfile):
                 self.__lfh.write("DBLoadUtil::doLoading() about to load %s with log %s\n" % (sqlfile, clogfile1))
-                sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
-                sq.loadSql(sqlfile, clogfile1)
+                # sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
+                # sq.loadSql(sqlfile, clogfile1)
+                self.__loadData(self.__sessionPath, sqlfile, clogfile1)
             else:
                 self.__lfh.write("DBLoadUtil::doLoading() failed to produce load file\n")
         except Exception as e:
@@ -115,6 +120,16 @@ class DBLoadUtil(object):
         except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadUtil::__getLoadFile(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
+
+    def __loadData(self, dataDir, sqlfile, logfile):
+        dbHost = self.__cI.get("SITE_DB_HOST_NAME")
+        dbUser = self.__cI.get("SITE_DB_USER_NAME")
+        dbPw = self.__cI.get("SITE_DB_PASSWORD")
+        dbPort = self.__cI.get("SITE_DB_PORT_NUMBER")
+
+        cmd = "cd " + dataDir
+        cmd += "; " + "mysql -u " + dbUser + " -p" + dbPw + " -h " + dbHost + " -P " + str(dbPort) + " < " + sqlfile + " >& " + logfile
+        os.system(cmd)
 
     def __getSession(self):
         """Join existing session or create new session as required."""

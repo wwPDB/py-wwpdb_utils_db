@@ -22,8 +22,8 @@ import traceback
 #
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=no-name-in-module,import-error
-from wwpdb.utils.db.SqlLoader import SqlLoader
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+# from wwpdb.utils.db.SqlLoader import SqlLoader
 
 # import signal
 
@@ -82,7 +82,7 @@ class DbLoadingApi(object):
             cmd = "cd " + dataDir
             cmd += "; rm -f *"
             cmd += "; ls -tl " + cifPath + "D_*model_P1.cif.V[1-9]* | head -n1 | awk '{print $9}' >FILELIST"
-            cmd += "; " + self.__dbLoader + " -server mysql -list FILELIST -map " + self.__mapping + " -db " + self.__dbName + " >& " + log1
+            cmd += "; " + self.__dbLoader + " -server mysql -list FILELIST -map " + self.__mapping + " -db " + self.__dbName + " -firstDataBlock" + " >& " + log1
             os.system(cmd)
             # print cmd
             # for file in os.listdir(dataDir):
@@ -154,6 +154,60 @@ class DbLoadingApi(object):
             self.__lfh.write("DbLoadingApi::__generateLoadDb(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
 
+    # def doLoadStatus(self, pdbxFilePath, sessionDir):
+    #     """
+    #     Load the input file into the status database and session directory as input
+
+    #     """
+    #     # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    #     self.__lfh.write("DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
+    #     try:
+    #         if os.path.exists(pdbxFilePath):
+    #             dataDir = sessionDir + "/" + self.__workDir
+
+    #             if not os.path.exists(dataDir):
+    #                 print("Creating " + dataDir)
+    #                 os.makedirs(dataDir)
+
+    #             if self.__debug:
+    #                 self.__lfh.write("DbLoadingApi::doLoadStatus(): generating db-loader command\n")
+
+    #             sql_file = os.path.join(dataDir, "DB_LOADER.sql")
+    #             log1 = os.path.join(dataDir, "db-loader.log")
+
+    #             self.__generateLoadDb(dataDir, pdbxFilePath, sql_file, log1)
+
+    #             log2 = os.path.join(dataDir, "status_load.log")
+    #             if os.path.exists(log2):
+    #                 os.unlink(log2)
+
+    #             if os.path.exists(sql_file):
+    #                 sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
+    #                 sq.loadSql(sql_file, log2)
+    #             else:
+    #                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
+    #                 return False
+
+    #             if os.path.exists(log2):
+    #                 with open(log2, "r") as fin:
+    #                     for line in fin:
+    #                         for word in line.split():
+    #                             if word.upper() == "ERROR":
+    #                                 self.__lfh.write("DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
+    #                                 return False
+
+    #             self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
+    #             return True
+
+    #         else:
+    #             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
+    #             return False
+
+    #     except:  # noqa: E722 pylint: disable=bare-except
+    #         self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
+    #         traceback.print_exc(file=self.__lfh)
+    #         return False
+
     def doLoadStatus(self, pdbxFilePath, sessionDir):
         """
         Load the input file into the status database and session directory as input
@@ -173,117 +227,70 @@ class DbLoadingApi(object):
                     self.__lfh.write("DbLoadingApi::doLoadStatus(): generating db-loader command\n")
 
                 sql_file = os.path.join(dataDir, "DB_LOADER.sql")
-                log1 = os.path.join(dataDir, "db-loader.log")
+                log1 = "db-loader.log"
+
+                # cmd = "cd " + dataDir
+                # cmd += "; " + self.__dbLoader + " -server mysql -f " + pdbxFilePath + " -map " + self.__mapping + " -db " + self.__dbName + " >& " + log1
+                # os.system(cmd)
+                # if self.__debug:
+                #     self.__lfh.write("DbLoadingApi::doLoadStatus(): db-loader command %s\n" % cmd)
 
                 self.__generateLoadDb(dataDir, pdbxFilePath, sql_file, log1)
 
                 log2 = os.path.join(dataDir, "status_load.log")
-                if os.path.exists(log2):
-                    os.unlink(log2)
-
                 if os.path.exists(sql_file):
-                    sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
-                    sq.loadSql(sql_file, log2)
-                else:
-                    self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
-                    return False
-
-                if os.path.exists(log2):
-                    with open(log2, "r") as fin:
-                        for line in fin:
+                    cmd = "cd " + dataDir
+                    if self.__dbSocket is None:
+                        cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + sql_file + " >& " + log2
+                    else:
+                        cmd += (
+                            "; "
+                            + self.__mysql
+                            + "-u "
+                            + self.__dbUser
+                            + " -p"
+                            + self.__dbPw
+                            + " -h "
+                            + self.__dbHost
+                            + " -P "
+                            + self.__dbPort
+                            + " -S "
+                            + self.__dbSocket
+                            + " <"
+                            + sql_file
+                            + " >& "
+                            + log2
+                        )  # noqa: E501
+                    if self.__debug:
+                        self.__lfh.write("DbLoadingApi::doLoadStatus(): database server command %s\n" % cmd)
+                    os.system(cmd)
+                    if os.path.exists(log2):
+                        file = open(log2, "r")
+                        for line in file:
                             for word in line.split():
                                 if word.upper() == "ERROR":
                                     self.__lfh.write("DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
                                     return False
+                    else:
+                        self.__lfh.write(
+                            'DbLoadingApi::doLoadStatus(): db-loader didn\'t generate the data file "DB_LOADER.sql". Please check the log file '
+                            + os.path.join(dataDir, log1)
+                            + " for details.\n"
+                        )
 
-                self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
-                return True
-
+                    #
+                    self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
+                    return True
+                else:
+                    self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
+                    return False
             else:
                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
                 return False
-
         except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
             return False
-
-    # def XXXdoLoadStatus(self, pdbxFilePath, sessionDir):
-    #     """
-    #     Load the input file into the status database and session directory as input
-
-    #     """
-    #     # signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-    #     self.__lfh.write("DbLoadingApi::doLoadStatus(): starting with file %s and session %s\n" % (pdbxFilePath, sessionDir))
-    #     try:
-    #         if os.path.exists(pdbxFilePath):
-    #             dataDir = sessionDir + "/" + self.__workDir
-    #             log1 = "db-loader.log"
-    #             if not os.path.exists(dataDir):
-    #                 print("Creating " + dataDir)
-    #                 os.makedirs(dataDir)
-
-    #             cmd = "cd " + dataDir
-    #             cmd += "; " + self.__dbLoader + " -server mysql -f " + pdbxFilePath + " -map " + self.__mapping + " -db " + self.__dbName + " >& " + log1
-    #             os.system(cmd)
-    #             if self.__debug:
-    #                 self.__lfh.write("DbLoadingApi::doLoadStatus(): db-loader command %s\n" % cmd)
-
-    #             file1 = os.path.join(dataDir, "DB_LOADER.sql")
-    #             log2 = os.path.join(dataDir, "status_load.log")
-    #             if os.path.exists(file1):
-    #                 cmd = "cd " + dataDir
-    #                 if self.__dbSocket is None:
-    #                     cmd += "; " + self.__mysql + "-u " + self.__dbUser + " -p" + self.__dbPw + " -h " + self.__dbHost + " -P " + self.__dbPort + " <" + file1 + " >& " + log2
-    #                 else:
-    #                     cmd += (
-    #                         "; "
-    #                         + self.__mysql
-    #                         + "-u "
-    #                         + self.__dbUser
-    #                         + " -p"
-    #                         + self.__dbPw
-    #                         + " -h "
-    #                         + self.__dbHost
-    #                         + " -P "
-    #                         + self.__dbPort
-    #                         + " -S "
-    #                         + self.__dbSocket
-    #                         + " <"
-    #                         + file1
-    #                         + " >& "
-    #                         + log2
-    #                     )  # noqa: E501
-    #                 if self.__debug:
-    #                     self.__lfh.write("DbLoadingApi::doLoadStatus(): database server command %s\n" % cmd)
-    #                 os.system(cmd)
-    #                 if os.path.exists(log2):
-    #                     file = open(log2, "r")
-    #                     for line in file:
-    #                         for word in line.split():
-    #                             if word.upper() == "ERROR":
-    #                                 self.__lfh.write("DbLoadingApi::doLoadStatus(): ERROR found during the database loading. Please check the log file " + log2 + " for details.\n")
-    #                                 return False
-    #                 else:
-    #                     self.__lfh.write(
-    #                         'DbLoadingApi::doLoadStatus(): db-loader didn\'t generate the data file "DB_LOADER.sql". Please check the log file '
-    #                         + os.path.join(dataDir, log1)
-    #                         + " for details.\n"
-    #                     )
-
-    #                 #
-    #                 self.__lfh.write("DbLoadingApi::doLoadStatus(): completed\n")
-    #                 return True
-    #             else:
-    #                 self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no load file created.\n")
-    #                 return False
-    #         else:
-    #             self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, no input cif file found.\n")
-    #             return False
-    #     except:  # noqa: E722 pylint: disable=bare-except
-    #         self.__lfh.write("DbLoadingApi::doLoadStatus(): failing, with exception.\n")
-    #         traceback.print_exc(file=self.__lfh)
-    #         return False
 
     def doDataLoadingBcp(self, depId, sessionDir):
         """
