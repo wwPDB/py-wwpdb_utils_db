@@ -40,7 +40,7 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     #
-    install_requires=["mmcif", "scandir", "mysqlclient", "wwpdb.utils.config", "wwpdb.io", "rcsb.utils.multiproc", "sqlalchemy ~= 1.3", "sqlparse"],
+    install_requires=["mmcif", "scandir", "mysqlclient", "wwpdb.utils.config", "wwpdb.io", "rcsb.utils.multiproc", "sqlalchemy ~= 1.3", ],
     packages=find_packages(exclude=["wwpdb.utils.tests-db", "examples", "mock-data", "tests.*"]),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
@@ -55,6 +55,7 @@ setup(
     extras_require={
         "dev": ["check-manifest"],
         "test": ["coverage"],
+        "status": ["wwpdb.utils.dp"]  # "sqlparse"
     },
     # Added for
     command_options={"build_sphinx": {"project": ("setup.py", thisPackage), "version": ("setup.py", version), "release": ("setup.py", version)}},
