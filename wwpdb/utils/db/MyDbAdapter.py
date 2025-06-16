@@ -398,7 +398,7 @@ class MyDbAdapter(object):
             status = " operation error " + str(e)
             logger.error("_select %s", status)
             if self.__verbose:
-                logger.eception("_select failed")
+                logger.exception("_select failed")
 
         if self.__debug:
             endTime = time.time()
