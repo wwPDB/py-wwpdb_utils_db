@@ -19,17 +19,17 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
-import sys
 import os
+import sys
 import traceback
 from optparse import OptionParser  # pylint: disable=deprecated-module
 
-from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
 from wwpdb.utils.session.WebRequest import InputRequest
 
 
-class StatusHistoryExec(object):
+class StatusHistoryExec:
     def __init__(self, defSiteId="WWWDPB_INTERNAL_RU", sessionId=None, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
@@ -79,8 +79,7 @@ class StatusHistoryExec(object):
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
             if numProc > 1:
                 return shu.loadStatusHistoryMulti(numProc, newTable=newTable)
-            else:
-                return shu.loadStatusHistory(newTable=newTable)
+            return shu.loadStatusHistory(newTable=newTable)
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
 

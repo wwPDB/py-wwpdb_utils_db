@@ -16,6 +16,7 @@
 Database schema definitions for PDBx data categories populated in model files.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -23,14 +24,17 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
+from typing import ClassVar
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
 
 class PdbxSchemaDef(SchemaDefBase):
-    """ A data class containing schema definitions PDBx data categories populated in model files.
-    """
+    """A data class containing schema definitions PDBx data categories populated in model files."""
+
     _databaseName = "pdbxv4"
-    _schemaDefDict = {
+    # fmt: off
+    _schemaDefDict: ClassVar[SchemaDictType] = {
         'ATOM_SITE': {'ATTRIBUTES': {'ADP_TYPE': 'adp_type',
                                      'ANISO_B_1_1': 'aniso_B_1_1',
                                      'ANISO_B_1_1_ESD': 'aniso_B_1_1_esd',
@@ -42557,10 +42561,10 @@ class PdbxSchemaDef(SchemaDefBase):
                         'TABLE_NAME': 'valence_ref',
                         'TABLE_TYPE': 'transactional'}
     }
+    # fmt: on
 
     def __init__(self, verbose=True, log=sys.stderr):
-        super(PdbxSchemaDef, self).__init__(databaseName=PdbxSchemaDef._databaseName, schemaDefDict=PdbxSchemaDef._schemaDefDict,
-                                            verbose=verbose, log=log)
+        super(PdbxSchemaDef, self).__init__(databaseName=PdbxSchemaDef._databaseName, schemaDefDict=PdbxSchemaDef._schemaDefDict, verbose=verbose, log=log)
 
 
 if __name__ == "__main__":

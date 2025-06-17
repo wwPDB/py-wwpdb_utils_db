@@ -13,6 +13,7 @@
 Test cases for status history file methods and accessors --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -20,19 +21,19 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 
-import sys
-import unittest
-import traceback
-import time
 import os
 import os.path
 import platform
-
-from wwpdb.utils.db.StatusHistory import StatusHistory
-from wwpdb.utils.config.ConfigInfo import getSiteId
-from wwpdb.io.file.DataFile import DataFile
+import sys
+import time
+import traceback
+import unittest
 
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
+
+from wwpdb.io.file.DataFile import DataFile
+from wwpdb.utils.config.ConfigInfo import getSiteId
+from wwpdb.utils.db.StatusHistory import StatusHistory
 
 # Not used but simple import test
 from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils  # noqa: F401  pylint: disable=unused-import
@@ -97,7 +98,10 @@ class StatusHistoryTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted StatusHistoryTests testReadWriteHistory at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted StatusHistoryTests testReadWriteHistory at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testCreateHistory(self):
         """Read existing entry and create initial status records as required -"""
@@ -135,8 +139,7 @@ class StatusHistoryTests(unittest.TestCase):
             # New status history?  The first record of a new file will mark the PROC->AUTH transition with at one
             #                      additional record depending on the current status state.
             #
-            if (numHist < 1) and (statusCode not in ["PROC"]):
-
+            if (numHist < 1) and (statusCode != "PROC"):
                 sH.add(
                     statusCodeBegin="PROC",
                     dateBegin=initialDepositionDate,
@@ -146,9 +149,14 @@ class StatusHistoryTests(unittest.TestCase):
                     details="Automated entry",
                 )
 
-                if statusCode in ["REL"]:
+                if statusCode == "REL":
                     sH.add(
-                        statusCodeBegin="AUTH", dateBegin=beginProcessingDate, statusCodeEnd=statusCode, dateEnd=releaseDate, annotator=annotatorInitials, details="Automated entry"
+                        statusCodeBegin="AUTH",
+                        dateBegin=beginProcessingDate,
+                        statusCodeEnd=statusCode,
+                        dateEnd=releaseDate,
+                        annotator=annotatorInitials,
+                        details="Automated entry",
                     )
 
                 elif statusCode in ["HOLD", "HPUB"]:
@@ -194,7 +202,10 @@ class StatusHistoryTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted StatusHistoryTests testCreateHistory at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted StatusHistoryTests testCreateHistory at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def suiteReadWriteTests():

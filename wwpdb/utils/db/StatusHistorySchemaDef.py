@@ -11,6 +11,7 @@
 Database schema defintions for status history table within the da_internal collection.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -18,15 +19,17 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
+from typing import ClassVar
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
 
 class StatusHistorySchemaDef(SchemaDefBase):
+    """A data class containing schema definitions for data processing status history."""
 
-    """ A data class containing schema definitions for data processing status history.
-    """
     _databaseName = "da_internal"
-    _schemaDefDict = {
+    # fmt: off
+    _schemaDefDict: ClassVar[SchemaDictType] = {
         "PDBX_DATABASE_STATUS_HISTORY": {
             "TABLE_ID": "PDBX_DATABASE_STATUS_HISTORY",
             "TABLE_NAME": "pdbx_database_status_history",
@@ -124,15 +127,12 @@ class StatusHistorySchemaDef(SchemaDefBase):
         #     'TABLE_DELETE_ATTRIBUTE': 'ENTRY_ID',
         # }
     }
+    # fmt: on
 
     def __init__(self, verbose=True, log=sys.stderr):
-        super(
-            StatusHistorySchemaDef,
-            self).__init__(
-            databaseName=StatusHistorySchemaDef._databaseName,
-            schemaDefDict=StatusHistorySchemaDef._schemaDefDict,
-            verbose=verbose,
-            log=log)
+        super(StatusHistorySchemaDef, self).__init__(
+            databaseName=StatusHistorySchemaDef._databaseName, schemaDefDict=StatusHistorySchemaDef._schemaDefDict, verbose=verbose, log=log
+        )
 
 
 if __name__ == "__main__":

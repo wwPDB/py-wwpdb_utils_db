@@ -29,20 +29,20 @@ class MiscSchemaReportTests(unittest.TestCase):
             tObj = sd.getTable(tableId)
             attributeIdList = tObj.getAttributeIdList()
             attributeNameList = tObj.getAttributeNameList()
-            print("Ordered attribute Id   list %s" % (str(attributeIdList)))
-            print("Ordered attribute name list %s" % (str(attributeNameList)))
+            print("Ordered attribute Id   list %s" % (str(attributeIdList)))  # noqa: T201
+            print("Ordered attribute name list %s" % (str(attributeNameList)))  # noqa: T201
             #
             mAL = tObj.getMapAttributeNameList()
-            print("Ordered mapped attribute name list %s" % (str(mAL)))
+            print("Ordered mapped attribute name list %s" % (str(mAL)))  # noqa: T201
 
             mAL = tObj.getMapAttributeIdList()
-            print("Ordered mapped attribute id   list %s" % (str(mAL)))
+            print("Ordered mapped attribute id   list %s" % (str(mAL)))  # noqa: T201
 
             cL = tObj.getMapInstanceCategoryList()
-            print("Mapped category list %s" % (str(cL)))
+            print("Mapped category list %s" % (str(cL)))  # noqa: T201
             for c in cL:
                 aL = tObj.getMapInstanceAttributeList(c)
-                print("Mapped attribute list in %s :  %s" % (c, str(aL)))
+                print("Mapped attribute list in %s :  %s" % (c, str(aL)))  # noqa: T201
 
     def testChemCompSchema(self):
         """Test case -  chemCompSchema test"""

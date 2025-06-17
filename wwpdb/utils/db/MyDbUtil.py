@@ -22,7 +22,6 @@
 Utility classes to create connections and process SQL commands with a MySQL RDBMS.
 
 """
-from __future__ import generators
 
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
@@ -31,12 +30,12 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 #
 
-import MySQLdb
-
-import sys
 import os
+import sys
 import traceback
 import warnings
+
+import MySQLdb
 
 # from operator import itemgetter, attrgetter
 
@@ -44,20 +43,28 @@ import warnings
 #
 if True:  # pylint: disable=using-constant-test
     try:
-        import sqlalchemy.pool as pool
+        from sqlalchemy import pool
 
         MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True, recycle=1800)
     except:  # noqa: E722 pylint: disable=bare-except
         pass
 
 
-class MyDbConnect(object):
-
+class MyDbConnect:
     """Class to encapsulate RDBMS DBI connection."""
 
     def __init__(
-        self, dbServer="mysql", dbHost="localhost", dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None, verbose=False, log=sys.stderr
-    ):  # pylint: disable=unused-argument
+        self,
+        dbServer="mysql",
+        dbHost="localhost",
+        dbName=None,
+        dbUser=None,
+        dbPw=None,
+        dbSocket=None,
+        dbPort=None,
+        verbose=False,
+        log=sys.stderr,  # noqa: ARG002
+    ):  # noqa: ARG002 pylint: disable=unused-argument
         self.__lfh = log
 
         if dbName is None:
@@ -121,7 +128,7 @@ class MyDbConnect(object):
                 self.__dbPort = authD["DB_PORT"]
             else:
                 self.__dbPort = 3306
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.__lfh.write("+MyDbConnect.setAuth failing  %r %s\n" % (authD.items(), str(e)))
             traceback.print_exc(file=self.__lfh)
 
@@ -155,7 +162,7 @@ class MyDbConnect(object):
                 )
 
             self.__dbcon = dbcon
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.__lfh.write(
                 "+MyDbConnect.connect() Connection error to server %s host %s dsn %s user %s pw %s socket %s port %d %s\n"
                 % (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort, str(e))
@@ -176,8 +183,7 @@ class MyDbConnect(object):
         return False
 
 
-class MyDbQuery(object):
-
+class MyDbQuery:
     """Parameterized SQL queries using Python DBI protocol..."""
 
     def __init__(self, dbcon, verbose=True, log=sys.stderr):
@@ -221,7 +227,6 @@ class MyDbQuery(object):
             self.__dbcon.rollback()
             curs.close()
         except MySQLdb.Warning as e:
-
             if self.__verbose:
                 self.__lfh.write("MyDbQuery.sqlCommand MySQL warning message is:\n%s\n" % e)
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (t % tuple(v)))
@@ -257,7 +262,6 @@ class MyDbQuery(object):
             self.__dbcon.rollback()
             curs.close()
         except MySQLdb.Warning as e:
-
             if self.__verbose:
                 self.__lfh.write("MyDbQuery.sqlCommand MySQL message is:\n%s\n" % e)
                 self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
@@ -275,9 +279,8 @@ class MyDbQuery(object):
         if action in ["error", "ignore", "default"]:
             self.__warningAction = action
             return True
-        else:
-            self.__warningAction = "default"
-            return False
+        self.__warningAction = "default"
+        return False
 
     def __setWarningHandler(self):
         if self.__warningAction == "error":
@@ -425,11 +428,11 @@ class MyDbQuery(object):
         if len(orderList) > 0:
             (a, t) = orderList[0]
             order = " ORDER BY CAST(%s AS %s) " % (a, t)
-            for (a, t) in orderList[1:]:
+            for a, t in orderList[1:]:
                 order += ", CAST(%s AS %s) " % (a, t)
 
         #
-        query = "SELECT " + colsCsv + " FROM " + tablesCsv + condition + order
+        query = "SELECT " + colsCsv + " FROM " + tablesCsv + condition + order  # noqa: S608
         if self.__verbose and self.__lfh:
             self.__lfh.write("Query: %s\n" % query)
         curs = self.__dbcon.cursor()

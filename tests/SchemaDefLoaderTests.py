@@ -19,16 +19,16 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
 import logging
-import unittest
-import traceback
+import os
 import platform
 import sys
-import os
-
-from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
+import traceback
+import unittest
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
+
+from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
+from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 logger = logging.getLogger()
@@ -55,7 +55,9 @@ class SchemaDefLoaderTests(unittest.TestCase):
         self.__lfh.write("\nStarting SchemaDefLoaderTests testLoadFile\n")
         try:
             bsd = BirdSchemaDef()
-            sml = SchemaDefLoader(schemaDefObj=bsd, ioObj=self.__ioObj, dbCon=None, workPath=TESTOUTPUT, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sml = SchemaDefLoader(
+                schemaDefObj=bsd, ioObj=self.__ioObj, dbCon=None, workPath=TESTOUTPUT, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             containerNameList, tList = sml.makeLoadFiles(self.__loadPathList)
         except:  # noqa: E722  pylint: disable=bare-except  # pragma: no cover
             traceback.print_exc(file=self.__lfh)

@@ -10,21 +10,25 @@
 Database schema defintions for Bird PRD/FAMILY reference data.
 
 """
+
 __docformat__ = "restructuredtext en"
-__author__    = "John Westbrook"
-__email__     = "jwest@rcsb.rutgers.edu"
-__license__   = "Creative Commons Attribution 3.0 Unported"
-__version__   = "V0.001"
+__author__ = "John Westbrook"
+__email__ = "jwest@rcsb.rutgers.edu"
+__license__ = "Creative Commons Attribution 3.0 Unported"
+__version__ = "V0.001"
 
 import sys
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
+from typing import ClassVar
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
 
 class BirdSchemaDef(SchemaDefBase):
-    """ A data class containing schema definitions for deposition related messages.
-    """
-    _databaseName="prdv4"
-    _schemaDefDict ={
+    """A data class containing schema definitions for deposition related messages."""
+
+    _databaseName = "prdv4"
+    # fmt: off
+    _schemaDefDict: ClassVar[SchemaDictType] = {
         'CHEM_COMP': {'ATTRIBUTES': {'DB_ID': 'db_id',
                                      'FORMULA': 'formula',
                                      'FORMULA_WEIGHT': 'formula_weight',
@@ -2627,34 +2631,32 @@ class BirdSchemaDef(SchemaDefBase):
                                              'TABLE_ID': 'PDBX_REFERENCE_MOLECULE_SYNONYMS',
                                              'TABLE_NAME': 'pdbx_reference_molecule_synonyms',
                                              'TABLE_TYPE': 'transactional'}}
+    # fmt: on
 
-    def __init__(self,verbose=True,log=sys.stderr):
-        super(BirdSchemaDef,self).__init__(databaseName=BirdSchemaDef._databaseName,schemaDefDict=BirdSchemaDef._schemaDefDict,
-                                           verbose=verbose,log=log)
-        
+    def __init__(self, verbose=True, log=sys.stderr):
+        super(BirdSchemaDef, self).__init__(databaseName=BirdSchemaDef._databaseName, schemaDefDict=BirdSchemaDef._schemaDefDict, verbose=verbose, log=log)
+
 
 if __name__ == "__main__":
-    bsd=BirdSchemaDef()
-    tableIdList=bsd.getTableIdList()
+    bsd = BirdSchemaDef()
+    tableIdList = bsd.getTableIdList()
 
     for tableId in tableIdList:
-        aIdL=bsd.getAttributeIdList(tableId)
-        tObj=bsd.getTable(tableId)
-        attributeIdList=tObj.getAttributeIdList()
-        attributeNameList=tObj.getAttributeNameList()        
+        aIdL = bsd.getAttributeIdList(tableId)
+        tObj = bsd.getTable(tableId)
+        attributeIdList = tObj.getAttributeIdList()
+        attributeNameList = tObj.getAttributeNameList()
         sys.stdout.write("Ordered attribute Id   list %s\n" % (str(attributeIdList)))
-        sys.stdout.write("Ordered attribute name list %s\n" % (str(attributeNameList)))        
+        sys.stdout.write("Ordered attribute name list %s\n" % (str(attributeNameList)))
         #
-        mAL=tObj.getMapAttributeNameList()
+        mAL = tObj.getMapAttributeNameList()
         sys.stdout.write("Ordered mapped attribute name list %s\n" % (str(mAL)))
 
-        mAL=tObj.getMapAttributeIdList()
-        sys.stdout.write("Ordered mapped attribute id   list %s\n" % (str(mAL)))        
+        mAL = tObj.getMapAttributeIdList()
+        sys.stdout.write("Ordered mapped attribute id   list %s\n" % (str(mAL)))
 
-        cL=tObj.getMapInstanceCategoryList()
+        cL = tObj.getMapInstanceCategoryList()
         sys.stdout.write("Mapped category list %s\n" % (str(cL)))
         for c in cL:
-            aL=tObj.getMapInstanceAttributeList(c)
-            sys.stdout.write("Mapped attribute list in %s :  %s\n" % (c,str(aL)))
-            
-
+            aL = tObj.getMapInstanceAttributeList(c)
+            sys.stdout.write("Mapped attribute list in %s :  %s\n" % (c, str(aL)))

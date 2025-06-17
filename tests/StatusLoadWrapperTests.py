@@ -9,6 +9,7 @@
 """
 Test cases for status load wrapper
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -16,20 +17,20 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 
-import sys
-import unittest
-import traceback
-import time
 import os
+import sys
+import time
+import traceback
+import unittest
 
-if __package__ is None or __package__ == "":
+if __package__ is None or __package__ == "":  # noqa: PLC1901
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import,import-error
+    from mock_import import mocksetup  # type: ignore  # noqa: F401 pylint: disable=unused-import,import-error
 else:
-    from .mock_import import mocksetup  # noqa: F401 pylint: disable=unused-import,import-error
+    from .mock_import import mocksetup  # noqa: F401,TID252 pylint: disable=unused-import,import-error
 
-from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 from wwpdb.utils.config.ConfigInfo import getSiteId
+from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 from wwpdb.utils.testing.Features import Features
 
 
@@ -59,7 +60,9 @@ class StatusLoadWrapperTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted StatusLoadWrapperTests testLoad at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted StatusLoadWrapperTests testLoad at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def suiteLoadTests():

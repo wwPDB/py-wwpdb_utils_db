@@ -25,15 +25,15 @@ __version__ = "V0.01"
 
 import sys
 import time
-import unittest
 import traceback
+import unittest
 
-from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
-from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
 from mmcif.io.IoAdapterPy import IoAdapterPy
-from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
-from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
+from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
+from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
+from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
 from wwpdb.utils.testing.Features import Features
 
 
@@ -61,8 +61,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
-        else:
-            return False
+        return False
 
     def close(self):
         if self.__dbCon is not None:
@@ -136,7 +135,9 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         startTime = time.time()
         try:
             loadPathList = ["test_file_inventory.cif"]
-            sml = SchemaDefLoader(schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sml = SchemaDefLoader(
+                schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             containerNameList, tList = sml.makeLoadFiles(loadPathList)
             for tId, fn in tList:
                 self.__lfh.write("\nCreated table %s load file %s\n" % (tId, fn))
@@ -145,7 +146,14 @@ class StatusHistoryLoaderTests(unittest.TestCase):
             self.__lfh.write("\nBatch files created in %.2f seconds\n" % (endTime1 - startTime))
             self.open()
             sdl = SchemaDefLoader(
-                schemaDefObj=self.__msd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+                schemaDefObj=self.__msd,
+                ioObj=self.__ioObj,
+                dbCon=self.__dbCon,
+                workPath=".",
+                cleanUp=False,
+                warnings="default",
+                verbose=self.__verbose,
+                log=self.__lfh,
             )
 
             sdl.loadBatchFiles(loadList=tList, containerNameList=containerNameList, deleteOpt="all")
@@ -157,7 +165,8 @@ class StatusHistoryLoaderTests(unittest.TestCase):
             self.fail()
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted StatusHistoryLoaderTests testLoadInventoryFile at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted StatusHistoryLoaderTests testLoadInventoryFile at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
 

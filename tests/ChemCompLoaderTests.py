@@ -19,22 +19,21 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
 import os
+import sys
 import time
-import unittest
-import scandir
 import traceback
+import unittest
 
-from wwpdb.utils.db.MyDbUtil import MyDbConnect
-from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
-
-from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
+import scandir
 
 # from pdbx_v2.adapter.IoAdapterPy       import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
+from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
 
+from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
+from wwpdb.utils.db.MyDbUtil import MyDbConnect
+from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.testing.Features import Features
 
 
@@ -56,8 +55,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
-        else:
-            return False
+        return False
 
     def close(self):
         if self.__dbCon is not None:
@@ -77,7 +75,8 @@ class ChemCompLoaderTests(unittest.TestCase):
                     pathList.append(os.path.join(root, name))
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted ChemCompLoaderTests __makeComponentPathList at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted ChemCompLoaderTests __makeComponentPathList at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
         self.__lfh.write("\nFound %d files in %s\n" % (len(pathList), self.__topCachePath))
         return pathList
@@ -93,7 +92,9 @@ class ChemCompLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
         endTime = time.time()
-        self.__lfh.write("\nCompleted ChemCompLoaderTests testListFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted ChemCompLoaderTests testListFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testConnect(self):
         """Test case - for creating a test connection"""
@@ -107,7 +108,9 @@ class ChemCompLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
         endTime = time.time()
-        self.__lfh.write("\nCompleted ChemCompLoaderTests testConnect at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted ChemCompLoaderTests testConnect at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testLoadFiles(self):
         """Test case - create batch load files for all chemical component definition data files -"""
@@ -115,7 +118,9 @@ class ChemCompLoaderTests(unittest.TestCase):
         startTime = time.time()
         try:
             ccsd = ChemCompSchemaDef()
-            sml = SchemaDefLoader(schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sml = SchemaDefLoader(
+                schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             pathList = self.__makeComponentPathList()
 
             containerNameList, tList = sml.makeLoadFiles(pathList, append=False)
@@ -127,7 +132,14 @@ class ChemCompLoaderTests(unittest.TestCase):
             self.__lfh.write("\nBatch files created in %.2f seconds\n" % (endTime1 - startTime))
             self.open(dbName=ccsd.getDatabaseName())
             sdl = SchemaDefLoader(
-                schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+                schemaDefObj=ccsd,
+                ioObj=self.__ioObj,
+                dbCon=self.__dbCon,
+                workPath=".",
+                cleanUp=False,
+                warnings="default",
+                verbose=self.__verbose,
+                log=self.__lfh,
             )
 
             sdl.loadBatchFiles(loadList=tList, containerNameList=containerNameList, deleteOpt="all")
@@ -138,18 +150,22 @@ class ChemCompLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
         endTime = time.time()
-        self.__lfh.write("\nCompleted ChemCompLoaderTests testLoadFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted ChemCompLoaderTests testLoadFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
-    def loadBatchFilesMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+    def loadBatchFilesMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002  pylint: disable=unused-argument
         ccsd = ChemCompSchemaDef()
         self.open(dbName=ccsd.getDatabaseName())
-        sdl = SchemaDefLoader(schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+        sdl = SchemaDefLoader(
+            schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+        )
         #
         sdl.loadBatchFiles(loadList=dataList, containerNameList=None, deleteOpt=None)
         self.close()
         return dataList, dataList, []
 
-    def makeComponentPathListMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+    def makeComponentPathListMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002  pylint: disable=unused-argument
         """Return the list of chemical component definition file paths in the current repository."""
         pathList = []
         for subdir in dataList:
@@ -169,7 +185,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         numProc = 8
         try:
             dataS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-            dataList = [a for a in dataS]
+            dataList = list(dataS)
             mpu = MultiProcUtil(verbose=True)
             mpu.set(workerObj=self, workerMethod="makeComponentPathListMulti")
             _ok, _failList, retLists, _diagList = mpu.runMulti(dataList=dataList, numProc=numProc, numResults=1)
@@ -181,7 +197,9 @@ class ChemCompLoaderTests(unittest.TestCase):
             # pathList=self.__makeComponentPathList()
 
             ccsd = ChemCompSchemaDef()
-            sml = SchemaDefLoader(schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sml = SchemaDefLoader(
+                schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
 
             #
             mpu = MultiProcUtil(verbose=True)
@@ -199,10 +217,17 @@ class ChemCompLoaderTests(unittest.TestCase):
             self.__lfh.write("\nBatch files created in %.2f seconds\n" % (endTime1 - endTime0))
             self.open(dbName=ccsd.getDatabaseName())
             sdl = SchemaDefLoader(
-                schemaDefObj=ccsd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+                schemaDefObj=ccsd,
+                ioObj=self.__ioObj,
+                dbCon=self.__dbCon,
+                workPath=".",
+                cleanUp=False,
+                warnings="default",
+                verbose=self.__verbose,
+                log=self.__lfh,
             )
             #
-            for tId, fn in tList:
+            for tId, _fn in tList:
                 sdl.delete(tId, containerNameList=containerNameList, deleteOpt="all")
             self.close()
             #
@@ -216,7 +241,10 @@ class ChemCompLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
         endTime = time.time()
-        self.__lfh.write("\nCompleted ChemCompLoaderTests testLoadFilesMulti at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted ChemCompLoaderTests testLoadFilesMulti at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def loadSuite():

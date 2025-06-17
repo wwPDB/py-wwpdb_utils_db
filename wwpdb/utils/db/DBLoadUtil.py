@@ -15,14 +15,15 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 import os
 import sys
 import traceback
 
-from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
-
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility  # pylint: disable=import-error,no-name-in-module
+
 # from wwpdb.utils.db.SqlLoader import SqlLoader
 
 __docformat__ = "restructuredtext en"
@@ -32,7 +33,7 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 
-class DBLoadUtil(object):
+class DBLoadUtil:
     """Class responsible for loading model cif file(s) into da_internal database"""
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
@@ -70,7 +71,7 @@ class DBLoadUtil(object):
                 self.__loadData(self.__sessionPath, sqlfile, clogfile1)
             else:
                 self.__lfh.write("DBLoadUtil::doLoading() failed to produce load file\n")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.__lfh.write("DbLoadiUtil::doLoading(): failing, with exception %s.\n" % str(e))
             traceback.print_exc(file=self.__lfh)
 
@@ -97,7 +98,6 @@ class DBLoadUtil(object):
         f.close()
 
     def __getLoadFile(self, sessionPath, listfile, sqlfile, logfile):
-
         fn = os.path.join(self.__sessionPath, listfile)
 
         mapping = self.__cIcommon.get_site_da_internal_schema_path()
@@ -129,7 +129,7 @@ class DBLoadUtil(object):
 
         cmd = "cd " + dataDir
         cmd += "; " + "mysql -u " + dbUser + " -p" + dbPw + " -h " + dbHost + " -P " + str(dbPort) + " < " + sqlfile + " >& " + logfile
-        os.system(cmd)
+        os.system(cmd)  # noqa: S605
 
     def __getSession(self):
         """Join existing session or create new session as required."""

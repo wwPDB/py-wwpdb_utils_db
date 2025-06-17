@@ -11,6 +11,7 @@
 Database schema defintions for annotation internal database
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -18,15 +19,17 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
+from typing import ClassVar
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
 
 class DaInternalSchemaDef(SchemaDefBase):
+    """A data class containing schema definitions for data processing status history."""
 
-    """ A data class containing schema definitions for data processing status history.
-    """
     _databaseName = "da_internal_combine"
-    _schemaDefDict = {
+    # fmt: off
+    _schemaDefDict: ClassVar[SchemaDictType] = {
         'AUDIT_AUTHOR': {'ATTRIBUTES': {'IDENTIFIER_ORCID': 'identifier_ORCID',
                                         'NAME': 'name',
                                         'PDBX_ORDINAL': 'pdbx_ordinal',
@@ -3102,28 +3105,19 @@ class DaInternalSchemaDef(SchemaDefBase):
                      'TABLE_ID': 'SYMMETRY',
                      'TABLE_NAME': 'symmetry',
                      'TABLE_TYPE': 'transactional'}}
+    # fmt: on
 
     def __init__(self, verbose=True, log=sys.stderr, databaseName=None):
         if databaseName is None:
-            super(
-                DaInternalSchemaDef,
-                self).__init__(
-                databaseName=DaInternalSchemaDef._databaseName,
-                schemaDefDict=DaInternalSchemaDef._schemaDefDict,
-                verbose=verbose,
-                log=log)
+            super(DaInternalSchemaDef, self).__init__(
+                databaseName=DaInternalSchemaDef._databaseName, schemaDefDict=DaInternalSchemaDef._schemaDefDict, verbose=verbose, log=log
+            )
         else:
-            super(
-                DaInternalSchemaDef,
-                self).__init__(
-                databaseName=databaseName,
-                schemaDefDict=DaInternalSchemaDef._schemaDefDict,
-                verbose=verbose,
-                log=log)
+            super(DaInternalSchemaDef, self).__init__(databaseName=databaseName, schemaDefDict=DaInternalSchemaDef._schemaDefDict, verbose=verbose, log=log)
 
 
 if __name__ == "__main__":
-    msd = DaInternalSchemaDef(databaseName='da_internal_combined')
+    msd = DaInternalSchemaDef(databaseName="da_internal_combined")
     tableIdList = msd.getTableIdList()
 
     for tableId in tableIdList:

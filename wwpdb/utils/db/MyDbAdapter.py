@@ -24,26 +24,26 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import time
 import copy
 import logging
+import sys
+import time
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
-from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbQuerySqlGen, MyDbConditionSqlGen
+from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 
 logger = logging.getLogger(__name__)
 
 
-class MyDbAdapter(object):
-
+class MyDbAdapter:
     """Database adapter for managing simple access and persistance queries using a relational database store."""
 
     def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):
@@ -71,8 +71,7 @@ class MyDbAdapter(object):
     def _getParameterDefaultValues(self, contextId):
         if contextId is not None and contextId in self.__defaultD:
             return self.__defaultD[contextId]
-        else:
-            return {}
+        return {}
 
     def _setParameterDefaultValues(self, contextId, valueD):
         """Set the optional lookup dictionary of default values for unspecified parameters...
@@ -105,8 +104,7 @@ class MyDbAdapter(object):
         """
         if tableId is not None and tableId in self.__attributeParameterMap:
             return self.__attributeParameterMap[tableId]
-        else:
-            return []
+        return []
 
     def _getConstraintParameterMap(self, tableId):
         """
@@ -116,8 +114,7 @@ class MyDbAdapter(object):
         """
         if tableId is not None and tableId in self.__attributeConstraintParameterMap:
             return self.__attributeConstraintParameterMap[tableId]
-        else:
-            return []
+        return []
 
     def _setConstraintParameterMap(self, tableId, mapL):
         """Set list of correspondences between method parameters and table attribute IDs to be used as
@@ -147,13 +144,20 @@ class MyDbAdapter(object):
         dbSocketX = dbSocket if dbSocket is not None else self.__cI.get("SITE_DB_SOCKET")
         #
         myC = MyDbConnect(
-            dbServer=dbServerX, dbHost=dbHostX, dbName=dbNameX, dbUser=dbUserX, dbPw=dbPwX, dbSocket=dbSocketX, dbPort=dbPortX, verbose=self.__verbose, log=self.__lfh
+            dbServer=dbServerX,
+            dbHost=dbHostX,
+            dbName=dbNameX,
+            dbUser=dbUserX,
+            dbPw=dbPwX,
+            dbSocket=dbSocketX,
+            dbPort=dbPortX,
+            verbose=self.__verbose,
+            log=self.__lfh,
         )
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
-        else:
-            return False
+        return False
 
     def _close(self):
         """Close connection to the data base server hosting WF status and tracking data -"""
@@ -238,15 +242,13 @@ class MyDbAdapter(object):
                 if kwId in kwargs and kwargs[kwId] is not None:
                     vList.append(kwargs[kwId])
                     aList.append(atId)
+                elif kwId in defaultValD and defaultValD[kwId] is not None:
+                    vList.append(defaultValD[kwId])
+                    aList.append(atId)
                 else:
-                    # use the default values if these exist
-                    if kwId in defaultValD and defaultValD[kwId] is not None:
-                        vList.append(defaultValD[kwId])
-                        aList.append(atId)
-                    else:
-                        # appropriate null handling -- all fields must be assigned on insert --
-                        vList.append(tableDefObj.getSqlNullValue(atId))
-                        aList.append(atId)
+                    # appropriate null handling -- all fields must be assigned on insert --
+                    vList.append(tableDefObj.getSqlNullValue(atId))
+                    aList.append(atId)
 
             sqlT = myAd.idInsertTemplateSQL(self.__databaseName, tableDefObj, insertAttributeIdList=aList)
             if self.__debug:
@@ -306,10 +308,9 @@ class MyDbAdapter(object):
                 if kwId in kwargs and kwargs[kwId] is not None:
                     vList.append(kwargs[kwId])
                     aList.append(atId)
-                else:
-                    if kwId in defaultValD and defaultValD[kwId] is not None:
-                        vList.append(defaultValD[kwId])
-                        aList.append(atId)
+                elif kwId in defaultValD and defaultValD[kwId] is not None:
+                    vList.append(defaultValD[kwId])
+                    aList.append(atId)
 
             for atId, kwId in cIdList:
                 if kwId in kwargs and kwargs[kwId] is not None:
@@ -355,7 +356,7 @@ class MyDbAdapter(object):
             sqlConstraint = MyDbConditionSqlGen(schemaDefObj=self.__sd, verbose=self.__verbose, log=self.__lfh)
             #
             atMapL = self._getAttributeParameterMap(tableId=tableId)
-            for kwArg, kwVal in kwargs.items():  # pylint: disable=unused-variable
+            for kwArg in kwargs:
                 for atId, kwId in atMapL:
                     if kwId == kwArg:
                         if tableDefObj.isAttributeStringType(atId):

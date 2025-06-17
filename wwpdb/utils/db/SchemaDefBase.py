@@ -17,6 +17,7 @@
 Base classes for schema defintions.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -25,10 +26,15 @@ __version__ = "V0.001"
 
 import sys
 from operator import itemgetter
+from typing import TypeAlias
+
+# SchemaDictType: TypeAlias = dict[str, dict[str, str | dict[str, str | int | bool | dict[str, str | list[str]]]]]
+SchemaDictType: TypeAlias = dict[
+    str, dict[str, str | dict[str, str | int | bool | dict[str, str | int | list[str] | tuple[str, ...]] | tuple[str | None, ...]]]
+]
 
 
-class SchemaDefBase(object):
-
+class SchemaDefBase:
     """A base class for schema definitions."""
 
     def __init__(self, databaseName=None, schemaDefDict=None, verbose=True, log=sys.stderr):
@@ -103,11 +109,10 @@ class SchemaDefBase(object):
         return qAN
 
 
-class TableDef(object):
-
+class TableDef:
     """Wrapper class for table schema definition."""
 
-    def __init__(self, tableDefDict=None, verbose=True, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, tableDefDict=None, verbose=True, log=sys.stderr):  # noqa: ARG002   pylint: disable=unused-argument
         if tableDefDict is None:
             tableDefDict = {}
         self.__tD = tableDefDict
@@ -208,7 +213,7 @@ class TableDef(object):
 
     def getPrimaryKeyAttributeIdList(self):
         try:
-            return [atId for atId in self.__tD["ATTRIBUTE_INFO"].keys() if self.__tD["ATTRIBUTE_INFO"][atId]["PRIMARY_KEY"]]
+            return [atId for atId in self.__tD["ATTRIBUTE_INFO"] if self.__tD["ATTRIBUTE_INFO"][atId]["PRIMARY_KEY"]]
         except:  # noqa: E722  pylint: disable=bare-except
             pass
 
@@ -252,7 +257,7 @@ class TableDef(object):
         """Get the ordered mapped attribute name list"""
         try:
             tupL = []
-            for k in self.__tD["ATTRIBUTE_MAP"].keys():
+            for k in self.__tD["ATTRIBUTE_MAP"]:
                 iOrd = self.__tD["ATTRIBUTE_INFO"][k]["ORDER"]
                 tupL.append((k, iOrd))
 
@@ -265,7 +270,7 @@ class TableDef(object):
         """Get the ordered mapped attribute name list"""
         try:
             tupL = []
-            for k in self.__tD["ATTRIBUTE_MAP"].keys():
+            for k in self.__tD["ATTRIBUTE_MAP"]:
                 iOrd = self.__tD["ATTRIBUTE_INFO"][k]["ORDER"]
                 tupL.append((k, iOrd))
 
@@ -299,7 +304,7 @@ class TableDef(object):
         """Get the list of instance category attribute names for mapped attributes in the input instance category."""
         try:
             aL = []
-            for _k, vTup in self.__tD["ATTRIBUTE_MAP"].items():
+            for vTup in self.__tD["ATTRIBUTE_MAP"].values():
                 if vTup[0] == categoryName:
                     aL.append(vTup[1])
             return aL
@@ -357,10 +362,9 @@ class TableDef(object):
         try:
             if self.__isStringType(self.__tD["ATTRIBUTE_INFO"][attributeId]["SQL_TYPE"].upper()):
                 return ""
-            elif self.__isDateType(self.__tD["ATTRIBUTE_INFO"][attributeId]["SQL_TYPE"].upper()):
+            if self.__isDateType(self.__tD["ATTRIBUTE_INFO"][attributeId]["SQL_TYPE"].upper()):
                 return r"\N"
-            else:
-                return r"\N"
+            return r"\N"
         except:  # noqa: E722  pylint: disable=bare-except
             return r"\N"
 
@@ -368,7 +372,6 @@ class TableDef(object):
         """Return a dictionary containing appropriate NULL value for each attribute."""
         d = {}
         for atId, atInfo in self.__tD["ATTRIBUTE_INFO"].items():
-
             if self.__isStringType(atInfo["SQL_TYPE"].upper()):
                 d[atId] = ""
             elif self.__isDateType(atInfo["SQL_TYPE"].upper()):
