@@ -180,31 +180,27 @@ class FileActivityUtil:
         Display formatted database contents within a specified time range.
 
         Args:
-            args (Union[str, List[str]]): Command line arguments containing time range and optional site filter
+            args (Union[str, List[str]]): Command line arguments containing time range
 
         Required Arguments (mutually exclusive):
             --hours HOURS: Time range in hours to filter changes
             --days DAYS:   Time range in days to filter changes
 
-        Optional Arguments:
-            --site-id ID: Site ID to filter changes
-
         Returns:
             int: 0 for success, 1 for failure
 
         Example:
-            displayActivity("--hours 24 --site-id WWPDB_DEPLOY")
+            displayActivity("--hours 24")
             displayActivity("--days 7")
         """
         parser = self.__createParser("Display file activity database contents")
         group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument("--hours", type=int, help="Time range in hours")
         group.add_argument("--days", type=int, help="Time range in days")
-        parser.add_argument("--site-id", help="Site ID to filter results")
         try:
             parsed_args = parser.parse_args(self.__parseArgs(args))
             self.__createDbWithVerbose(parsed_args)
-            self.db.displayActivity(hours=parsed_args.hours, days=parsed_args.days, site_id=parsed_args.site_id)
+            self.db.displayActivity(hours=parsed_args.hours, days=parsed_args.days)
             return 0
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
@@ -226,21 +222,33 @@ class FileActivityUtil:
                           OneDep naming convention.
 
         Optional Arguments:
-            --site-id ID: Site ID to associate with the loaded files
+            --ignore-storage-types TYPES: Comma-separated list of storage types to ignore
+                                        (e.g., "session,wf-instance"). Defaults to "session,wf-instance".
+                                        Set to empty string to process all types.
 
         Returns:
             int: 0 for success, 1 for failure
 
         Example:
             populateFromDirectory("--load-dir /path/to/archive/files")
+            populateFromDirectory("--load-dir /path/to/archive/files --ignore-storage-types session")
+            populateFromDirectory("--load-dir /path/to/archive/files --ignore-storage-types session,wf-instance")
+            populateFromDirectory("--load-dir /path/to/archive/files --ignore-storage-types ''")  # Process all types
         """
         parser = self.__createParser("Load file metadata into database")
         parser.add_argument("--load-dir", required=True, help="Directory containing files to process")
-        parser.add_argument("--site-id", help="Site ID to associate with loaded files")
+        parser.add_argument("--ignore-storage-types", default="session,wf-instance",
+                          help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
         try:
             parsed_args = parser.parse_args(self.__parseArgs(args))
             self.__createDbWithVerbose(parsed_args)
-            self.db.populateFromDirectory(parsed_args.load_dir, site_id=parsed_args.site_id)
+
+            # Parse ignore_storage_types
+            ignore_types = None
+            if parsed_args.ignore_storage_types:
+                ignore_types = [t.strip() for t in parsed_args.ignore_storage_types.split(",") if t.strip()]
+
+            self.db.populateFromDirectory(parsed_args.load_dir, ignore_storage_types=ignore_types)
             return 0
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
@@ -267,9 +275,10 @@ class FileActivityUtil:
                               Example: model,structure,validation
 
         Optional Arguments:
-            --site-id ID: Site ID to filter changes
             --formats FORMATS: Comma-separated list of file formats or ALL
                             Example: cif,xml,json
+            --storage-types TYPES: Comma-separated list of storage types or ALL
+                                Example: archive,deposit,session
 
         Returns:
             int: 0 for success, 1 for failure
@@ -277,25 +286,26 @@ class FileActivityUtil:
         Examples:
             getActivity("--hours 24 --deposition-ids ALL --file-types model,structure")
             getActivity("--days 7 --deposition-ids D_1000000-D_1000100 --file-types ALL --formats cif,xml")
+            getActivity("--hours 24 --deposition-ids ALL --file-types model --storage-types archive,deposit")
         """
         parser = self.__createParser("Query file activity database")
         group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument("--hours", type=int, help="Time range in hours")
         group.add_argument("--days", type=int, help="Time range in days")
-        parser.add_argument("--site-id", help="Site ID to filter changes")
         parser.add_argument("--deposition-ids", required=True, help="List or range of deposition IDs or ALL")
         parser.add_argument("--file-types", required=True, help="Comma-separated list of file types or ALL")
-        parser.add_argument("--formats", default="ALL", help="Comma-separated list of file formats or ALL")
+        parser.add_argument("--formats", default="ALL", help="Comma-separated list of file formats or ALL. Common extensions (cif,xml,json) are mapped to internal formats (pdbx,xml,json).")
+        parser.add_argument("--storage-types", default="ALL", help="Comma-separated list of storage types or ALL")
         try:
             parsed_args = parser.parse_args(self.__parseArgs(args))
             self.__createDbWithVerbose(parsed_args)
             results = self.db.getFileActivity(
                 hours=parsed_args.hours,
                 days=parsed_args.days,
-                site_id=parsed_args.site_id,
                 deposition_ids=parsed_args.deposition_ids,
                 file_types=parsed_args.file_types,
                 formats=parsed_args.formats,
+                storage_types=parsed_args.storage_types,
             )
             if results:
                 print("\n".join(results))
@@ -342,12 +352,12 @@ def main() -> int:
     # Create the main parser
     parser = argparse.ArgumentParser(
         description="""File Activity Database Utility
-        
+
 This tool manages the OneDep system's file activity database.
 
 Commands:
   display         Show recently changed files within a time range
-  query           Find files matching specific criteria 
+  query           Find files matching specific criteria
   load            Populate database from a directory of files
   purge           Remove all database records (CAUTION: destructive)
   purge-dataset   Remove records for a specific deposition ID
@@ -367,34 +377,35 @@ Use -v/--verbose to enable detailed logging
     display_parser = subparsers.add_parser("display", help="Display activity within a time range")
     display_parser.description = """
     Display formatted database contents within a time range.
-    
+
     Examples:
       display --hours 24
-      display --days 7 --site-id WWPDB_DEPLOY
+      display --days 7
       display --days 7 -v  # With verbose output
     """
     display_parser.formatter_class = argparse.RawDescriptionHelpFormatter
     time_group = display_parser.add_mutually_exclusive_group(required=True)
     time_group.add_argument("--hours", type=int, help="Time range in hours (e.g., 24 for last day)")
     time_group.add_argument("--days", type=int, help="Time range in days (e.g., 7 for last week)")
-    display_parser.add_argument("--site-id", help="Site ID to filter results (optional)")
+    # site_id has been removed from the schema
     display_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     # Query command
     query_parser = subparsers.add_parser("query", help="Query file activity with filters")
     query_parser.description = """
     Query changed files with flexible filters.
-    
+
     Examples:
       query --hours 24 --deposition-ids ALL --file-types model
       query --days 7 --deposition-ids D_8000210000-D_8000210100 --file-types pdbx --formats cif,xml
-      query --days 7 --deposition-ids D_8000210001,D_8000210002 --file-types model --formats pdbx -v
+      query --days 7 --deposition-ids D_8000210001,D_8000210002 --file-types model --formats cif -v  # 'cif' automatically maps to 'pdbx' format
+      query --hours 24 --deposition-ids ALL --file-types model --storage-types archive,deposit
     """
     query_parser.formatter_class = argparse.RawDescriptionHelpFormatter
     query_time_group = query_parser.add_mutually_exclusive_group(required=True)
     query_time_group.add_argument("--hours", type=int, help="Time range in hours")
     query_time_group.add_argument("--days", type=int, help="Time range in days")
-    query_parser.add_argument("--site-id", help="Site ID to filter changes")
+    # site_id has been removed from the schema
     query_parser.add_argument(
         "--deposition-ids",
         required=True,
@@ -402,30 +413,36 @@ Use -v/--verbose to enable detailed logging
              "range (D_8000210000-D_8000210100), or comma-separated list (D_8000210001,D_8000210002)",
     )
     query_parser.add_argument("--file-types", required=True, help="Comma-separated list of file types (e.g., model,structure,pdbx) or 'ALL'")
-    query_parser.add_argument("--formats", default="ALL", help="Comma-separated list of file formats (e.g., cif,xml,json) or 'ALL' (default)")
+    query_parser.add_argument("--formats", default="ALL", help="Comma-separated list of file formats (e.g., cif,xml,json) or 'ALL' (default). Note: 'cif' maps to 'pdbx' format in the database.")
+    query_parser.add_argument("--storage-types", default="ALL", help="Comma-separated list of storage types (e.g., archive,deposit,session) or 'ALL' (default)")
     query_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     # Load command
     load_parser = subparsers.add_parser("load", help="Load file metadata from a directory")
     load_parser.description = """
     Load file metadata into the database from a specified directory.
-    
+
     Example:
-      load --load-dir /path/to/archive/files --site-id WWPDB_DEPLOY
+      load --load-dir /path/to/archive/files
+      load --load-dir /path/to/archive/files --ignore-storage-types session  # Ignore only session directories
+      load --load-dir /path/to/archive/files --ignore-storage-types session,wf-instance  # Ignore both session and wf-instance
+      load --load-dir /path/to/archive/files --ignore-storage-types ''  # Process all storage types
     """
     load_parser.formatter_class = argparse.RawDescriptionHelpFormatter
     load_parser.add_argument("--load-dir", required=True, help="Directory containing files to process (should contain subdirectories with files)")
-    load_parser.add_argument("--site-id", help="Site ID to associate with loaded files (optional)")
+    # site_id has been removed from the schema
+    load_parser.add_argument("--ignore-storage-types", default="session,wf-instance",
+                          help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
     load_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     # Purge command
     purge_parser = subparsers.add_parser("purge", help="Purge all data from the database")
     purge_parser.description = """
     Purge all data from the file activity database.
-    
+
     CAUTION: This is a destructive operation that removes all records.
     Requires explicit confirmation with --confirmed flag.
-    
+
     Example:
       purge --confirmed
     """
@@ -437,10 +454,10 @@ Use -v/--verbose to enable detailed logging
     purge_dataset_parser = subparsers.add_parser("purge-dataset", help="Purge data for a specific dataset")
     purge_dataset_parser.description = """
     Purge all data for a specific deposition ID from the database.
-    
+
     CAUTION: This is a destructive operation that removes all records for the specified ID.
     Requires explicit confirmation with --confirmed flag.
-    
+
     Example:
       purge-dataset --deposition-id D_8000210018 --confirmed
       purge-dataset --deposition-id D_8000210018 --confirmed -v  # With verbose output
@@ -461,7 +478,7 @@ Use -v/--verbose to enable detailed logging
     # Configure logging based on verbosity - handle both global and subcommand verbose flags
     # Get verbose flag from the appropriate namespace
     verbose_enabled = getattr(args, 'verbose', False)
-    
+
     if verbose_enabled:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug("Verbose mode enabled")
@@ -477,9 +494,8 @@ Use -v/--verbose to enable detailed logging
         else:
             cmd = f"--days {args.days}"
 
-        if args.site_id:
-            cmd += f" --site-id {args.site_id}"
-            
+        # site_id references removed (schema update)
+
         # Add verbose flag if enabled
         if verbose_enabled:
             cmd += " -v"
@@ -487,42 +503,44 @@ Use -v/--verbose to enable detailed logging
         return util.displayActivity(cmd)
     elif args.command == "query":
         cmd = f"--{'hours' if args.hours else 'days'} {args.hours or args.days}"
-        if args.site_id:
-            cmd += f" --site-id {args.site_id}"
+        # site_id references removed (schema update)
         cmd += f" --deposition-ids {args.deposition_ids} --file-types {args.file_types} --formats {args.formats}"
-        
+        if args.storage_types:
+            cmd += f" --storage-types {args.storage_types}"
+
         # Add verbose flag if enabled
         if verbose_enabled:
             cmd += " -v"
-            
+
         return util.getActivity(cmd)
     elif args.command == "load":
         cmd = f"--load-dir {args.load_dir}"
-        if args.site_id:
-            cmd += f" --site-id {args.site_id}"
-            
+        # site_id references removed (schema update)
+        if args.ignore_storage_types:
+            cmd += f" --ignore-storage-types {args.ignore_storage_types}"
+
         # Add verbose flag if enabled
         if verbose_enabled:
             cmd += " -v"
-            
+
         return util.populateFromDirectory(cmd)
     elif args.command == "purge":
         cmd = "--confirmed" if args.confirmed else ""
-        
+
         # Add verbose flag if enabled
         if verbose_enabled:
             cmd += " -v"
-            
+
         return util.purgeAllData(cmd)
     elif args.command == "purge-dataset":
         cmd = f"--deposition-id {args.deposition_id}"
         if args.confirmed:
             cmd += " --confirmed"
-            
+
         # Add verbose flag if enabled
         if verbose_enabled:
             cmd += " -v"
-            
+
         return util.purgeDataSetData(cmd)
 
     # Should not reach here
