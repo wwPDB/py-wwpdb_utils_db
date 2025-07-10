@@ -7,7 +7,14 @@ wwpdb.utils.session
 rcsb.utils.multiproc
 sqlalchemy
 
+# For testing - full requirements
+wwpdb.utils.dp
+
 # For testing - extra imports
 wwpdb.utils.testing
 mmcif.utils
 mock
+
+# For mypy
+types-mysqlclient
+

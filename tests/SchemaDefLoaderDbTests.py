@@ -24,28 +24,25 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
 import os
+import sys
 import time
-import unittest
 import traceback
-
-from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
-from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
-
-from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
-from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
-from wwpdb.utils.db.PdbxSchemaDef import PdbxSchemaDef
-from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
+import unittest
 
 from mmcif.io.IoAdapterCore import IoAdapterCore
-
-from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
 from mmcif_utils.bird.PdbxFamilyIo import PdbxFamilyIo
+from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
 from mmcif_utils.bird.PdbxPrdUtils import PdbxPrdUtils
 from mmcif_utils.chemcomp.PdbxChemCompIo import PdbxChemCompIo
 
+from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
+from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
+from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
+from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
+from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.utils.db.PdbxSchemaDef import PdbxSchemaDef
+from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.testing.Features import Features
 
 
@@ -84,8 +81,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
-        else:
-            return False
+        return False
 
     def close(self):
         if self.__dbCon is not None:
@@ -110,7 +106,9 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.__schemaCreate(schemaDefObj=sd)
             inputPathList = self.__getPrdPathList()
             inputPathList.extend(self.__getPrdFamilyPathList())
-            sdl = SchemaDefLoader(schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             sdl.load(inputPathList=inputPathList, loadType="batch-file")
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -118,7 +116,8 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted SchemaDefLoaderDbTest testLoadBirdReference at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted SchemaDefLoaderDbTest testLoadBirdReference at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testReloadBirdReference(self):
@@ -128,7 +127,9 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             sd = BirdSchemaDef()
             self.__schemaCreate(schemaDefObj=sd)
             inputPathList = self.__getPrdPathList()
-            sdl = SchemaDefLoader(schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             sdl.load(inputPathList=inputPathList, loadType="batch-file")
             #
             self.__lfh.write("\n\n\n+INFO BATCH FILE RELOAD TEST --------------------------------------------\n")
@@ -141,7 +142,8 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted SchemaDefLoaderDbTest testReloadBirdReference at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted SchemaDefLoaderDbTest testReloadBirdReference at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testLoadBirdReferenceWithSequence(self):
@@ -177,7 +179,9 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             #
             # Run loader on container list --
             #
-            sdl = SchemaDefLoader(schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="error", verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="error", verbose=self.__verbose, log=self.__lfh
+            )
             sdl.load(containerList=containerList, loadType="batch-file", deleteOpt="selected")
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -196,7 +200,9 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             sd = ChemCompSchemaDef()
             self.__schemaCreate(schemaDefObj=sd)
             inputPathList = self.__getChemCompPathList()
-            sdl = SchemaDefLoader(schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             sdl.load(inputPathList=inputPathList, loadType="batch-file")
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -204,7 +210,8 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted SchemaDefLoaderDbTest testLoadChemCompReference at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted SchemaDefLoaderDbTest testLoadChemCompReference at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testLoadPdbxFiles(self):
@@ -214,14 +221,19 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             sd = PdbxSchemaDef()
             self.__schemaCreate(schemaDefObj=sd)
             inputPathList = self.__getPdbxPathList()
-            sdl = SchemaDefLoader(schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             sdl.load(inputPathList=inputPathList, loadType="batch-insert", deleteOpt="all")
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted SchemaDefLoaderDbTest testLoadPdbxFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted SchemaDefLoaderDbTest testLoadPdbxFiles at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testLoadChemCompExamples(self):
         startTime = time.time()
@@ -230,7 +242,9 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             sd = ChemCompSchemaDef()
             self.__schemaCreate(schemaDefObj=sd)
             inputPathList = [os.path.join(self.__ccPath, fn) for fn in self.__ccFileList]
-            sdl = SchemaDefLoader(schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+            sdl = SchemaDefLoader(
+                schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self.__dbCon, workPath=".", cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+            )
             sdl.load(inputPathList=inputPathList, loadType="batch-insert", deleteOpt="selected")
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -238,7 +252,8 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted SchemaDefLoaderDbTest testLoadChemCompExamples at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted SchemaDefLoaderDbTest testLoadChemCompExamples at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testGenSchemaDaInternal(self):
@@ -253,7 +268,8 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted SchemaDefLoaderDbTest testGenSchemaDaInternal at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted SchemaDefLoaderDbTest testGenSchemaDaInternal at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def __schemaCreateSQL(self, schemaDefObj):
@@ -275,7 +291,10 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted SchemaDefLoaderDbTest __schemaCreateSQL at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted SchemaDefLoaderDbTest __schemaCreateSQL at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def __schemaCreate(self, schemaDefObj):
         """Test case -  create table schema using schema definition"""
@@ -306,7 +325,10 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted SchemaDefLoaderDbTest __schemaCreate at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted SchemaDefLoaderDbTest __schemaCreate at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def __getPdbxPathList(self):
         """Test case -  get the path list of PDBx instance example files -"""

@@ -14,23 +14,24 @@
 Base class for managing database connection which handles application specific authentication.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import MySQLdb
-
 import logging
+import sys
+
+import MySQLdb
 
 logger = logging.getLogger(__name__)
 #
 #
 if True:  # pylint: disable=using-constant-test
     try:
-        import sqlalchemy.pool as pool
+        from sqlalchemy import pool
 
         MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True, recycle=1800)
     except:  # noqa: E722 pylint: disable=bare-except
@@ -40,8 +41,8 @@ if True:  # pylint: disable=using-constant-test
 from wwpdb.utils.config.ConfigInfo import ConfigInfo  # noqa: E402
 
 
-class MyConnectionBase(object):
-    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+class MyConnectionBase:
+    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         #
         self.__siteId = siteId
         self._cI = ConfigInfo(self.__siteId)
@@ -184,7 +185,12 @@ class MyConnectionBase(object):
         try:
             if self.__dbSocket is None:
                 dbcon = MySQLdb.connect(
-                    db="%s" % self.__databaseName, user="%s" % self.__dbUser, passwd="%s" % self.__dbPw, host="%s" % self.__dbHost, port=self.__dbPort, local_infile=1
+                    db="%s" % self.__databaseName,
+                    user="%s" % self.__dbUser,
+                    passwd="%s" % self.__dbPw,
+                    host="%s" % self.__dbHost,
+                    port=self.__dbPort,
+                    local_infile=1,
                 )
             else:
                 dbcon = MySQLdb.connect(
@@ -223,8 +229,7 @@ class MyConnectionBase(object):
             self._dbCon.close()
             self._dbCon = None
             return True
-        else:
-            return False
+        return False
 
     def getCursor(self):
         try:

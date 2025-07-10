@@ -22,14 +22,14 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
-import unittest
-import traceback
-import pprint
 import os
 
 # import json
 import platform
+import pprint
+import sys
+import traceback
+import unittest
 
 from wwpdb.utils.db.PdbxSchemaMapReader import PdbxSchemaMapReader
 
@@ -87,7 +87,7 @@ class PdbxSchemaMapReaderTests(unittest.TestCase):
             with open(os.devnull, "w") as fout:
                 smr.dump(fout)
 
-        except Exception as _e:  # noqa: F841  # pragma: no cover
+        except Exception as _e:  # noqa: F841,BLE001  # pragma: no cover
             traceback.print_exc(file=sys.stderr)
             self.fail()
 

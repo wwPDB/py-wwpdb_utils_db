@@ -11,21 +11,25 @@
 Database schema defintions for chemical component definitions.
 
 """
+
 __docformat__ = "restructuredtext en"
-__author__    = "John Westbrook"
-__email__     = "jwest@rcsb.rutgers.edu"
-__license__   = "Creative Commons Attribution 3.0 Unported"
-__version__   = "V0.001"
+__author__ = "John Westbrook"
+__email__ = "jwest@rcsb.rutgers.edu"
+__license__ = "Creative Commons Attribution 3.0 Unported"
+__version__ = "V0.001"
 
 import sys
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
+from typing import ClassVar
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
 
 class ChemCompSchemaDef(SchemaDefBase):
-    """ A data class containing schema definitions chemical component definitions.
-    """
-    _databaseName="compv4"
-    _schemaDefDict = {
+    """A data class containing schema definitions chemical component definitions."""
+
+    _databaseName = "compv4"
+    # fmt: off
+    _schemaDefDict: ClassVar[SchemaDictType] = {
         'CHEM_COMP': {'ATTRIBUTES': {'COMPONENT_ID': 'Component_ID',
                                      'FORMULA': 'formula',
                                      'FORMULA_WEIGHT': 'formula_weight',
@@ -1938,35 +1942,35 @@ class ChemCompSchemaDef(SchemaDefBase):
                                     'TABLE_ID': 'PDBX_CHEM_COMP_SYNONYMS',
                                     'TABLE_NAME': 'pdbx_chem_comp_synonyms',
                                     'TABLE_TYPE': 'transactional'}}
-    
 
-    def __init__(self,verbose=True,log=sys.stderr):
-        super(ChemCompSchemaDef,self).__init__(databaseName=ChemCompSchemaDef._databaseName,schemaDefDict=ChemCompSchemaDef._schemaDefDict,
-                                               verbose=verbose,log=log)
+    # fmt: on
+
+    def __init__(self, verbose=True, log=sys.stderr):
+        super(ChemCompSchemaDef, self).__init__(
+            databaseName=ChemCompSchemaDef._databaseName, schemaDefDict=ChemCompSchemaDef._schemaDefDict, verbose=verbose, log=log
+        )
 
 
 if __name__ == "__main__":
-    sd=ChemCompSchemaDef()
-    tableIdList=sd.getTableIdList()
+    sd = ChemCompSchemaDef()
+    tableIdList = sd.getTableIdList()
 
     for tableId in tableIdList:
-        aIdL=sd.getAttributeIdList(tableId)
-        tObj=sd.getTable(tableId)
-        attributeIdList=tObj.getAttributeIdList()
-        attributeNameList=tObj.getAttributeNameList()
+        aIdL = sd.getAttributeIdList(tableId)
+        tObj = sd.getTable(tableId)
+        attributeIdList = tObj.getAttributeIdList()
+        attributeNameList = tObj.getAttributeNameList()
         sys.stdout.write("Ordered attribute Id   list %s\n" % (str(attributeIdList)))
         sys.stdout.write("Ordered attribute name list %s\n" % (str(attributeNameList)))
         #
-        mAL=tObj.getMapAttributeNameList()
+        mAL = tObj.getMapAttributeNameList()
         sys.stdout.write("Ordered mapped attribute name list %s\n" % (str(mAL)))
 
-        mAL=tObj.getMapAttributeIdList()
+        mAL = tObj.getMapAttributeIdList()
         sys.stdout.write("Ordered mapped attribute id   list %s\n" % (str(mAL)))
 
-        cL=tObj.getMapInstanceCategoryList()
+        cL = tObj.getMapInstanceCategoryList()
         sys.stdout.write("Mapped category list %s\n" % (str(cL)))
         for c in cL:
-            aL=tObj.getMapInstanceAttributeList(c)
-            sys.stdout.write("Mapped attribute list in %s :  %s\n" % (c,str(aL)))
-
-
+            aL = tObj.getMapInstanceAttributeList(c)
+            sys.stdout.write("Mapped attribute list in %s :  %s\n" % (c, str(aL)))

@@ -5,8 +5,10 @@ File:    DbLoaderImportTest.py
      Some test cases ..
 
 """
-import unittest
+
 import sys
+import unittest
+
 from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
 
@@ -16,7 +18,7 @@ class DBLoaderTests(unittest.TestCase):
 
     def testDbLoaderImport(self):
         """Test case -  noop - as cannot instantiate"""
-        pass  # pylint: disable=unnecessary-pass
+        # pylint: disable=unnecessary-pass
 
 
 if __name__ == "__mainold__":  # pragma: no cover

@@ -9,6 +9,7 @@
 Test cases for SQL command generation  --   no data connections required for these tests --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -16,18 +17,17 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
 import os
-import sys
 import platform
-import unittest
-import traceback
+import sys
 import time
+import traceback
+import unittest
 
-
-from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbQuerySqlGen, MyDbConditionSqlGen
-from wwpdb.utils.db.MessageSchemaDef import MessageSchemaDef
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
-from wwpdb.utils.db.PrdChemCompSchemaDef import PrdChemCompSchemaDef
+from wwpdb.utils.db.MessageSchemaDef import MessageSchemaDef
+from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
+from wwpdb.utils.db.PrdChemCompSchemaDef import PrdChemCompSchemaDef
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 TESTOUTPUT = os.path.join(HERE, "test-output", platform.python_version())
@@ -64,7 +64,10 @@ class MyDbSqlGenTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbSqlGenTests testMessageSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testMessageSchemaCreate at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testMessageImportExport(self):
         """Test case -  import and export commands --"""
@@ -92,7 +95,10 @@ class MyDbSqlGenTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbSqlGenTests testMessageImportExport at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testMessageImportExport at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testBirdSchemaCreate(self):
         """Test case -  create table schema using message schema definition as an example"""
@@ -115,7 +121,10 @@ class MyDbSqlGenTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbSqlGenTests testBirdSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testBirdSchemaCreate at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testPrdChemCompSchemaCreate(self):
         """Test case -  create table schema using message schema definition as an example"""
@@ -139,7 +148,8 @@ class MyDbSqlGenTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted MyDbSqlGenTests testPrdChemCompSchemaCreate at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted MyDbSqlGenTests testPrdChemCompSchemaCreate at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testBirdImportExport(self):
@@ -168,14 +178,16 @@ class MyDbSqlGenTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbSqlGenTests testBirdImportExport at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testBirdImportExport at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testSelect1(self):
         """Test case -  selection everything for a simple condition-"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
-
             #
             msd = MessageSchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = msd.getTableIdList()
@@ -198,7 +210,9 @@ class MyDbSqlGenTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbSqlGenTests testSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testSelectDistro(self):
         """Test case -  selection, condition and ordering methods using distro schema"""
@@ -254,7 +268,9 @@ class MyDbSqlGenTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbSqlGenTests testSelectDistro at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbSqlGenTests testSelectDistro at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def suite():  # pragma: no cover

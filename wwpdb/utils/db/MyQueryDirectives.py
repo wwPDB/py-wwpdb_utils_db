@@ -15,21 +15,22 @@
 A collection of classes to generate SQL commands to perform queries and schema construction.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
-import sys
-from wwpdb.utils.db.MyDbSqlGen import MyDbQuerySqlGen, MyDbConditionSqlGen
 import logging
+import sys
+
+from wwpdb.utils.db.MyDbSqlGen import MyDbConditionSqlGen, MyDbQuerySqlGen
 
 logger = logging.getLogger(__name__)
 
 
-class MyQueryDirectives(object):
-
+class MyQueryDirectives:
     """Process query directives and generate SQL instructions.
 
      mini- SQL Query API token stream.
@@ -211,22 +212,21 @@ class MyQueryDirectives(object):
             while i < len(qdL):
                 # Get selections  -
                 #
-                if qdL[i] in ["SELECT_ITEM"]:
+                if qdL[i] == "SELECT_ITEM":
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 1)
                     if ("ITEM" in tD) and (tD["ITEM"] is not None):
                         tdotc = str(tD["ITEM"]).split(".")
                         # (tableId, attributeId)  apply the upper case convention used in schema map
                         selectD[ordinal] = (tdotc[0].upper(), tdotc[1].upper())
-                    else:
-                        if self.__verbose:
-                            logger.info("selection incomplete at i = %d", i)
-                            for k, v in tD.items():
-                                logger.info(" --- tD --  %r %r", k, v)
+                    elif self.__verbose:
+                        logger.info("selection incomplete at i = %d", i)
+                        for k, v in tD.items():
+                            logger.info(" --- tD --  %r %r", k, v)
                         # raise ValueError("Selection definition incomplete")
                     i += 4
                     continue
-                elif qdL[i] in ["VALUE_CONDITION"]:
+                if qdL[i] == "VALUE_CONDITION":
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 4)
                     if ("VALUE" in tD) and (tD["VALUE"] is not None):
@@ -239,12 +239,13 @@ class MyQueryDirectives(object):
                             cop = str(tD["COP"]).upper()
                             conditionD[ordinal] = {"cType": "value", "lOp": tD["LOP"], "cObj": ((tableId, attributeId), cop, (tD["VALUE"], aType))}
                         else:
-                            raise ValueError("Value condition incomplete")
+                            err = "Value condition incomplete"
+                            raise ValueError(err)  # noqa: TRY301
                     else:
                         pass
                     i += 10
                     continue
-                elif qdL[i] in ["VALUE_LIST_CONDITION"]:
+                if qdL[i] == "VALUE_LIST_CONDITION":
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 5)
                     if ("VALUE_LIST" in tD) and (tD["VALUE_LIST"] is not None):
@@ -262,12 +263,13 @@ class MyQueryDirectives(object):
                                 vL = [tD["VALUE_LIST"]]
                             conditionD[ordinal] = {"cType": "value_list", "lOp": tD["LOP"], "cObj": ((tableId, attributeId), cop, vLop, (vL, aType))}
                         else:
-                            raise ValueError("Value list condition incomplete")
+                            err = "Value list condition incomplete"
+                            raise ValueError(err)  # noqa: TRY301
                     else:
                         pass
                     i += 12
                     continue
-                elif qdL[i] in ["JOIN_CONDITION"]:
+                if qdL[i] == "JOIN_CONDITION":
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 4)
                     if "LOP" in tD and "L_ITEM" in tD and "COP" in tD and "R_ITEM" in tD:
@@ -280,10 +282,11 @@ class MyQueryDirectives(object):
                         cop = str(tD["COP"]).upper()
                         conditionD[ordinal] = {"cType": "join", "lOp": tD["LOP"], "cObj": ((ltableId, lattributeId), cop, (rtableId, rattributeId))}
                     else:
-                        raise ValueError("Join condition incomplete")
+                        err = "Join condition incomplete"
+                        raise ValueError(err)  # noqa: TRY301
                     i += 10
                     continue
-                elif qdL[i] in ["CONDITION_LIST"]:
+                if qdL[i] == "CONDITION_LIST":
                     # example: CONDITION_LIST:1:KEY:mr:LOP:OR:ITEM:pdbx_webselect.solution:COP:LIKE:VALUE:%MR%
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 5)
@@ -303,13 +306,14 @@ class MyQueryDirectives(object):
                                 condListD[ordinal][ky] = []
                             condListD[ordinal][ky].append((tD["LOP"], (tableId, attributeId), cop, (tD["VALUE"], aType)))
                         else:
-                            raise ValueError("Value condition incomplete")
+                            err = "Value condition incomplete"
+                            raise ValueError(err)  # noqa: TRY301
                     else:
                         pass
 
                     i += 12
                     continue
-                elif qdL[i] in ["VALUE_KEYED_CONDITION"]:
+                if qdL[i] == "VALUE_KEYED_CONDITION":
                     # example: "VALUE_KEYED_CONDITION:15:LOP:AND:CONDITION_LIST_ID:1:VALUE:DOM_REF:solution"
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 3)
@@ -317,12 +321,13 @@ class MyQueryDirectives(object):
                         if "LOP" in tD and "CONDITION_LIST_ID" in tD:
                             keyCondD[ordinal] = (int(str(tD["CONDITION_LIST_ID"])), tD["VALUE"], tD["LOP"])
                         else:
-                            raise ValueError("Value key condition incomplete")
+                            err = "Value key condition incomplete"
+                            raise ValueError(err)  # noqa: TRY301
                     else:
                         pass
                     i += 8
                     continue
-                elif qdL[i] in ["ORDER_ITEM"]:
+                if qdL[i] == "ORDER_ITEM":
                     ordinal = int(str(qdL[i + 1]))
                     tD = self.__getTokenD(qdL, i + 2, 2)
                     if ("ITEM" in tD) and ("SORT_ORDER" in tD) and (tD["ITEM"] is not None):
@@ -336,16 +341,13 @@ class MyQueryDirectives(object):
                             sf = "ASC"
 
                         orderD[ordinal] = ((tdotc[0].upper(), tdotc[1].upper()), sf)
-                    else:
-                        if self.__verbose:
-                            logger.info("orderby incomplete at i = %d", i)
-                            for k, v in tD.items():
-                                logger.info(" --- tD --  %r %r", k, v)
+                    elif self.__verbose:
+                        logger.info("orderby incomplete at i = %d", i)
+                        for k, v in tD.items():
+                            logger.info(" --- tD --  %r %r", k, v)
                         # raise ValueError("Order definition incomplete")
                     i += 6
                     continue
-                else:
-                    pass
         except Exception as e:
             if self.__verbose:
                 logger.error("fails at i = %d err=%s", i, str(e))
@@ -393,7 +395,7 @@ class MyQueryDirectives(object):
                 tD = conditionD[k]
                 if tD["cType"] in ["value", "value_list"]:
                     vSelectL.append(tD["cObj"][0])
-                elif tD["cType"] in ["group"]:
+                elif tD["cType"] == "group":
                     cL = tD["cObj"]
                     for c in cL:
                         vSelectL.append(c[1])
@@ -419,18 +421,17 @@ class MyQueryDirectives(object):
 
         sqlCondition = MyDbConditionSqlGen(schemaDefObj=self.__sd, verbose=self.__verbose, log=self.__lfh)
         if len(conditionD) > 0:
-
             for k in sorted(conditionD.keys()):
                 cD = conditionD[k]
                 cObj = cD["cObj"]
                 lOp = cD["lOp"]
-                if cD["cType"] in ["value"]:
+                if cD["cType"] == "value":
                     sqlCondition.addValueCondition(lhsTuple=cObj[0], opCode=cObj[1], rhsTuple=cObj[2], preOp=lOp)
-                elif cD["cType"] in ["join"]:
+                elif cD["cType"] == "join":
                     sqlCondition.addJoinCondition(lhsTuple=cObj[0], opCode=cObj[1], rhsTuple=cObj[2], preOp=lOp)
-                elif cD["cType"] in ["group"]:
+                elif cD["cType"] == "group":
                     sqlCondition.addGroupValueConditionList(cD["cObj"], preOp=lOp)
-                elif cD["cType"] in ["value_list"]:
+                elif cD["cType"] == "value_list":
                     # build cDefList = [(lPreOp,lhsTuple, opCode, rhsTuple), ...] from value_list -
                     # cObj  = ((tableId, attributeId), cop, vLop, (tD['VALUE_LIST'], aType))}
                     #
@@ -492,7 +493,7 @@ class MyQueryDirectives(object):
                         tV = ""
                     qL.append(tV if len(tV) > 0 else None)
                     i += 1
-                elif t.upper() in ["DOM_REF"]:
+                elif t.upper() == "DOM_REF":
                     if (inpQueryDirList[i + 1] in domD) and (domD[inpQueryDirList[i + 1]] is not None) and (len(domD[inpQueryDirList[i + 1]]) > 0):
                         if isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) > 1):
                             tV = domD[inpQueryDirList[i + 1]]

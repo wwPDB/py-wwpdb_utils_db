@@ -18,26 +18,26 @@
 A collection of classes to generate SQL commands to perform queries and schema construction.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
-import sys
-import itertools
 import copy
+import itertools
+import sys
 
 try:
     # Python 3
     from itertools import zip_longest
 except ImportError:  # pragma: no cover
     # Python 2
-    from itertools import izip_longest as zip_longest
+    from itertools import izip_longest as zip_longest  # type: ignore
 
 
-class MyDbAdminSqlGen(object):
-
+class MyDbAdminSqlGen:
     """Builds SQL commands to create table schema from a schema definition derived from class SchemaDefBase.
 
     Note:
@@ -67,11 +67,7 @@ class MyDbAdminSqlGen(object):
         tableName = tableDefObj.getName()
         fL = []
         for atId in updateAttributeIdList:
-            if tableDefObj.isAttributeStringType(atId):
-                fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
-            elif tableDefObj.isAttributeFloatType(atId):
-                fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
-            elif tableDefObj.isAttributeIntegerType(atId):
+            if tableDefObj.isAttributeStringType(atId) or tableDefObj.isAttributeFloatType(atId) or tableDefObj.isAttributeIntegerType(atId):
                 fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
             else:
                 fL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
@@ -83,9 +79,9 @@ class MyDbAdminSqlGen(object):
                     cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
                 else:
                     cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
-            tS = "UPDATE %s.%s SET %s WHERE (%s);" % (databaseName, tableName, ",".join(fL), ",".join(cL))
+            tS = "UPDATE %s.%s SET %s WHERE (%s);" % (databaseName, tableName, ",".join(fL), ",".join(cL))  # noqa: S608
         else:
-            tS = "UPDATE %s.%s SET %s;" % (databaseName, tableName, ",".join(fL))
+            tS = "UPDATE %s.%s SET %s;" % (databaseName, tableName, ",".join(fL))  # noqa: S608
         #
         return tS
 
@@ -105,16 +101,12 @@ class MyDbAdminSqlGen(object):
         fL = []
         for atId in insertAttributeIdList:
             attributeNameList.append(tableDefObj.getAttributeName(atId))
-            if tableDefObj.isAttributeStringType(atId):
-                fL.append("%s")
-            elif tableDefObj.isAttributeFloatType(atId):
-                fL.append("%s")
-            elif tableDefObj.isAttributeIntegerType(atId):
+            if tableDefObj.isAttributeStringType(atId) or tableDefObj.isAttributeFloatType(atId) or tableDefObj.isAttributeIntegerType(atId):
                 fL.append("%s")
             else:
                 fL.append("%s")
         #
-        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))
+        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))  # noqa: S608
         #
         return tS
 
@@ -139,9 +131,9 @@ class MyDbAdminSqlGen(object):
                 else:
                     cL.append(" %s=" % tableDefObj.getAttributeName(atId) + "%s")
 
-            tS = "DELETE FROM  %s.%s WHERE (%s);" % (databaseName, tableName, " AND ".join(cL))
+            tS = "DELETE FROM  %s.%s WHERE (%s);" % (databaseName, tableName, " AND ".join(cL))  # noqa: S608
         else:
-            tS = "DELETE FROM  %s.%s;" % (databaseName, tableName)
+            tS = "DELETE FROM  %s.%s;" % (databaseName, tableName)  # noqa: S608
         #
         return tS
 
@@ -158,7 +150,7 @@ class MyDbAdminSqlGen(object):
         for _v in attributeNameList:
             fL.append("%s")
         #
-        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))
+        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))  # noqa: S608
         return tS
 
     def deleteTemplateSQL(self, databaseName, tableName, attributeNameList=None):
@@ -174,7 +166,7 @@ class MyDbAdminSqlGen(object):
         for v in attributeNameList:
             fL.append(" %s=" % v + "%s")
         #
-        tS = "DELETE FROM %s.%s WHERE %s;" % (databaseName, tableName, " AND ".join(fL))
+        tS = "DELETE FROM %s.%s WHERE %s;" % (databaseName, tableName, " AND ".join(fL))  # noqa: S608
         return tS
 
     def deleteFromListSQL(self, databaseName, tableName, attributeName, valueList, chunkSize=10):
@@ -188,7 +180,7 @@ class MyDbAdminSqlGen(object):
         chunkLists = self.__makeSubLists(chunkSize, valueList)
         for chunk in chunkLists:
             fL = ["'%s'" % v for v in chunk]
-            sqlList.append("DELETE FROM %s.%s WHERE %s IN (%s); " % (databaseName, tableName, attributeName, ",".join(fL)))
+            sqlList.append("DELETE FROM %s.%s WHERE %s IN (%s); " % (databaseName, tableName, attributeName, ",".join(fL)))  # noqa: S608
 
         return sqlList
 
@@ -244,7 +236,7 @@ class MyDbAdminSqlGen(object):
         attributeIdList = tableDefObj.getAttributeIdList()
         #
         oL.append("CREATE TABLE %s (" % tableDefObj.getName())
-        for _ii, attributeId in enumerate(attributeIdList):
+        for attributeId in attributeIdList:
             #
             name = tableDefObj.getAttributeName(attributeId)
 
@@ -258,13 +250,12 @@ class MyDbAdminSqlGen(object):
             if (sqlType == "CHAR") or (sqlType == "VARCHAR"):
                 sW = "%-s(%d)" % (sqlType, width)
                 tS = "%-40s %-16s  %s" % (name, sW, notNull)
-            elif sqlType.startswith("INT") or sqlType in ["INTEGER", "BIGINT", "SMALLINT"]:
-                tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif sqlType in ["FLOAT", "REAL", "DOUBLE PRECISION"]:
-                tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif (sqlType == "DATE") or (sqlType == "DATETIME"):
-                tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
-            elif (sqlType == "TEXT") or (sqlType == "MEDIUMTEXT") or (sqlType == "LONGTEXT"):
+            elif (
+                sqlType.startswith("INT")
+                or sqlType in ["INTEGER", "BIGINT", "SMALLINT"]
+                or sqlType in ["FLOAT", "REAL", "DOUBLE PRECISION"]
+                or ((sqlType == "DATE") or (sqlType == "DATETIME") or ((sqlType == "TEXT") or (sqlType == "MEDIUMTEXT") or (sqlType == "LONGTEXT")))
+            ):
                 tS = "%-40s %-16s  %s" % (name, sqlType, notNull)
             elif (sqlType == "DECIMAL") or (sqlType == "NUMERIC"):
                 sW = "%-s(%d,%d)" % (sqlType, width, precision)
@@ -364,11 +355,10 @@ class MyDbAdminSqlGen(object):
         return " ".join(oL)
 
 
-class MyDbQuerySqlGen(object):
-
+class MyDbQuerySqlGen:
     """Builds an the SQL command string for a selection query."""
 
-    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         """Input:
 
         schemaDef is instance of class derived from SchemaDefBase().
@@ -415,7 +405,7 @@ class MyDbQuerySqlGen(object):
         self.__selectList.append(attributeTuple)
         return True
 
-    def setOrderBySortOrder(self, dir="ASC"):  # pylint: disable=redefined-builtin
+    def setOrderBySortOrder(self, dir="ASC"):  # noqa: A002 pylint: disable=redefined-builtin
         """The default sort order applied to attributes in the ORDER BY clause. (ASC|DESC)"""
         self.__sortOrder = dir
 
@@ -484,8 +474,7 @@ class MyDbQuerySqlGen(object):
         return "\n".join(oL)
 
 
-class MyDbConditionSqlGen(object):
-
+class MyDbConditionSqlGen:
     """Builds the Condition portion of an SQL selection or related query."""
 
     def __init__(self, schemaDefObj, addKeyJoinFlag=True, verbose=False, log=sys.stderr):
@@ -497,7 +486,18 @@ class MyDbConditionSqlGen(object):
         self.__lfh = log
         self.__verbose = verbose
         # self.__ops = ["EQ", "NE", "GE", "GT", "LT", "LE", "LIKE", "NOT LIKE", "IS", "IS NOT"]
-        self.__opDict = {"EQ": "=", "NE": "!=", "GE": ">=", "GT": ">", "LT": "<", "LE": "<=", "LIKE": "LIKE", "NOT LIKE": "NOT LIKE", "IS": "IS", "IS NOT": "IS NOT"}
+        self.__opDict = {
+            "EQ": "=",
+            "NE": "!=",
+            "GE": ">=",
+            "GT": ">",
+            "LT": "<",
+            "LE": "<=",
+            "LIKE": "LIKE",
+            "NOT LIKE": "NOT LIKE",
+            "IS": "IS",
+            "IS NOT": "IS NOT",
+        }
         # self.__logOps = ["AND", "OR", "NOT"]
         # self.__grpOps = ["BEGIN", "END"]
         #
@@ -521,8 +521,7 @@ class MyDbConditionSqlGen(object):
             for c in self.__cList:
                 self.__updateTableList(c)
             return True
-        else:
-            return False
+        return False
 
     def __updateTableList(self, cObj):
         """Add the tables included in the input condition to the internal table list."""
@@ -532,22 +531,20 @@ class MyDbConditionSqlGen(object):
             lTableId, _lAttributeId = lhsTuple
             self.__addTable(lTableId)
             return True
-        elif cType in ["JOIN_CONDITION"]:
+        if cType == "JOIN_CONDITION":
             cType, lhsTuple, _opCode, rhsTuple = cObj
             lTableId, _lAttributeId = lhsTuple
             rTableId, _rAttributeId = rhsTuple
             self.__addTable(lTableId)
             self.__addTable(rTableId)
             return True
-        else:
-            return False
+        return False
 
     def __addTable(self, tableId):
         if tableId not in self.__tableIdList:
             self.__tableIdList.append(tableId)
             return True
-        else:
-            return False
+        return False
 
     def get(self):
         return self.__cList
@@ -681,11 +678,11 @@ class MyDbConditionSqlGen(object):
             return 0
         cList = copy.deepcopy(self.__cList)
         self.__cList = []
-        tablePairList = [t for t in itertools.combinations(self.__tableIdList, 2)]
-        for (t1, t2) in tablePairList:
+        tablePairList = [t for t in itertools.combinations(self.__tableIdList, 2)]  # noqa: C416
+        for t1, t2 in tablePairList:
             self.__addInterTableJoinContraints(t1, t2)
         for c in cList:
-            if c[0] in ["JOIN_CONDITION"] and c in self.__cList:
+            if c[0] == "JOIN_CONDITION" and c in self.__cList:
                 continue
             self.__cList.append(c)
 
@@ -761,7 +758,7 @@ class MyDbConditionSqlGen(object):
 
             elif cType == "LOG_OP":
                 (_cT, logOp) = c
-                if logOp not in ["NOT"] and cCount > 0:
+                if logOp != "NOT" and cCount > 0:
                     cSqlL.append(" %s " % logOp)
             elif cType == "GROUPING":
                 (_cT, group) = c
@@ -783,7 +780,9 @@ class MyDbConditionSqlGen(object):
         #
         commonAttributeIdSet = set(lKeyAttributeIdL) & set(rKeyAttributeIdL)
         if self.__verbose:
-            self.__lfh.write("+MyDbConditionSqlGen.__addInterTableJoinConditions lTable %s rTable %s  common keys %r\n" % (lTableId, rTableId, commonAttributeIdSet))
+            self.__lfh.write(
+                "+MyDbConditionSqlGen.__addInterTableJoinConditions lTable %s rTable %s  common keys %r\n" % (lTableId, rTableId, commonAttributeIdSet)
+            )
         #
         for attributeId in commonAttributeIdSet:
             lhsTuple = (lTableId, attributeId)

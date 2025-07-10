@@ -5,9 +5,10 @@ File:    DbLoadingApiTest.py
      Some test cases ..
 
 """
-import sys
-from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
+import sys
+
+from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
 if __name__ == "__mainold__":
     depId = "D_1000000020"

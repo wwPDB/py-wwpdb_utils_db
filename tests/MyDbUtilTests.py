@@ -13,6 +13,7 @@ Environment setup --
         . set-test-env.sh
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -21,14 +22,12 @@ __version__ = "V0.01"
 
 import os
 import sys
-import unittest
-import traceback
 import time
+import traceback
+import unittest
 
-from wwpdb.utils.db.MyDbUtil import MyDbConnect
-from wwpdb.utils.db.MyDbUtil import MyDbQuery
 from wwpdb.utils.db.MyDbAdapter import MyDbAdapter  # noqa: F401  pylint: disable=unused-import
-
+from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.testing.Features import Features
 
 
@@ -43,14 +42,15 @@ class MyDbUtilTests(unittest.TestCase):
         self.close()
 
     def open(self, dbUserId=None, dbUserPwd=None, dbHost=None, dbName=None, dbSocket=None):
-        myC = MyDbConnect(dbServer="mysql", dbHost=dbHost, dbName=dbName, dbUser=dbUserId, dbPw=dbUserPwd, dbSocket=dbSocket, verbose=self.__verbose, log=self.__lfh)
+        myC = MyDbConnect(
+            dbServer="mysql", dbHost=dbHost, dbName=dbName, dbUser=dbUserId, dbPw=dbUserPwd, dbSocket=dbSocket, verbose=self.__verbose, log=self.__lfh
+        )
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             if self.__verbose:
                 self.__lfh.write("\nDatabase connection opened MyDbUtilTests open at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
             return True
-        else:
-            return False
+        return False
 
     def close(self):
         if self.__dbCon is not None:
@@ -59,8 +59,7 @@ class MyDbUtilTests(unittest.TestCase):
             self.__dbCon.close()
             self.__dbCon = None
             return True
-        else:
-            return False
+        return False
 
     def testOpen1(self):
         """Test case -  all values specified
@@ -87,7 +86,9 @@ class MyDbUtilTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbUtilTests testOpen1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbUtilTests testOpen1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testOpen2(self):
         """Test case -  w/o socket
@@ -114,7 +115,9 @@ class MyDbUtilTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbUtilTests testOpen2 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbUtilTests testOpen2 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testOpen3(self):
         """Test case -  w/o socket w/ localhost
@@ -141,7 +144,9 @@ class MyDbUtilTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbUtilTests testOpen3 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbUtilTests testOpen3 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testPool1(self):
         """Test case -  connection pool management -
@@ -169,7 +174,9 @@ class MyDbUtilTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbUtilTests testPool1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbUtilTests testPool1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testPoolQuery(self):
         """Test case -  connection pool management -
@@ -201,7 +208,9 @@ class MyDbUtilTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyDbUtilTests testPoolQuery at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyDbUtilTests testPoolQuery at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def suiteOpen():
