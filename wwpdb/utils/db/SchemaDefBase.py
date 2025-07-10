@@ -26,11 +26,18 @@ __version__ = "V0.001"
 
 import sys
 from operator import itemgetter
-from typing import TypeAlias
+from typing import Tuple, Optional, List, Dict, Union
+
+# Python 3.8 does not have TypeAlias
+
+_OptTupleStr = Tuple[Optional[str], ...]  # ('pdbx_reference_entity_poly_link', 'atom_id_1', None, None),
+_ListMultiStr = Tuple[str, ...]  # ('family_prd_id', 'prd_id', 'ordinal')
+_AttrInfoDict = Dict[str, Union[str, int, List[str], _ListMultiStr]]
+_ValueDict = Dict[str, Union[str, int, bool, _AttrInfoDict, _OptTupleStr]]
 
 # SchemaDictType: TypeAlias = dict[str, dict[str, str | dict[str, str | int | bool | dict[str, str | list[str]]]]]
-SchemaDictType: TypeAlias = dict[
-    str, dict[str, str | dict[str, str | int | bool | dict[str, str | int | list[str] | tuple[str, ...]] | tuple[str | None, ...]]]
+SchemaDictType = Dict[
+    str, Dict[str, Union[str, _ValueDict]]
 ]
 
 
