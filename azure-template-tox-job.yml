@@ -42,7 +42,7 @@ jobs:
       - bash: |
           set -e
           ls -la /Applications/Xcode*
-          sudo xcode-select --switch /Applications/Xcode_12.2.app/Contents/Developer
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
           which g++
           c++ --version
         displayName: "setup Xcode"
@@ -69,6 +69,11 @@ jobs:
       - script: sudo apt-get install bison
         displayName: 'Install bison'
   #
+    - ${{ if and(contains(parameters.fixtures, 'graphviz'), startsWith(parameters.os, 'linux')) }}:
+      - bash: |
+          sudo apt-get install graphviz
+        displayName: 'Install graphviz'
+
     - ${{ if and(contains(parameters.fixtures, 'mysql'), startsWith(parameters.os, 'linux')) }}:
       - bash: |
           sudo apt-get install libmysqlclient-dev python-mysqldb
@@ -141,6 +146,21 @@ jobs:
           export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}', parameters.tox) }}
         displayName: 'Running tox task'
+    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.13')) }}:
+      - script: |
+          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
+          ${{ format('python -m tox -e {0}-py313', parameters.tox) }}
+        displayName: 'Running tox task'
+    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.12')) }}:
+      - script: |
+          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
+          ${{ format('python -m tox -e {0}-py312', parameters.tox) }}
+        displayName: 'Running tox task'
+    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.11')) }}:
+      - script: |
+          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
+          ${{ format('python -m tox -e {0}-py311', parameters.tox) }}
+        displayName: 'Running tox task'
     - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.10')) }}:
       - script: |
           export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
@@ -170,23 +190,14 @@ jobs:
     #  Build artifacts if this is a test target (i.e. labeled as py##)
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
-      - script: pip install --upgrade pip twine setuptools wheel
+      - script: pip install --upgrade pip twine build wheel
         displayName: "Acquire build tools"
-      - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-        displayName: "Build source dist"
-      - script: python setup.py  bdist_wheel --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-        displayName: "Build wheel"
-    #
-      - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/udist"
-        displayName: "Build source dist"
-      #
+      - script: python -m build --outdir "$(System.DefaultWorkingDirectory)/dist"
+        displayName: "Build source distributions"
       # Check the install artifacts
-      - script: ls -lR "$(System.DefaultWorkingDirectory)/dist" "$(System.DefaultWorkingDirectory)/udist"
+      - script: ls -lR "$(System.DefaultWorkingDirectory)/dist"
         displayName: "Listing of installed software"
       #
       - publish: $(System.DefaultWorkingDirectory)/dist
         artifact: ${{ format('sw_{0}_{1}', parameters.tox, parameters.os) }}
-      #
-      - publish: $(System.DefaultWorkingDirectory)/udist
-        artifact: ${{ format('sw_u_{0}_{1}', parameters.tox, parameters.os) }}
       #

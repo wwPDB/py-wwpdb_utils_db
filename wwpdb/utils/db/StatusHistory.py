@@ -11,22 +11,24 @@
 Manage status history data file access and update --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os
 import datetime
+import os
+import sys
 import traceback
+
 from mmcif_utils.pdbx.PdbxIo import PdbxStatusHistoryIo
+
 from wwpdb.io.locator.PathInfo import PathInfo
 
 
-class StatusHistory(object):
-
+class StatusHistory:
     """
     Manage status history updates.
 
@@ -47,7 +49,6 @@ class StatusHistory(object):
         self.__setup()
 
     def __setup(self):
-
         if self.__sessionPath is not None:
             self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
         else:
@@ -68,8 +69,7 @@ class StatusHistory(object):
         self.__inpFilePath = self.__pI.getStatusHistoryFilePath(dataSetId=entryId, fileSource=self.__fileSource, versionId="latest")
         if self.__exists():
             return self.__pio.setFilePath(filePath=self.__inpFilePath, idCode=entryId)
-        else:
-            return False
+        return False
 
     def __setInpPath(self, inpPath, entryId, pdbId):
         """Set the file path of the status history file and read any existing content --"""
@@ -78,8 +78,7 @@ class StatusHistory(object):
         self.__inpFilePath = inpPath
         if self.__exists():
             return self.__pio.setFilePath(filePath=self.__inpFilePath, idCode=entryId)
-        else:
-            return False
+        return False
 
     def __new(self, entryId):
         """Create a new status history category using base category style content definition --"""
@@ -106,7 +105,6 @@ class StatusHistory(object):
         return self.__getRowCount()
 
     def store(self, entryId, outPath=None, versionId="latest"):
-
         if self.__getRowCount() < 1:
             return False
         if outPath is None:
@@ -123,25 +121,23 @@ class StatusHistory(object):
         """Return True if a status history file exists or false otherwise."""
         if os.access(self.__inpFilePath, os.R_OK):
             return True
-        else:
-            return False
+        return False
 
     def getNow(self):
         return self.__getNow()
 
     def __getNow(self):
         """Return a CIF style date-timestamp value for current local time -"""
-        today = datetime.datetime.today()
-        return str(today.strftime(self.__timeFormat))
+        today = datetime.datetime.today()  # No timezone  # noqa: DTZ002
+        return str(today.strftime(self.__timeFormat))  # noqa: DTZ007
 
     def dateTimeOk(self, dateTime):
         try:
             tS = self.__makeTimeStamp(dateTime)
             if (tS is not None) and (len(tS) < 16):
                 return False
-            else:
-                datetime.datetime.strptime(tS, self.__timeFormat)
-                return True
+            datetime.datetime.strptime(tS, self.__timeFormat)  # noqa: DTZ007
+            return True
         except:  # noqa: E722  pylint: disable=bare-except
             return False
 
@@ -150,14 +146,14 @@ class StatusHistory(object):
             inpT = ""
             if len(inpTimeStamp) < 10:
                 return inpT
-            elif len(inpTimeStamp) == 10:
+            if len(inpTimeStamp) == 10:
                 inpT = inpTimeStamp + ":00:00"
             elif len(inpTimeStamp) >= 16:
                 inpT = inpTimeStamp[:16]
             #
-            t = datetime.datetime.strptime(inpT, self.__timeFormat)
-            return str(t.strftime(self.__timeFormat))
-        except Exception as e:
+            t = datetime.datetime.strptime(inpT, self.__timeFormat)  # noqa: DTZ007
+            return str(t.strftime(self.__timeFormat))  # noqa: DTZ007
+        except Exception as e:  # noqa: BLE001
             self.__lfh.write("+StatusHistory.__makeTimeStamp() fails for inpTimeStamp %r inpT %r err %r\n" % (inpTimeStamp, inpT, str(e)))
             if self.__debug:
                 traceback.print_exc(file=self.__lfh)
@@ -197,8 +193,7 @@ class StatusHistory(object):
                         tOrd = (ii, int(d["ordinal"]))
                 dA = dList[tOrd[0]]
                 return (dA["status_code_end"], dA["date_end"], int(str(dA["ordinal"])), dA["pdb_id"])
-            else:
-                return (None, None, None, None)
+            return (None, None, None, None)
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             return (None, None, None, None)
@@ -317,8 +312,8 @@ class StatusHistory(object):
 
     def __deltaDate(self, dateTimeEnd, dateTimeBegin, fail=-1):
         try:
-            tEnd = datetime.datetime.strptime(dateTimeEnd, self.__timeFormat)
-            tBegin = datetime.datetime.strptime(dateTimeBegin, self.__timeFormat)
+            tEnd = datetime.datetime.strptime(dateTimeEnd, self.__timeFormat)  # noqa: DTZ007
+            tBegin = datetime.datetime.strptime(dateTimeBegin, self.__timeFormat)  # noqa: DTZ007
             tDelta = tEnd - tBegin
             days = float(tDelta.total_seconds()) / 86400.0
             #  print " dateTimeBegin=", dateTimeBegin, " dateTimeEnd=", dateTimeEnd, " tDelta=", tDelta.total_seconds(), " days=", days

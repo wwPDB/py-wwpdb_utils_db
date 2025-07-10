@@ -13,47 +13,45 @@ Wrapper for utilities for database loading of status history data content from
 repository directories.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
+import copy
+import logging
 import os
 import os.path
+import sys
 import time
-import copy
-import scandir
 import traceback
+
+import scandir
+from mmcif.io.IoAdapterCore import IoAdapterCore
+from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
+from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
+
+from wwpdb.io.file.DataFile import DataFile
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.db.MyConnectionBase import MyConnectionBase
+from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
+from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 # try:
 #     from itertools import zip_longest
 # except ImportError:
 #     from itertools import izip_longest as zip_longest
-
 from wwpdb.utils.db.StatusHistory import StatusHistory
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
-from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
-from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
-
-from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
-
 from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
-from mmcif.io.IoAdapterCore import IoAdapterCore
-from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
-from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.io.file.DataFile import DataFile
-
-from wwpdb.utils.db.MyConnectionBase import MyConnectionBase
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class StatusHistoryUtils(MyConnectionBase):
-
     """Wrapper for utilities for database loading of content from status history"""
 
     #
@@ -152,7 +150,7 @@ class StatusHistoryUtils(MyConnectionBase):
         return retLists[0]
         #
 
-    def createHistoryWorker(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+    def createHistoryWorker(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002 pylint: disable=unused-argument
         if "overWrite" in optionsD:
             overWrite = optionsD["overWrite"]
         else:
@@ -209,7 +207,9 @@ class StatusHistoryUtils(MyConnectionBase):
             ei = PdbxEntryInfoIo(verbose=self.__verbose, log=self.__lfh)
             ei.setFilePath(filePath=filePath, idCode=entryId)
             # sD = ei.getInfoD(contextType="history")
-            _tId, pdbId, statusCode, _authReleaseCode, annotatorInitials, initialDepositionDate, beginProcessingDate, authorApprovalDate, releaseDate = ei.getCurrentStatusDetails()
+            _tId, pdbId, statusCode, _authReleaseCode, annotatorInitials, initialDepositionDate, beginProcessingDate, authorApprovalDate, releaseDate = (
+                ei.getCurrentStatusDetails()
+            )
             #
             if self.__verbose:
                 logger.info("+StatusHistoryUtils.createHistory() %s begin proccessing date time %r", entryId, beginProcessingDate)
@@ -239,7 +239,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
             numHist = sH.setEntryId(entryId=entryId, pdbId=pdbId, overWrite=overWrite)
             #
-            if (statusUpdateAuthWait is not None) and (numHist < 1) and (statusCode in ["PROC"]):
+            if (statusUpdateAuthWait is not None) and (numHist < 1) and (statusCode == "PROC"):
                 statusCode = statusUpdateAuthWait
                 endFirstStepDate = sH.getNow()
 
@@ -276,7 +276,7 @@ class StatusHistoryUtils(MyConnectionBase):
                     details="Automated initial entry",
                 )
 
-                if statusCode in ["REL"]:
+                if statusCode == "REL":
                     sH.add(
                         statusCodeBegin="AUTH",
                         dateBegin=endFirstStepDate,
@@ -300,7 +300,9 @@ class StatusHistoryUtils(MyConnectionBase):
                     # Get the modification date for the latest model file  milestone = deposit -
                     revStepDate = self.__getModelFileTimeStamp(entryId, versionId="latest", mileStone="deposit", defValue=currentModelTimeStamp)
                     if self.__verbose:
-                        logger.info("+StatusHistoryUtils.createHistory() %s model file (deposit) timestamp used for revision step date %r", entryId, revStepDate)
+                        logger.info(
+                            "+StatusHistoryUtils.createHistory() %s model file (deposit) timestamp used for revision step date %r", entryId, revStepDate
+                        )
                     sH.add(
                         statusCodeBegin="AUTH",
                         dateBegin=endFirstStepDate,
@@ -311,7 +313,7 @@ class StatusHistoryUtils(MyConnectionBase):
                     )
                 success = True
                 #
-            elif (numHist < 1) and (statusCode in ["WAIT"]):
+            elif (numHist < 1) and (statusCode == "WAIT"):
                 # New status history?  The first three records of a new file will mark the
                 #  PROC->PROC_ST_1, PROC_ST_1->WAIT, and the overall PROC->WAIT transitions.
                 #
@@ -358,11 +360,10 @@ class StatusHistoryUtils(MyConnectionBase):
                     else:
                         logger.info("+StatusHistoryUtils.createHistory() %s NO status history file written", entryId)
                 #
-            else:
-                if self.__verbose:
-                    if numHist > 0:
-                        logger.info("+StatusHistoryUtils.createHistory() %s found existing status history category with row count %r", entryId, numHist)
-                    logger.info("+StatusHistoryUtils.createHistory() %s skipping entry with current status code is %r", entryId, statusCode)
+            elif self.__verbose:
+                if numHist > 0:
+                    logger.info("+StatusHistoryUtils.createHistory() %s found existing status history category with row count %r", entryId, numHist)
+                logger.info("+StatusHistoryUtils.createHistory() %s skipping entry with current status code is %r", entryId, statusCode)
             #
             #
             # Recover the contents of the current history file -
@@ -409,20 +410,24 @@ class StatusHistoryUtils(MyConnectionBase):
             return False
 
         endTime = time.time()
-        logger.debug("StatusHistoryUtils(__schemaCreate) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        logger.debug(
+            "StatusHistoryUtils(__schemaCreate) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime
+        )
         return ret
 
     # def __makeSubLists(self, n, iterable):
     #     args = [iter(iterable)] * n
     #     return ([e for e in t if e is not None] for t in zip_longest(*args))
 
-    def loadBatchFilesWorker(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+    def loadBatchFilesWorker(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002 pylint: disable=unused-argument
         """Load tabular batch files created for the chemical component definitions into the database server."""
         shsd = StatusHistorySchemaDef()
         myC = MyDbConnect(verbose=self.__verbose, log=self.__lfh)
         myC.setAuth(optionsD)
         dbCon = myC.connect()
-        sdl = SchemaDefLoader(schemaDefObj=shsd, ioObj=self.__ioObj, dbCon=dbCon, workPath=workingDir, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh)
+        sdl = SchemaDefLoader(
+            schemaDefObj=shsd, ioObj=self.__ioObj, dbCon=dbCon, workPath=workingDir, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+        )
         #
         sdl.loadBatchFiles(loadList=dataList, containerNameList=None, deleteOpt=None)
 
@@ -443,7 +448,14 @@ class StatusHistoryUtils(MyConnectionBase):
 
             shsd = StatusHistorySchemaDef()
             sml = SchemaDefLoader(
-                schemaDefObj=shsd, ioObj=self.__ioObj, dbCon=None, workPath=self.__sessionPath, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+                schemaDefObj=shsd,
+                ioObj=self.__ioObj,
+                dbCon=None,
+                workPath=self.__sessionPath,
+                cleanUp=False,
+                warnings="default",
+                verbose=self.__verbose,
+                log=self.__lfh,
             )
 
             #
@@ -468,13 +480,20 @@ class StatusHistoryUtils(MyConnectionBase):
             #
             authD = copy.deepcopy(self.getAuth())
             sdl = SchemaDefLoader(
-                schemaDefObj=shsd, ioObj=self.__ioObj, dbCon=self._dbCon, workPath=self.__sessionPath, cleanUp=False, warnings="default", verbose=self.__verbose, log=self.__lfh
+                schemaDefObj=shsd,
+                ioObj=self.__ioObj,
+                dbCon=self._dbCon,
+                workPath=self.__sessionPath,
+                cleanUp=False,
+                warnings="default",
+                verbose=self.__verbose,
+                log=self.__lfh,
             )
             #
             if newTable:
                 self.__schemaCreate(schemaDefObj=shsd)
             else:
-                for tId, fn in tList:
+                for tId, _fn in tList:
                     sdl.delete(tId, containerNameList=containerNameList, deleteOpt="selected")
 
             self.closeConnection()
@@ -498,6 +517,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
         endTime = time.time()
         logger.debug("Completed at %s (%.2f seconds)", time.localtime(), endTime - startTime)
+        return False
 
     def loadStatusHistory(self, newTable=False):
         """Do a full batch load/reload of status history files from the current file source (e.g. archive)."""
@@ -520,13 +540,19 @@ class StatusHistoryUtils(MyConnectionBase):
                     self.__schemaCreate(schemaDefObj=sd)
                 #
                 sdl = SchemaDefLoader(
-                    schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self._dbCon, workPath=self.__sessionPath, cleanUp=False, warnings="error", verbose=self.__verbose, log=self.__lfh
+                    schemaDefObj=sd,
+                    ioObj=self.__ioObj,
+                    dbCon=self._dbCon,
+                    workPath=self.__sessionPath,
+                    cleanUp=False,
+                    warnings="error",
+                    verbose=self.__verbose,
+                    log=self.__lfh,
                 )
                 sdl.load(inputPathList=pathList, containerList=None, loadType="batch-file", deleteOpt="all")
                 self.closeConnection()
-            else:
-                if self.__verbose:
-                    logger.info("+StatusHistoryUtils(loadStatusHistory) database connection failed")
+            elif self.__verbose:
+                logger.info("+StatusHistoryUtils(loadStatusHistory) database connection failed")
 
         except:  # noqa: E722  pylint: disable=bare-except
             self.closeConnection()
@@ -534,7 +560,9 @@ class StatusHistoryUtils(MyConnectionBase):
             ok = False
 
         endTime = time.time()
-        logger.debug("+StatusHistoryUtils(loadStatusHistory) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        logger.debug(
+            "+StatusHistoryUtils(loadStatusHistory) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime
+        )
         return ok
 
     def loadEntryStatusHistory(self, entryIdList):
@@ -554,13 +582,19 @@ class StatusHistoryUtils(MyConnectionBase):
             if ok:
                 sd = StatusHistorySchemaDef()
                 sdl = SchemaDefLoader(
-                    schemaDefObj=sd, ioObj=self.__ioObj, dbCon=self._dbCon, workPath=self.__sessionPath, cleanUp=False, warnings="error", verbose=self.__verbose, log=self.__lfh
+                    schemaDefObj=sd,
+                    ioObj=self.__ioObj,
+                    dbCon=self._dbCon,
+                    workPath=self.__sessionPath,
+                    cleanUp=False,
+                    warnings="error",
+                    verbose=self.__verbose,
+                    log=self.__lfh,
                 )
                 sdl.load(inputPathList=pathList, containerList=None, loadType="batch-insert", deleteOpt="selected")
                 self.closeConnection()
-            else:
-                if self.__verbose:
-                    logger.info("+StatusHistoryUtils(loadEntryStatusHistory) database connection failed")
+            elif self.__verbose:
+                logger.info("+StatusHistoryUtils(loadEntryStatusHistory) database connection failed")
 
         except:  # noqa: E722  pylint: disable=bare-except
             self.closeConnection()
@@ -568,7 +602,11 @@ class StatusHistoryUtils(MyConnectionBase):
             ok = False
 
         endTime = time.time()
-        logger.debug("+StatusHistoryUtils(loadEntryStatusHistory) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        logger.debug(
+            "+StatusHistoryUtils(loadEntryStatusHistory) Completed at %s (%.2f seconds)",
+            time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            endTime - startTime,
+        )
         return ok
 
     def createStatusHistorySchema(self):
@@ -584,9 +622,8 @@ class StatusHistoryUtils(MyConnectionBase):
                 sd = StatusHistorySchemaDef()
                 self.__schemaCreate(schemaDefObj=sd)
                 self.closeConnection()
-            else:
-                if self.__verbose:
-                    logger.info("+StatusHistoryUtils(createStatusHistorySchema) database connection failed")
+            elif self.__verbose:
+                logger.info("+StatusHistoryUtils(createStatusHistorySchema) database connection failed")
 
         except:  # noqa: E722  pylint: disable=bare-except
             self.closeConnection()
@@ -594,7 +631,11 @@ class StatusHistoryUtils(MyConnectionBase):
             ok = False
 
         endTime = time.time()
-        logger.debug("+StatusHistoryUtils(createStatusHistorySchema) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        logger.debug(
+            "+StatusHistoryUtils(createStatusHistorySchema) Completed at %s (%.2f seconds)",
+            time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            endTime - startTime,
+        )
         return ok
 
     def updateEntryStatusHistory(self, entryIdList, statusCode, annotatorInitials, details="Update by status module", statusCodePrior=None):
@@ -620,7 +661,10 @@ class StatusHistoryUtils(MyConnectionBase):
         )
         if (entryIdList is None) or (len(entryIdList) < 1) or (statusCode is None) or (annotatorInitials is None) or (statusCode in ["AUCO", "REPL"]):
             logger.debug(
-                "+StatusHistoryUtils(updateEntryStatusHistory) SKIPPED UPDATE with entryIdList %r statusCode %r annotatorInitials %r", entryIdList, statusCode, annotatorInitials
+                "+StatusHistoryUtils(updateEntryStatusHistory) SKIPPED UPDATE with entryIdList %r statusCode %r annotatorInitials %r",
+                entryIdList,
+                statusCode,
+                annotatorInitials,
             )
             return okSh
         try:
@@ -667,5 +711,9 @@ class StatusHistoryUtils(MyConnectionBase):
             okSh = False
 
         endTime = time.time()
-        logger.debug("+StatusHistoryUtils(updateEntryStatusHistory) Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        logger.debug(
+            "+StatusHistoryUtils(updateEntryStatusHistory) Completed at %s (%.2f seconds)",
+            time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            endTime - startTime,
+        )
         return okSh

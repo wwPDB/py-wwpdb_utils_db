@@ -26,17 +26,18 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
 import os
+import sys
 import time
-import unittest
 import traceback
+import unittest
 
-from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
-from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
-from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
+
+from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
+from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
+from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.testing.Features import Features
 
 
@@ -64,8 +65,7 @@ class BirdLoaderTests(unittest.TestCase):
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
-        else:
-            return False
+        return False
 
     def close(self):
         if self.__dbCon is not None:
@@ -97,7 +97,10 @@ class BirdLoaderTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted BirdLoaderTests testBirdSchemaCreate at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted BirdLoaderTests testBirdSchemaCreate at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testPrdPathList(self):
         """Test case -  get the path list of PRD definitions in the CVS repository."""
@@ -128,7 +131,10 @@ class BirdLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
         endTime = time.time()
-        self.__lfh.write("\nCompleted BirdLoaderTests testMakeLoadPrdFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted BirdLoaderTests testMakeLoadPrdFiles at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testBirdBatchImport(self):
         """Test case -  import loadable files"""
@@ -166,7 +172,10 @@ class BirdLoaderTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted BirdLoaderTests testBirdBatchImport at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted BirdLoaderTests testBirdBatchImport at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testBirdInsertImport(self):
         """Test case -  import loadable data via SQL inserts"""
@@ -215,7 +224,10 @@ class BirdLoaderTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted BirdLoaderTests testBirdInsertImport at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted BirdLoaderTests testBirdInsertImport at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testBirdBatchInsertImport(self):
         """Test case -  import loadable data via SQL inserts -"""
@@ -264,7 +276,8 @@ class BirdLoaderTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted BirdLoaderTests testBirdBatchInsertImport at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted BirdLoaderTests testBirdBatchInsertImport at %s (%.2f seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
 

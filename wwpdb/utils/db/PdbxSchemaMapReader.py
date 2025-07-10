@@ -24,13 +24,12 @@ __version__ = "V0.01"
 import sys
 import traceback
 
-from mmcif.io.PdbxReader import PdbxReader
-
 # from mmcif.api.PdbxContainers import *
 from mmcif.api.PdbxContainers import CifName
+from mmcif.io.PdbxReader import PdbxReader
 
 
-class PdbxSchemaMapReader(object):
+class PdbxSchemaMapReader:
     def __init__(self, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
@@ -60,7 +59,7 @@ class PdbxSchemaMapReader(object):
             for k, v in d.items():
                 ofh.write("Table %s - attribute %s  abbreviation %s\n" % (tN, k, v))
 
-    def __convertDataType(self, dtype, width=0, precision=0):  # pylint:  disable=unused-argument
+    def __convertDataType(self, dtype, width=0, precision=0):  # noqa: ARG002 pylint:  disable=unused-argument
         if dtype.lower() in ["char", "varchar", "text"]:
             if width < 65000:
                 retType = "VARCHAR"
@@ -81,14 +80,12 @@ class PdbxSchemaMapReader(object):
     def __toBool(self, flag):
         if flag.lower() == "y" or flag.lower() == "yes" or flag == "1":
             return True
-        else:
-            return False
+        return False
 
     def __getTableAbbrev(self, tableName):
         if tableName in self.__tableAbbrev:
             return self.__tableAbbrev[tableName]
-        else:
-            return tableName
+        return tableName
 
     def __getAttributeAbbrev(self, tableName, attributeName):
         try:
@@ -140,7 +137,7 @@ class PdbxSchemaMapReader(object):
 
             #
             indexList = []
-            for (ii, atD) in enumerate(infoL):
+            for ii, atD in enumerate(infoL):
                 attributeName = atD["attribute_name"]
                 attributeAbbrev = self.__getAttributeAbbrev(tableName, attributeName)
                 atU = attributeAbbrev.upper()
@@ -176,7 +173,7 @@ class PdbxSchemaMapReader(object):
                 # Using RCSB convention of including one attribute in each table corresponding to the datablockId()
                 #   this attributeId is used a key pre-insert deletions.
                 #
-                if fN in ["datablockid()"]:
+                if fN == "datablockid()":
                     deleteAttributeList.append(atU)
             #
             # Assign a merge index to this instance category
@@ -210,7 +207,7 @@ class PdbxSchemaMapReader(object):
         try:
             #
             myContainerList = []
-            ifh = open(schemaMapFile, "r")
+            ifh = open(schemaMapFile)
             pRd = PdbxReader(ifh)
             pRd.read(myContainerList)
             ifh.close()
@@ -282,7 +279,7 @@ class PdbxSchemaMapReader(object):
                 else:
                     self.__lfh.write("+ERROR -unanticipated data container %s\n" % cN)
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.__lfh.write("+ERROR - error processing schema map file %s - %s\n" % (schemaMapFile, str(e)))
             traceback.print_exc(file=self.__lfh)
 

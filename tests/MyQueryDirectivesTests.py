@@ -14,6 +14,7 @@
 Test cases for parsing query directives and producing SQL instructions.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -21,15 +22,14 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
 import sys
-import unittest
-import traceback
 import time
+import traceback
+import unittest
 
-from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
-from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
+from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.db.MyQueryDirectives import MyQueryDirectives
-
+from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 from wwpdb.utils.testing.Features import Features
 
 
@@ -106,8 +106,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         if self.__dbCon is not None:
             self.__lfh.write("\nDatabase connection opened MyQueryDirectivesTest open at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
             return True
-        else:
-            return False
+        return False
 
     def close(self):
         if self.__dbCon is not None:
@@ -131,7 +130,10 @@ class MyQueryDirectivesTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted MyQueryDirectivesTest testDirective1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted MyQueryDirectivesTest testDirective1 at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
     def testDirectiveWithQuery0(self):
         qdL = [
@@ -314,7 +316,8 @@ class MyQueryDirectivesTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted MyQueryDirectivesTest __testDirectiveWithDistroQuery at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted MyQueryDirectivesTest __testDirectiveWithDistroQuery at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def __testDirectiveWithHistoryQuery(self, qdL, domD):
@@ -344,7 +347,8 @@ class MyQueryDirectivesTests(unittest.TestCase):
 
         endTime = time.time()
         self.__lfh.write(
-            "\nCompleted MyQueryDirectivesTest __testDirectiveWithHistoryQuery at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            "\nCompleted MyQueryDirectivesTest __testDirectiveWithHistoryQuery at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
 

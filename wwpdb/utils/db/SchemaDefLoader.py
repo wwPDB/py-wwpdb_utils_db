@@ -21,27 +21,31 @@ Generic mapper of PDBx/mmCIF instance data to SQL loadable data files based on e
 schema definition defined in class SchemaDefBase().
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
-import sys
-import traceback
+import contextlib
 import os
+import sys
 import time
+import traceback
+
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbQuery
-from mmcif.io.IoAdapterCore import IoAdapterCore
 
 
-class SchemaDefLoader(object):
-
+class SchemaDefLoader:
     """Map PDBx/mmCIF instance data to SQL loadable data using external schema definition."""
 
-    def __init__(self, schemaDefObj, ioObj=IoAdapterCore(), dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=True, log=sys.stderr):
+    def __init__(self, schemaDefObj, ioObj=None, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=True, log=sys.stderr):
+        if ioObj is None:
+            ioObj = IoAdapterCore()
         self.__lfh = log
         self.__verbose = verbose
         self.__debug = False
@@ -62,9 +66,8 @@ class SchemaDefLoader(object):
         if action in ["error", "ignore", "default"]:
             self.__warningAction = action
             return True
-        else:
-            self.__warningAction = "default"
-            return False
+        self.__warningAction = "default"
+        return False
 
     def setDelimiters(self, colSep=None, rowSep=None):
         """Set column and row delimiters for intermediate data files used for
@@ -111,30 +114,26 @@ class SchemaDefLoader(object):
                     self.__lfh.write("+SchemaDefLoader(load) %r maximum width %r\n" % (k, v))
         #
         if loadType in ["batch-file", "batch-file-append"]:
-            append = True if loadType == "batch-file-append" else False
+            append = True if loadType == "batch-file-append" else False  # noqa: SIM210
             exportList = self.__export(tableDataDict, colSep=self.__colSep, rowSep=self.__rowSep, append=append)
             for tableId, loadPath in exportList:
                 self.__batchFileImport(tableId, loadPath, sqlFilePath=None, containerNameList=containerNameList, deleteOpt=deleteOpt)
                 if self.__cleanUp:
                     self.__cleanUpFile(loadPath)
             return True
-        elif loadType == "batch-insert":
+        if loadType == "batch-insert":
             for tableId, rowList in tableDataDict.items():
                 if deleteOpt in ["all", "selected"] or len(rowList) > 0:
                     self.__batchInsertImport(tableId, rowList=rowList, containerNameList=containerNameList, deleteOpt=deleteOpt)
             return True
-        else:
-            pass
 
         return False
 
     def __cleanUpFile(self, filePath):
-        try:
+        with contextlib.suppress(Exception):
             os.remove(filePath)
-        except:  # noqa: E722 pylint: disable=bare-except
-            pass
 
-    def makeLoadFilesMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+    def makeLoadFilesMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002 pylint: disable=unused-argument
         """Create a loadable data file for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
 
@@ -185,11 +184,12 @@ class SchemaDefLoader(object):
         endTime = time.time()
         if self.__verbose:
             self.__lfh.write(
-                "+SchemaDefLoader(loadBatchFiles) completed with status %r at %s (%.3f seconds)\n" % (ok, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+                "+SchemaDefLoader(loadBatchFiles) completed with status %r at %s (%.3f seconds)\n"
+                % (ok, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
             )
         return ok
 
-    def fetchMulti(self, dataList, procName, optionsD, workingDir):  # pylint: disable=unused-argument
+    def fetchMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002  pylint: disable=unused-argument
         """Method to comply with the MultiProcPoolUtil interface. This method should only
         be used with MultiProcPoolUtil, passing its name through the argument 'workerMethod'.
         """
@@ -223,7 +223,9 @@ class SchemaDefLoader(object):
         #
         endTime = time.time()
         if self.__verbose:
-            self.__lfh.write("+SchemaDefLoader(__fetch) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+            self.__lfh.write(
+                "+SchemaDefLoader(__fetch) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            )
 
         return tableDataDict, containerNameList
 
@@ -251,7 +253,9 @@ class SchemaDefLoader(object):
         #
         endTime = time.time()
         if self.__verbose:
-            self.__lfh.write("+SchemaDefLoader(__process) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+            self.__lfh.write(
+                "+SchemaDefLoader(__process) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            )
 
         return tableDataDict, containerNameList
 
@@ -281,14 +285,13 @@ class SchemaDefLoader(object):
                 exportList.append((tableId, fn))
         return exportList
 
-    def __evalMapFunction(self, dataContainer, rowList, attributeId, functionName, functionArgs=None):  # pylint: disable=unused-argument
+    def __evalMapFunction(self, dataContainer, rowList, attributeId, functionName, functionArgs=None):  # noqa: ARG002  pylint: disable=unused-argument
         if functionName == "datablockid()":
             val = dataContainer.getName()
             for rowD in rowList:
                 rowD[attributeId] = val
             return True
-        else:
-            return False
+        return False
 
     def __mapData(self, containerList, tableIdList, tableDataDict):
         """
@@ -460,7 +463,7 @@ class SchemaDefLoader(object):
 
         return mD.values()
 
-    def delete(self, tableId, containerNameList=None, deleteOpt="all"):  # pylint: disable=unused-argument
+    def delete(self, tableId, containerNameList=None, deleteOpt="all"):  # noqa: ARG002  pylint: disable=unused-argument
         #
         startTime = time.time()
         sqlCommandList = self.__getSqlDeleteList(tableId, containerNameList=None, deleteOpt=deleteOpt)
@@ -473,12 +476,13 @@ class SchemaDefLoader(object):
         endTime = time.time()
         if self.__verbose:
             self.__lfh.write("+SchemaDefLoader(delete) table %s server returns %r\n" % (tableId, ret))
-            self.__lfh.write("+SchemaDefLoader(delete) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+            self.__lfh.write(
+                "+SchemaDefLoader(delete) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            )
             return ret
-        else:
-            if self.__verbose:
-                self.__lfh.write("+SchemaDefLoader(delete) failse for %s\n" % tableId)
-            return False
+        if self.__verbose:
+            self.__lfh.write("+SchemaDefLoader(delete) failse for %s\n" % tableId)
+        return False
 
     def __getSqlDeleteList(self, tableId, containerNameList=None, deleteOpt="all"):
         """Return the SQL delete commands for the input table and container name list."""
@@ -500,7 +504,7 @@ class SchemaDefLoader(object):
             self.__lfh.write("+SchemaDefLoader(__getSqlDeleteList) delete SQL for %s : %r\n" % (tableId, sqlDeleteList))
         return sqlDeleteList
 
-    def __batchFileImport(self, tableId, tableLoadPath, sqlFilePath=None, containerNameList=None, deleteOpt="all"):  # pylint: disable=unused-argument
+    def __batchFileImport(self, tableId, tableLoadPath, sqlFilePath=None, containerNameList=None, deleteOpt="all"):  # noqa: ARG002 pylint: disable=unused-argument
         """Batch load the input table using data in the input loadable data file.
 
         if sqlFilePath is provided then any generated SQL commands are preserved in this file.
@@ -546,7 +550,10 @@ class SchemaDefLoader(object):
         endTime = time.time()
         if self.__verbose:
             self.__lfh.write("+SchemaDefLoader(__batchFileImport) table %s server returns %r\n" % (tableId, ret))
-            self.__lfh.write("+SchemaDefLoader(__batchFileImport) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+            self.__lfh.write(
+                "+SchemaDefLoader(__batchFileImport) completed at %s (%.3f seconds)\n"
+                % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            )
         return ret
 
     def loadBatchData(self, tableId, rowList=None, containerNameList=None, deleteOpt="selected"):
@@ -604,7 +611,10 @@ class SchemaDefLoader(object):
 
         endTime = time.time()
         if self.__verbose:
-            self.__lfh.write("+SchemaDefLoader(__batchInsertImport) completed at %s (%.3f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+            self.__lfh.write(
+                "+SchemaDefLoader(__batchInsertImport) completed at %s (%.3f seconds)\n"
+                % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            )
 
         return ret
 

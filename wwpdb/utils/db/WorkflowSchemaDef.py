@@ -15,6 +15,9 @@
 Database schema defintions for tables used to manage the workflow engine processes.
 
 """
+
+from __future__ import annotations
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -22,14 +25,17 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
+from typing import ClassVar
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
 
 class WorkflowSchemaDef(SchemaDefBase):
-    """ A data class containing schema definitions for workflow status and tracking tables.
-    """
+    """A data class containing schema definitions for workflow status and tracking tables."""
+
     _databaseName = "status"
-    _schemaDefDict = {
+    # fmt: off
+    _schemaDefDict: ClassVar[SchemaDictType] = {
         "COMMUNICATION": {
             "TABLE_ID": "COMMUNICATION",
             "TABLE_NAME": "communication",
@@ -415,9 +421,13 @@ class WorkflowSchemaDef(SchemaDefBase):
             }
         }
     }
+    # fmt: on
 
     def __init__(self, verbose=True, log=sys.stderr):
-        super(WorkflowSchemaDef, self).__init__(databaseName=WorkflowSchemaDef._databaseName, schemaDefDict=WorkflowSchemaDef._schemaDefDict, verbose=verbose, log=log)
+        super(WorkflowSchemaDef, self).__init__(
+            databaseName=WorkflowSchemaDef._databaseName, schemaDefDict=WorkflowSchemaDef._schemaDefDict, verbose=verbose, log=log
+        )
+
 
 if __name__ == "__main__":
     wfsd = WorkflowSchemaDef()

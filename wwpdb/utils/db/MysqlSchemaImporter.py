@@ -6,12 +6,12 @@
 # table descriptions.
 #
 import os
-import sys
 import pprint
+import sys
 
 
-class MysqlSchemaImporter(object):
-    def __init__(self, dbUser, dbPw, dbHost, mysqlPath="/opt/local/bin/mysql", verbose=True, log=sys.stderr):  # pylint:  disable=unused-argument
+class MysqlSchemaImporter:
+    def __init__(self, dbUser, dbPw, dbHost, mysqlPath="/opt/local/bin/mysql", verbose=True, log=sys.stderr):  # noqa: ARG002 pylint:  disable=unused-argument
         self.__lfh = log
         self.__mysqlPath = mysqlPath
         self.__dbUser = dbUser
@@ -20,15 +20,14 @@ class MysqlSchemaImporter(object):
 
     def __import(self, filePath):
         colDataList = []
-        ifh = open(filePath, "r")
+        ifh = open(filePath)
         for line in ifh:
             if line is not None and len(line) > 0:
                 fields = str(line[:-1]).split("\t")
                 if len(fields) != 6:
                     self.__lfh.write("bad line in %s  = %s" % (filePath, line))
                     continue
-                else:
-                    colDataList.append(fields)
+                colDataList.append(fields)
         ifh.close()
         os.remove(filePath)
         #
@@ -37,9 +36,9 @@ class MysqlSchemaImporter(object):
     def __export(self, filePath, db, tableName):
         cmdDetail = ' --user=%s --password=%s --host=%s %s -e "describe %s;" ' % (self.__dbUser, self.__dbPw, self.__dbHost, db, tableName)
         cmd = self.__mysqlPath + cmdDetail + " > %s" % filePath
-        return os.system(cmd)
+        return os.system(cmd)  # noqa: S605
 
-    def __buildDef(self, dbName, tableName, colDataList):  # pylint: disable=unused-argument
+    def __buildDef(self, dbName, tableName, colDataList):  # noqa: ARG002 pylint: disable=unused-argument
         defD = {}
         tableId = str(tableName).upper()
         attIdKeyList = []
@@ -50,7 +49,7 @@ class MysqlSchemaImporter(object):
         for ii, ff in enumerate(colDataList, start=1):
             attName = str(ff[0])
             attId = str(attName).upper()
-            nullFlag = True if ff[2] == "YES" else False
+            nullFlag = bool(ff[2] == "YES")
             impType = ff[1]
             if "(" in impType:
                 width = impType[impType.find("(") + 1 : -1]
@@ -101,7 +100,7 @@ class MysqlSchemaImporter(object):
                 tableId, defD = self.__buildDef(dbName, tableName, colDataList)
                 schemaDef[tableId] = defD
         #
-        pprint.pprint(schemaDef, stream=sys.stdout, width=120, indent=3)
+        pprint.pprint(schemaDef, stream=sys.stdout, width=120, indent=3)  # noqa: T203
 
 
 def __main():

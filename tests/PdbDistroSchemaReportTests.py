@@ -9,6 +9,7 @@
 Test cases for SQL select and report generation  using PDB Distro -
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -16,11 +17,11 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
 import sys
-import unittest
-import traceback
 import time
+import traceback
+import unittest
 
-from wwpdb.utils.db.MyDbSqlGen import MyDbQuerySqlGen, MyDbConditionSqlGen
+from wwpdb.utils.db.MyDbSqlGen import MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 
 
@@ -87,7 +88,10 @@ class PdbDistroSchemaReportTests(unittest.TestCase):
             self.fail()
 
         endTime = time.time()
-        self.__lfh.write("\nCompleted PdbDistroSchemaReportTests testSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime))
+        self.__lfh.write(
+            "\nCompleted PdbDistroSchemaReportTests testSelect1 at %s (%d seconds)\n"
+            % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+        )
 
 
 def suiteSelect():
