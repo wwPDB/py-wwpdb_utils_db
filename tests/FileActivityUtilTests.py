@@ -33,13 +33,13 @@ class DummyFileActivityDb:
         self.displayCalled: bool = False
         self.queryParams: Dict[str, Optional[Union[int, str]]] = {}
 
-    def purgeFileActivityDb(self, confirmed: bool = False) -> None:
+    def purgeAllData(self, confirmed: bool = False) -> None:
         self.purged = confirmed
 
-    def populateFileActivityDb(self, directory: str) -> None:
+    def populateFromDirectory(self, directory: str) -> None:
         self.loadedDirectory = directory
 
-    def displayFileActivityDb(self, hours: Optional[int] = None, days: Optional[int] = None, site_id: Optional[str] = None) -> None:
+    def displayActivity(self, hours: Optional[int] = None, days: Optional[int] = None) -> None:
         self.displayCalled = True
         print("Dummy display output")
 
@@ -71,7 +71,7 @@ class FileActivityUtilTests(unittest.TestCase):
     def testPurgeWithoutConfirmation(self) -> None:
         """Test purge command without confirmation flag"""
         with patch('sys.stderr', new=StringIO()) as fake_err:
-            ret = self.util.purgeFileActivityDb([])
+            ret = self.util.purgeAllData([])
             self.assertEqual(ret, 1)
             self.assertIn("Must provide --confirmed flag to purge database", fake_err.getvalue())
             self.assertFalse(self.dummy_db.purged)
@@ -80,21 +80,21 @@ class FileActivityUtilTests(unittest.TestCase):
         """Test purge command with cancellation simulation (production ignores cancellation)"""
         # Even if input returns 'n', production does not cancel purge since --confirmed is provided
         with patch('builtins.input', return_value='n'), patch('sys.stdout', new=StringIO()):
-            ret = self.util.purgeFileActivityDb(['--confirmed'])
+            ret = self.util.purgeAllData(['--confirmed'])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.purged)
 
     def testPurgeWithConfirm(self) -> None:
         """Test purge command with confirmation"""
         with patch('builtins.input', return_value='y'):
-            ret = self.util.purgeFileActivityDb(['--confirmed'])
+            ret = self.util.purgeAllData(['--confirmed'])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.purged)
 
     def testDisplayWithHours(self) -> None:
         """Test display command with hours parameter"""
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            ret = self.util.displayFileActivityDb(['--hours', '24'])
+            ret = self.util.displayActivity(['--hours', '24'])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.displayCalled)
             self.assertIn("Dummy display output", fake_out.getvalue())
@@ -102,7 +102,7 @@ class FileActivityUtilTests(unittest.TestCase):
     def testDisplayWithDays(self) -> None:
         """Test display command with days parameter"""
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            ret = self.util.displayFileActivityDb(['--days', '7'])
+            ret = self.util.displayActivity(['--days', '7'])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.displayCalled)
 
@@ -111,7 +111,7 @@ class FileActivityUtilTests(unittest.TestCase):
         testDir = os.path.join(self.testDir, "test_load")
         if not os.path.exists(testDir):
             os.makedirs(testDir)
-        ret = self.util.loadFileActivityDb(['--load-dir', testDir])
+        ret = self.util.populateFromDirectory(['--load-dir', testDir])
         self.assertEqual(ret, 0)
         self.assertEqual(self.dummy_db.loadedDirectory, testDir)
 
@@ -124,7 +124,7 @@ class FileActivityUtilTests(unittest.TestCase):
             '--formats', 'pdbx'
         ]
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            ret = self.util.queryFileActivity(args)
+            ret = self.util.getActivity(args)
             self.assertEqual(ret, 0)
             self.assertEqual(self.dummy_db.queryParams['hours'], 24)
             self.assertEqual(self.dummy_db.queryParams['deposition_ids'], 'D_1000000000')

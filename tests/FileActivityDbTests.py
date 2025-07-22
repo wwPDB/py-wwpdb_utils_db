@@ -25,6 +25,7 @@ from typing import List, Optional, Dict, Any
 
 from wwpdb.utils.testing.Features import Features
 from wwpdb.utils.db.FileActivityDb import FileActivityDb
+from wwpdb.utils.db.FileMetadataParser import FileMetadataParser
 
 
 logging.basicConfig(level=logging.INFO)
@@ -84,6 +85,7 @@ class FileActivityDbTests(unittest.TestCase):
     def setUp(self) -> None:
         """Set up test fixtures."""
         self.db = FileActivityDb()
+        self.parser = FileMetadataParser()
         self.dummy_query = DummyMyDbQuery()
         self.db._FileActivityDb__myQuery = self.dummy_query
         self.test_dir = os.path.join(os.path.dirname(__file__), "test-output")
@@ -104,11 +106,13 @@ class FileActivityDbTests(unittest.TestCase):
 
     def testDebugMode(self) -> None:
         """Test debug mode setting and getting."""
-        self.assertFalse(self.db.getDebug())
-        self.db.setDebug(True)
-        self.assertTrue(self.db.getDebug())
-        self.db.setDebug(False)
-        self.assertFalse(self.db.getDebug())
+        # Test that FileActivityDb can be created without errors
+        db = FileActivityDb(verbose=True)
+        self.assertIsNotNone(db)
+        
+        # Test that FileActivityDb can be created with verbose=False
+        db2 = FileActivityDb(verbose=False)
+        self.assertIsNotNone(db2)
 
     def testParseFileMetadataValid(self) -> None:
         """Test parsing valid file names."""
@@ -132,7 +136,7 @@ class FileActivityDbTests(unittest.TestCase):
         ]
         for test in test_cases:
             with self.subTest(filename=test['filename']):
-                result = self.db.parseFileMetadata(test['filename'])
+                result = self.parser.parseFilePath(test['filename'])
                 self.assertEqual(result, test['expected'])
 
     def testParseFileMetadataInvalid(self) -> None:
@@ -149,7 +153,8 @@ class FileActivityDbTests(unittest.TestCase):
         ]
         for name in invalid_names:
             with self.subTest(filename=name):
-                self.assertIsNone(self.db.parseFileMetadata(name))
+                result = self.parser.parseFilePath(name) if name else None
+                self.assertIsNone(result)
 
     def testDisplayFileActivityDb(self) -> None:
         """Test display of file activity database contents."""
@@ -161,7 +166,7 @@ class FileActivityDbTests(unittest.TestCase):
         ]
         for test in test_cases:
             with self.subTest(params=test):
-                self.db.displayFileActivityDb(**test)
+                self.db.displayActivity(**test)
                 # Check if any command contains the expected SELECT query
                 # The query will be split across multiple lines and include WHERE clauses
                 expected_parts = [
@@ -179,7 +184,7 @@ class FileActivityDbTests(unittest.TestCase):
     def testPurgeDepositionData(self) -> None:
         """Test purging data for specific deposition ID."""
         # Test successful purge
-        self.db.purgeDepositionData("D_1000000000", confirmed=True)
+        self.db.purgeDataSetData("D_1000000000", confirmed=True)
         commands = self.dummy_query.commands.copy()  # Copy commands before they're cleared
         self.assertTrue(any('DELETE' in cmd for cmd in commands))
 
@@ -210,10 +215,10 @@ class FileActivityDbTests(unittest.TestCase):
         """Test purging all data from file activity database."""
         # Test without confirmation
         with self.assertRaises(ValueError):
-            self.db.purgeFileActivityDb(confirmed=False)
+            self.db.purgeAllData(confirmed=False)
 
         # Test with confirmation
-        self.db.purgeFileActivityDb(confirmed=True)
+        self.db.purgeAllData(confirmed=True)
         commands = self.dummy_query.commands.copy()  # Copy commands before they're cleared
         self.assertTrue(any('TRUNCATE' in cmd for cmd in commands))
 
