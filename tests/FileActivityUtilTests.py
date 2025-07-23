@@ -36,7 +36,7 @@ class DummyFileActivityDb:
     def purgeAllData(self, confirmed: bool = False) -> None:
         self.purged = confirmed
 
-    def populateFromDirectory(self, directory: str) -> None:
+    def populateFromDirectory(self, directory: str, ignore_storage_types: Optional[List[str]] = None) -> None:
         self.loadedDirectory = directory
 
     def displayActivity(self, hours: Optional[int] = None, days: Optional[int] = None) -> None:
@@ -44,14 +44,15 @@ class DummyFileActivityDb:
         print("Dummy display output")
 
     def getFileActivity(self, hours: Optional[int] = None, days: Optional[int] = None, site_id: Optional[str] = None,
-                       deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL") -> List[str]:
+                       deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL", storage_types: str = "ALL") -> List[str]:
         self.queryParams = {
             "hours": hours,
             "days": days,
             "site_id": site_id,
             "deposition_ids": deposition_ids,
             "file_types": file_types,
-            "formats": formats
+            "formats": formats,
+            "storage_types": storage_types
         }
         return ["dummy/file/path"]
 
