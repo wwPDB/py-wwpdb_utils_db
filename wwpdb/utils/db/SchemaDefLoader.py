@@ -280,6 +280,9 @@ class SchemaDefLoader:
                 fn = os.path.join(self.__workingPath, tableId + "-loadable-" + partName + ".tdd")
                 ofh = open(fn, modeOpt)
                 for rD in rowList:
+                    if tableId == "PDBX_CHEM_COMP_DESCRIPTOR":
+                        rD["DESCRIPTOR"] = rD["DESCRIPTOR"].replace("\\", "\\\\")
+                    #
                     ofh.write("%s%s" % (colSep.join([rD[aId] for aId in schemaAttributeIdList]), rowSep))
                 ofh.close()
                 exportList.append((tableId, fn))
