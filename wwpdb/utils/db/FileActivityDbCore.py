@@ -85,7 +85,7 @@ class FileActivityDbCore:
             # Get database configuration from site configuration - no fallbacks
             db_name = config.get("SITE_FILE_ACTIVITY_DB_NAME")
             db_host = config.get("SITE_FILE_ACTIVITY_DB_HOST_NAME")
-            db_port = str(config.get("SITE_FILE_ACTIVITY_DB_NUMBER"))
+            db_port = config.get("SITE_FILE_ACTIVITY_DB_NUMBER")
             db_socket = config.get("SITE_FILE_ACTIVITY_DB_SOCKET")
             db_user = config.get("SITE_FILE_ACTIVITY_DB_USER_NAME")
             db_pw = config.get("SITE_FILE_ACTIVITY_DB_PASSWORD")

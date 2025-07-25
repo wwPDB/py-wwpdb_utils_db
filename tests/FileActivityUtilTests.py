@@ -16,6 +16,7 @@ __email__ = "vivek.chithari@rcsb.org"
 __license__ = "Apache 2.0"
 
 import os
+import platform
 import sys
 import unittest
 from unittest.mock import patch
@@ -24,6 +25,12 @@ from typing import Optional, Union, List, Dict
 
 from wwpdb.utils.db.FileActivityUtil import FileActivityUtil
 from wwpdb.utils.testing.Features import Features
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+TESTOUTPUT = os.path.join(HERE, "test-output", platform.python_version())
+if not os.path.exists(TESTOUTPUT):  # pragma: no cover
+    os.makedirs(TESTOUTPUT)
+
 
 class DummyFileActivityDb:
     """Mock FileActivityDb for testing"""
@@ -69,6 +76,7 @@ class FileActivityUtilTests(unittest.TestCase):
         if not os.path.exists(self.testDir):
             os.makedirs(self.testDir)
 
+    @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
     def testPurgeWithoutConfirmation(self) -> None:
         """Test purge command without confirmation flag"""
         with patch('sys.stderr', new=StringIO()) as fake_err:

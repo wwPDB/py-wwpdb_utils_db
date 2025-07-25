@@ -17,6 +17,7 @@ __email__ = "vivek.chithari@rcsb.org"
 __license__ = "Apache 2.0"
 
 import os
+import platform
 import tempfile
 import unittest
 import logging
@@ -26,7 +27,7 @@ from typing import List, Optional, Dict, Any
 from wwpdb.utils.testing.Features import Features
 from wwpdb.utils.db.FileActivityDb import FileActivityDb
 from wwpdb.utils.db.FileMetadataParser import FileMetadataParser
-
+from wwpdb.utils.testing.Features import Features
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -79,6 +80,7 @@ class DummyMyDbQuery:
             self.closed = True
             self.commands = []  # Clear commands on close
 
+# @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class FileActivityDbTests(unittest.TestCase):
     """Test cases for FileActivityDb class."""
 
@@ -86,7 +88,7 @@ class FileActivityDbTests(unittest.TestCase):
         """Set up test fixtures."""
         self.db = FileActivityDb()
         self.parser = FileMetadataParser()
-        self.test_dir = os.path.join(os.path.dirname(__file__), "test-output")
+        self.test_dir = os.path.join(os.path.dirname(__file__), "test-output", platform.python_version(), "fileactivitytest")
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
 
@@ -190,6 +192,7 @@ class FileActivityDbTests(unittest.TestCase):
                     else:
                         self.fail(f"displayActivity failed with parameters {test}: {e}")
 
+    @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
     def testPurgeDepositionData(self) -> None:
         """Test purging data for specific deposition ID."""
         # Test successful purge - should complete without error
@@ -203,6 +206,7 @@ class FileActivityDbTests(unittest.TestCase):
             self.db.purgeDataSetData("D_1000000000", confirmed=False)
 
 
+    @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
     def testPurgeFileActivityDb(self) -> None:
         """Test purging all data from file activity database."""
         # Test without confirmation
