@@ -26,7 +26,7 @@ __version__ = "V0.001"
 
 import sys
 from operator import itemgetter
-from typing import Tuple, Optional, List, Dict, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 # Python 3.8 does not have TypeAlias
 

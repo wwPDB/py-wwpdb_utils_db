@@ -17,12 +17,12 @@ __license__ = "Apache 2.0"
 
 import os
 import platform
-import sys
 import unittest
-from unittest.mock import patch
 from io import StringIO
-from typing import Optional, Union, List, Dict
+from typing import Dict, List, Optional, Union
+from unittest.mock import patch
 
+from wwpdb.utils.db.FileActivityDb import FileActivityDb
 from wwpdb.utils.db.FileActivityUtil import FileActivityUtil
 from wwpdb.utils.testing.Features import Features
 
@@ -32,7 +32,7 @@ if not os.path.exists(TESTOUTPUT):  # pragma: no cover
     os.makedirs(TESTOUTPUT)
 
 
-class DummyFileActivityDb:
+class DummyFileActivityDb(FileActivityDb):
     """Mock FileActivityDb for testing"""
     def __init__(self) -> None:
         self.purged: bool = False
@@ -43,25 +43,25 @@ class DummyFileActivityDb:
     def purgeAllData(self, confirmed: bool = False) -> None:
         self.purged = confirmed
 
-    def populateFromDirectory(self, directory: str, ignore_storage_types: Optional[List[str]] = None) -> None:
+    def populateFromDirectory(self, directory: str, ignore_storage_types: Optional[List[str]] = None) -> None:  # noqa: ARG002 pylint: disable=unused-argument
         self.loadedDirectory = directory
 
-    def displayActivity(self, hours: Optional[int] = None, days: Optional[int] = None) -> None:
+    def displayActivity(self, hours: Optional[int] = None, days: Optional[int] = None) -> None:  # noqa: ARG002 pylint: disable=unused-argument
         self.displayCalled = True
-        print("Dummy display output")
+        print("Dummy display output")  # noqa: T201
 
-    def getFileActivity(self, hours: Optional[int] = None, days: Optional[int] = None, site_id: Optional[str] = None,
-                       deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL", storage_types: str = "ALL") -> List[str]:
+    def getFileActivity(self, hours: Optional[int] = None, days: Optional[int] = None,
+                        deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL", storage_types: str = "ALL") -> List[str]:
         self.queryParams = {
             "hours": hours,
             "days": days,
-            "site_id": site_id,
             "deposition_ids": deposition_ids,
             "file_types": file_types,
             "formats": formats,
             "storage_types": storage_types
         }
         return ["dummy/file/path"]
+
 
 class FileActivityUtilTests(unittest.TestCase):
     """Test cases for FileActivityUtil class"""
@@ -110,7 +110,7 @@ class FileActivityUtilTests(unittest.TestCase):
 
     def testDisplayWithDays(self) -> None:
         """Test display command with days parameter"""
-        with patch('sys.stdout', new=StringIO()) as fake_out:
+        with patch('sys.stdout', new=StringIO()) as _fake_out:  # noqa: F841
             ret = self.util.displayActivity(['--days', '7'])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.displayCalled)
@@ -139,6 +139,7 @@ class FileActivityUtilTests(unittest.TestCase):
             self.assertEqual(self.dummy_db.queryParams['deposition_ids'], 'D_1000000000')
             self.assertIn("dummy/file/path", fake_out.getvalue())
 
+
 def suiteUtilTests() -> unittest.TestSuite:
     suite = unittest.TestSuite()
     suite.addTest(FileActivityUtilTests("testPurgeWithoutConfirmation"))
@@ -149,6 +150,7 @@ def suiteUtilTests() -> unittest.TestSuite:
     suite.addTest(FileActivityUtilTests("testLoadFileActivityDb"))
     suite.addTest(FileActivityUtilTests("testQueryFileActivity"))
     return suite
+
 
 if __name__ == "__main__":
     runner = unittest.TextTestRunner(verbosity=2)

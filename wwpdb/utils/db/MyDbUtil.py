@@ -62,7 +62,7 @@ class MyDbConnect:
         dbPw=None,
         dbSocket=None,
         dbPort=None,
-        verbose=False,
+        verbose=False,  # noqa: ARG002
         log=sys.stderr,  # noqa: ARG002
     ):  # noqa: ARG002 pylint: disable=unused-argument
         self.__lfh = log

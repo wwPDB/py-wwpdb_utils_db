@@ -16,15 +16,14 @@ __author__ = "Vivek Reddy Chithari"
 __email__ = "vivek.chithari@rcsb.org"
 __license__ = "Apache 2.0"
 
+import logging
 import os
 import platform
 import tempfile
 import unittest
-import logging
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List
 
-from wwpdb.utils.testing.Features import Features
 from wwpdb.utils.db.FileActivityDb import FileActivityDb
 from wwpdb.utils.db.FileMetadataParser import FileMetadataParser
 from wwpdb.utils.testing.Features import Features
@@ -32,12 +31,13 @@ from wwpdb.utils.testing.Features import Features
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class DummyMyDbQuery:
     """Mock database query class for testing."""
     def __init__(self) -> None:
         self.commands: List[str] = []
         self.test_data: Dict[str, List[List[Any]]] = {
-            'version_check': [[1, datetime.now().strftime('%Y-%m-%d %H:%M:%S')]],
+            'version_check': [[1, datetime.now().strftime('%Y-%m-%d %H:%M:%S')]],  # noqa: DTZ005
             'activity_query': [
                 ['file1.cif'],
                 ['file2.pdb']
@@ -54,24 +54,25 @@ class DummyMyDbQuery:
     def selectRows(self, sql: str) -> List[List[Any]]:
         """Mock select query execution."""
         if self.closed:
-            raise Exception("Query executed on closed connection")
+            err = "Query executed on closed connection"
+            raise Exception(err)  # noqa: TRY002 pylint: disable=broad-exception-raised
         # Store the SQL query in commands
         self.commands.append(sql.strip())
         if 'version_number' in sql:
             return self.test_data['version_check']
-        elif 'COUNT' in sql:
+        if 'COUNT' in sql:
             return self.test_data['count_query']
-        elif 'DISTINCT site_id, deposition_id, content_type, created_date' in sql:
+        if 'DISTINCT site_id, deposition_id, content_type, created_date' in sql:
             return self.test_data['display_query']
-        elif 'SELECT location FROM file_activity_log' in sql:
+        if 'SELECT location FROM file_activity_log' in sql:
             return self.test_data['activity_query']
-        else:
-            return []
+        return []
 
     def sqlCommand(self, sqlList: List[str]) -> None:
         """Mock SQL command execution."""
         if self.closed:
-            raise Exception("Command executed on closed connection")
+            err = "Command executed on closed connection"
+            raise Exception(err)  # noqa: TRY002 pylint: disable=broad-exception-raised
         self.commands.extend([sql.strip() for sql in sqlList])
 
     def close(self) -> None:
@@ -80,7 +81,7 @@ class DummyMyDbQuery:
             self.closed = True
             self.commands = []  # Clear commands on close
 
-# @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
+
 class FileActivityDbTests(unittest.TestCase):
     """Test cases for FileActivityDb class."""
 
@@ -109,7 +110,7 @@ class FileActivityDbTests(unittest.TestCase):
         # Test that FileActivityDb can be created without errors
         db = FileActivityDb(verbose=True)
         self.assertIsNotNone(db)
-        
+
         # Test that FileActivityDb can be created with verbose=False
         db2 = FileActivityDb(verbose=False)
         self.assertIsNotNone(db2)
@@ -119,23 +120,21 @@ class FileActivityDbTests(unittest.TestCase):
         # Use simpler, more standard OneDep filenames that are likely to be recognized
         test_cases = [
             "D_1000000001_model_P1.cif.V1",
-            "D_1000000002_sf_P1.cif.V2", 
+            "D_1000000002_sf_P1.cif.V2",
             "D_1000000003_structure-factors_P1.pdbx.V1",
             "D_1000000004_validation-report_P1.pdf.V1"
         ]
         for filename in test_cases:
             with self.subTest(filename=filename):
                 # Create a temporary file for the parser to work with
-                import tempfile
                 with tempfile.NamedTemporaryFile(suffix=filename, delete=False) as tmp:
                     tmp.write(b"test content")
                     tmp_path = tmp.name
-                
+
                 try:
-                    result = self.parser.parseFilePath(tmp_path)
+                    _result = self.parser.parseFilePath(tmp_path)  # noqa: F841
                     # For now, just check that parsing doesn't crash
                     # Whether it returns None or a result depends on PathInfo implementation
-                    self.assertTrue(True, "Parser executed without errors")
                 finally:
                     if os.path.exists(tmp_path):
                         os.unlink(tmp_path)
@@ -154,7 +153,7 @@ class FileActivityDbTests(unittest.TestCase):
         ]
         for name in invalid_names:
             with self.subTest(filename=name):
-                if name is None or name == "":
+                if name is None or name == "":  # noqa: PLC1901
                     # Handle None/empty string case
                     result = None
                     self.assertIsNone(result)
@@ -184,11 +183,10 @@ class FileActivityDbTests(unittest.TestCase):
                 try:
                     self.db.displayActivity(**test)
                     # Test passes if no exception raised
-                    self.assertTrue(True)
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     # If tracking is disabled, this is expected
                     if "File activity tracking is disabled" in str(e):
-                        self.assertTrue(True)
+                        pass
                     else:
                         self.fail(f"displayActivity failed with parameters {test}: {e}")
 
@@ -198,25 +196,22 @@ class FileActivityDbTests(unittest.TestCase):
         # Test successful purge - should complete without error
         self.db.purgeDataSetData("D_1000000000", confirmed=True)
         # Verify that the method completed without exception
-        self.assertTrue(True)  # If we get here, the method succeeded
-
+        # If we get here, the method succeeded
 
         # Test without confirmation
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError):  # noqa: PT027
             self.db.purgeDataSetData("D_1000000000", confirmed=False)
-
 
     @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
     def testPurgeFileActivityDb(self) -> None:
         """Test purging all data from file activity database."""
         # Test without confirmation
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError):  # noqa: PT027
             self.db.purgeAllData(confirmed=False)
 
         # Test with confirmation - should succeed without error
         self.db.purgeAllData(confirmed=True)
         # Verify that the method completed without exception
-        self.assertTrue(True)  # If we get here, the method succeeded
 
     @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
     def testUpdateFileActivity(self) -> None:
@@ -242,7 +237,6 @@ class FileActivityDbTests(unittest.TestCase):
             # Test database population
             self.db.populateFromDirectory(tmpdir)
             # Test passes if no exception is raised
-            self.assertTrue(True)
 
     def testGetFileActivity(self) -> None:
         """Test retrieving file activity records."""
@@ -276,9 +270,12 @@ class FileActivityDbTests(unittest.TestCase):
 
         for test in test_cases:
             with self.subTest(params=test['params']):
-                results = self.db.getFileActivity(**test['params'])
-                # Should return empty list for empty database or disabled tracking
-                self.assertIsInstance(results, list)
+                if isinstance(test['params'], dict):
+                    results = self.db.getFileActivity(**test['params'])
+                    # Should return empty list for empty database or disabled tracking
+                    self.assertIsInstance(results, list)
+                else:
+                    self.fail("Test instance wrong type")
 
     def testConnectionManagement(self) -> None:
         """Test database connection management."""
@@ -301,6 +298,7 @@ class FileActivityDbTests(unittest.TestCase):
         results = db.getFileActivity(hours=24, deposition_ids="ALL")
         self.assertIsInstance(results, list)
 
+
 def suiteFileActivityDbTests() -> unittest.TestSuite:
     """Create test suite for FileActivityDb tests."""
     suite = unittest.TestSuite()
@@ -314,6 +312,7 @@ def suiteFileActivityDbTests() -> unittest.TestSuite:
     suite.addTest(FileActivityDbTests("testPurgeDepositionData"))
     suite.addTest(FileActivityDbTests("testConnectionManagement"))
     return suite
+
 
 if __name__ == "__main__":
     runner = unittest.TextTestRunner(verbosity=2)

@@ -25,7 +25,7 @@ __license__ = "Apache 2.0"
 
 import argparse
 import logging
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from wwpdb.utils.db.FileActivityDb import FileActivityDb
 
@@ -137,7 +137,7 @@ class FileActivityUtil:
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
             return 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to purge database: %s", str(e))
             return 1
 
@@ -171,7 +171,7 @@ class FileActivityUtil:
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
             return 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to purge deposition data: %s", str(e))
             return 1
 
@@ -205,7 +205,7 @@ class FileActivityUtil:
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
             return 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to display database contents: %s", str(e))
             return 1
 
@@ -238,7 +238,7 @@ class FileActivityUtil:
         parser = self.__createParser("Load file metadata into database")
         parser.add_argument("--load-dir", required=True, help="Directory containing files to process")
         parser.add_argument("--ignore-storage-types", default="session,wf-instance",
-                          help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
+                            help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
         try:
             parsed_args = parser.parse_args(self.__parseArgs(args))
             self.__createDbWithVerbose(parsed_args)
@@ -253,7 +253,7 @@ class FileActivityUtil:
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
             return 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to load file activity data: %s", str(e))
             return 1
 
@@ -308,12 +308,12 @@ class FileActivityUtil:
                 storage_types=parsed_args.storage_types,
             )
             if results:
-                print("\n".join(results))
+                print("\n".join(results))  # noqa: T201
             return 0
         except SystemExit as e:
             logger.error("Argument parsing error: %s", e)
             return 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to query file activity: %s", str(e))
             return 1
 
@@ -343,9 +343,6 @@ def main() -> int:
     Returns:
         int: Exit code (0 for success, non-zero for failure)
     """
-    import argparse
-    import logging
-
     # Configure logging
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -413,7 +410,8 @@ Use -v/--verbose to enable detailed logging
              "range (D_8000210000-D_8000210100), or comma-separated list (D_8000210001,D_8000210002)",
     )
     query_parser.add_argument("--file-types", required=True, help="Comma-separated list of file types (e.g., model,structure,pdbx) or 'ALL'")
-    query_parser.add_argument("--formats", default="ALL", help="Comma-separated list of file formats (e.g., cif,xml,json) or 'ALL' (default). Note: 'cif' maps to 'pdbx' format in the database.")
+    query_parser.add_argument("--formats", default="ALL",
+                              help="Comma-separated list of file formats (e.g., cif,xml,json) or 'ALL' (default). Note: 'cif' maps to 'pdbx' format in the database.")
     query_parser.add_argument("--storage-types", default="ALL", help="Comma-separated list of storage types (e.g., archive,deposit,session) or 'ALL' (default)")
     query_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
@@ -432,7 +430,7 @@ Use -v/--verbose to enable detailed logging
     load_parser.add_argument("--load-dir", required=True, help="Directory containing files to process (should contain subdirectories with files)")
     # site_id has been removed from the schema
     load_parser.add_argument("--ignore-storage-types", default="session,wf-instance",
-                          help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
+                             help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
     load_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     # Purge command
@@ -501,7 +499,7 @@ Use -v/--verbose to enable detailed logging
             cmd += " -v"
 
         return util.displayActivity(cmd)
-    elif args.command == "query":
+    if args.command == "query":
         cmd = f"--{'hours' if args.hours else 'days'} {args.hours or args.days}"
         # site_id references removed (schema update)
         cmd += f" --deposition-ids {args.deposition_ids} --file-types {args.file_types} --formats {args.formats}"
@@ -513,7 +511,7 @@ Use -v/--verbose to enable detailed logging
             cmd += " -v"
 
         return util.getActivity(cmd)
-    elif args.command == "load":
+    if args.command == "load":
         cmd = f"--load-dir {args.load_dir}"
         # site_id references removed (schema update)
         if args.ignore_storage_types:
@@ -524,7 +522,7 @@ Use -v/--verbose to enable detailed logging
             cmd += " -v"
 
         return util.populateFromDirectory(cmd)
-    elif args.command == "purge":
+    if args.command == "purge":
         cmd = "--confirmed" if args.confirmed else ""
 
         # Add verbose flag if enabled
@@ -532,7 +530,7 @@ Use -v/--verbose to enable detailed logging
             cmd += " -v"
 
         return util.purgeAllData(cmd)
-    elif args.command == "purge-dataset":
+    if args.command == "purge-dataset":
         cmd = f"--deposition-id {args.deposition_id}"
         if args.confirmed:
             cmd += " --confirmed"

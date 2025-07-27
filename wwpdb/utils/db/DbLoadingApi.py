@@ -141,7 +141,7 @@ class DbLoadingApi:
                         for line in file:
                             for word in line.split():
                                 if word.upper() == "ERROR":
-                                    print(
+                                    print(  # noqa: T201
                                         "DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file "
                                         + log2
                                         + " for details."
@@ -452,7 +452,7 @@ class DbLoadingApi:
                         for line in file:
                             for word in line.split():
                                 if word.upper() == "ERROR":
-                                    print(
+                                    print(  # noqa: T201
                                         "DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file "
                                         + log2
                                         + " for details."
@@ -594,7 +594,7 @@ class DbLoadingApi:
                         for line in file:
                             for word in line.split():
                                 if word.upper() == "ERROR":
-                                    print(
+                                    print(  # noqa: T201
                                         "DbLoadingApi::doDataLoading(): ERROR found during the database loading. Please check the log file "
                                         + log2
                                         + " for details."

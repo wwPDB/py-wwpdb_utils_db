@@ -26,13 +26,13 @@ import os
 import sys
 from datetime import datetime
 from types import TracebackType
-from typing import List, Optional, Tuple, Dict, Any, TextIO, Union, Type
+from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, Union
 
+from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.config.ConfigInfo import getSiteId
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.utils.db.FileActivityDbCore import FileActivityDbCore
 from wwpdb.utils.db.FileMetadataParser import FileMetadataParser
-from wwpdb.io.locator.PathInfo import PathInfo
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ class FileActivityDb:
             # Cast the return value to bool to satisfy typechecking
             # If None is returned, cast will make it False
             return bool(support_value)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.warning("Error checking file activity configuration: %s", str(e))
             return False
 
@@ -166,9 +166,9 @@ class FileActivityDb:
                     self.__lfh.write(f"+FileActivityDb.logActivity Failed to log: {file_path}\n")
 
             return result
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             if self.__verbose and self.__lfh:
-                self.__lfh.write(f"+FileActivityDb.logActivity Error logging file: {str(e)}\n")
+                self.__lfh.write(f"+FileActivityDb.logActivity Error logging file: {e!s}\n")
             logger.error("Error logging file activity: %s", str(e))
             return False
 
@@ -192,14 +192,14 @@ class FileActivityDb:
         """
         # Check if tracking is enabled
         if not self.isTrackingEnabled():
-            logger.warning("File activity tracking is disabled in site configuration. " "To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
-            print("NOTE: File activity tracking is disabled in site configuration.")
+            logger.warning("File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
+            print("NOTE: File activity tracking is disabled in site configuration.")  # noqa: T201
             return
 
         try:
             with self.__db_core._connection():
                 if not os.path.isdir(directory):
-                    raise ValueError("Invalid directory: %s" % directory)
+                    raise ValueError("Invalid directory: %s" % directory)  # noqa: TRY301
 
                 # No longer need site_id as it's been removed from schema
 
@@ -258,7 +258,7 @@ class FileActivityDb:
                                         version_number = 1
 
                                     key = (deposition_id, content_type, format_type, part_number, storage_type)
-                                    created_date = datetime.fromtimestamp(file_entry.stat().st_ctime).strftime("%Y-%m-%d %H:%M:%S")
+                                    created_date = datetime.fromtimestamp(file_entry.stat().st_ctime).strftime("%Y-%m-%d %H:%M:%S")  # noqa: DTZ006
 
                                     if key not in group_files or group_files[key]["version_number"] < version_number:
                                         group_files[key] = {
@@ -271,13 +271,13 @@ class FileActivityDb:
                                             "created_date": created_date,
                                         }
                                         logger.debug("Updated group_files with: %s", group_files[key])
-                                except Exception as e:
+                                except Exception as e:  # noqa: BLE001
                                     logger.warning("Error processing file %s: %s", file_entry.path, str(e))
 
                         self.__updateDbRecords(group_files)
 
                 logger.info("Successfully loaded the latest version files from %s into the database.", directory)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Error loading files from directory: %s", e)
             raise
 
@@ -305,7 +305,7 @@ class FileActivityDb:
             AND format_type = %s
             AND part_number = %s
             AND storage_type = %s;
-        """
+        """  # noqa: S608
 
         check_params = (
             record["deposition_id"],
@@ -335,7 +335,7 @@ class FileActivityDb:
                     version_number = VALUES(version_number),
                     created_date = VALUES(created_date),
                     storage_type = VALUES(storage_type);
-            """
+            """  # noqa: S608
 
             insert_params = (
                 record["deposition_id"],
@@ -395,10 +395,9 @@ class FileActivityDb:
         """
         if hours is not None:
             return hours
-        elif days is not None:
+        if days is not None:
             return days * 24
-        else:
-            return 24  # Default to last 24 hours
+        return 24  # Default to last 24 hours
 
     def getFileActivity(
         self, hours: Optional[int] = None, days: Optional[int] = None, deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL", storage_types: str = "ALL"
@@ -422,8 +421,8 @@ class FileActivityDb:
         """
         # Check if tracking is enabled
         if not self.isTrackingEnabled():
-            logger.warning("File activity tracking is disabled in site configuration. " "To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
-            print("NOTE: File activity tracking is disabled in site configuration.")
+            logger.warning("File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
+            print("NOTE: File activity tracking is disabled in site configuration.")  # noqa: T201
             return []
 
         # site_id has been removed from the schema
@@ -432,7 +431,7 @@ class FileActivityDb:
         total_hours = self.__calculateTimeRange(hours, days)
 
         table_name = self.__db_core.getTableName()
-        query_parts = [f"SELECT deposition_id, content_type, format_type, part_number, version_number, storage_type FROM {table_name} WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)"]
+        query_parts = [f"SELECT deposition_id, content_type, format_type, part_number, version_number, storage_type FROM {table_name} WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)"]   # noqa: S608,E501
         params: List[Union[int, str]] = [total_hours]
 
         # No need to filter by site_id as it's been removed from schema
@@ -446,9 +445,10 @@ class FileActivityDb:
                     end_num = int(end_id.replace("D_", ""))
                     query_parts.append("AND CAST(SUBSTRING(deposition_id, 3) AS UNSIGNED) BETWEEN %s AND %s")
                     params.extend([start_num, end_num])
-                except Exception:
+                except Exception as e:  # noqa: BLE001
                     logger.error("Invalid deposition-ids range '%s'. Valid options: ALL, D_XXXX, D_XXXX-D_YYYY, or comma separated list.", deposition_ids)
-                    raise ValueError("Invalid deposition-ids range")
+                    err = "Invalid deposition-ids range"
+                    raise ValueError(err) from e
             elif "," in deposition_ids:
                 # For IN queries with variable number of items
                 dep_list = [d.strip() for d in deposition_ids.split(",")]
@@ -463,8 +463,8 @@ class FileActivityDb:
         if file_types.upper() != "ALL":
             types_list = file_types.split(",")
             type_conditions = []
-            for ft in types_list:
-                ft = ft.strip()
+            for ft_in in types_list:
+                ft = ft_in.strip()
                 # Use exact match instead of LIKE with wildcard
                 type_conditions.append("content_type = %s")
                 params.append(ft)
@@ -475,8 +475,8 @@ class FileActivityDb:
         if formats.upper() != "ALL":
             formats_list = formats.split(",")
             format_conditions = []
-            for fmt in formats_list:
-                fmt = fmt.strip()
+            for fmt_in in formats_list:
+                fmt = fmt_in.strip()
                 # Map common file extensions to format_type values
                 if fmt.lower() == 'cif':
                     mapped_fmt = 'pdbx'
@@ -486,13 +486,13 @@ class FileActivityDb:
                     mapped_fmt = 'json'
                 else:
                     mapped_fmt = fmt
-                
+
                 format_conditions.append("format_type = %s")
                 params.append(mapped_fmt)
-                
+
                 if self.__verbose:
                     logger.debug("Mapped format '%s' to format_type '%s'", fmt, mapped_fmt)
-            
+
             if format_conditions:
                 query_parts.append("AND (%s)" % " OR ".join(format_conditions))
 
@@ -501,9 +501,9 @@ class FileActivityDb:
             storage_list = storage_types.split(",")
             storage_conditions = []
             for st in storage_list:
-                st = st.strip()
+                st_str = st.strip()
                 storage_conditions.append("storage_type = %s")
-                params.append(st)
+                params.append(st_str)
             if storage_conditions:
                 query_parts.append("AND (%s)" % " OR ".join(storage_conditions))
 
@@ -526,7 +526,7 @@ class FileActivityDb:
 
                 # For empty results, check if the table exists and has data
                 if not results and self.__verbose:
-                    check_table_sql = f"SELECT COUNT(*) FROM {table_name}"
+                    check_table_sql = f"SELECT COUNT(*) FROM {table_name}"  # noqa: S608
                     count_result = self.__db_core._executeSelectQuery(check_table_sql)
                     if count_result and count_result[0][0] == 0:
                         logger.info("The table %s exists but is empty", table_name)
@@ -546,13 +546,13 @@ class FileActivityDb:
                         contentType=content_type,     # e.g., "model"
                         formatType=format_type,       # e.g., "pdbx"
                         fileSource=storage_type,      # e.g., "archive"
-                        versionId=str(version_number),# e.g., "3"
+                        versionId=str(version_number),  # e.g., "3"
                         partNumber=str(part_number)  # e.g., "0"
                     )
                     file_paths.append(file_path)
 
                 return file_paths
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 logger.error("Unable to retrieve changed files from %s: %s", table_name, err)
                 raise
 
@@ -574,7 +574,8 @@ class FileActivityDb:
         """
         if not confirmed:
             logger.error("Must provide --confirmed flag to purge database")
-            raise ValueError("Must provide --confirmed flag to purge database")
+            err = "Must provide --confirmed flag to purge database"
+            raise ValueError(err)
 
         with self.__db_core._connection():
             try:
@@ -582,7 +583,7 @@ class FileActivityDb:
                 truncate_sql = f"TRUNCATE TABLE {table_name}"
                 self.__db_core._executeUpdateQuery(truncate_sql)
                 logger.info("Successfully purged all data from %s table.", table_name)
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 logger.error("Failed to purge database: %s", err)
                 raise
 
@@ -603,7 +604,8 @@ class FileActivityDb:
         """
         if not confirmed:
             logger.error("Must provide confirmed=True to purge dataset data")
-            raise ValueError("Confirmation required for purge operation")
+            err = "Confirmation required for purge operation"
+            raise ValueError(err)
 
         # No regex check for development machines where ID range may be D_800000 to D_999999
 
@@ -615,7 +617,7 @@ class FileActivityDb:
                 count_sql = f"""
                     SELECT COUNT(*) FROM {table_name}
                     WHERE deposition_id = %s;
-                """
+                """  # noqa: S608
 
                 # Use our helper method to get results
                 count_result = self.__db_core._executeSelectQuery(count_sql, (deposition_id,))
@@ -625,11 +627,11 @@ class FileActivityDb:
                 delete_sql = f"""
                     DELETE FROM {table_name}
                     WHERE deposition_id = %s;
-                """
+                """  # noqa: S608
                 self.__db_core._executeUpdateQuery(delete_sql, (deposition_id,))
 
                 logger.info("Successfully purged %d records for deposition ID: %s", record_count, deposition_id)
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 logger.error("Failed to purge data for deposition ID %s: %s", deposition_id, err)
                 raise
 
@@ -650,8 +652,8 @@ class FileActivityDb:
         """
         # Check if tracking is enabled
         if not self.isTrackingEnabled():
-            logger.warning("File activity tracking is disabled in site configuration. " "To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
-            print("NOTE: File activity tracking is disabled in site configuration.")
+            logger.warning("File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
+            print("NOTE: File activity tracking is disabled in site configuration.")  # noqa: T201
             return
 
         total_hours = self.__calculateTimeRange(hours, days)
@@ -661,7 +663,7 @@ class FileActivityDb:
             SELECT DISTINCT deposition_id, content_type, storage_type, created_date
             FROM {table_name}
             WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)
-        """
+        """  # noqa: S608
 
         params: List[Union[int, str]] = [total_hours]
 
@@ -676,13 +678,13 @@ class FileActivityDb:
 
                 # Print headers
                 headers = ["dep_id", "file_type", "storage_type", "last_timestamp"]
-                print(",".join(headers))
+                print(",".join(headers))  # noqa: T201
 
                 # Print data
                 for row in results:
-                    print(",".join([str(row[0]), str(row[1]), str(row[2]), str(row[3])]))
+                    print(",".join([str(row[0]), str(row[1]), str(row[2]), str(row[3])]))  # noqa: T201
 
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 logger.error("Failed to display database contents: %s", err)
                 raise
 
@@ -724,7 +726,7 @@ class FileActivityDb:
             with self.__db_core._connection():
                 self.__updateDbRecordInternal(record)
             return True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to add/update file record for %s: %s", file_path, str(e))
             return False
 
@@ -761,7 +763,7 @@ class FileActivityDb:
             WHERE deposition_id = %s AND content_type = %s
             AND format_type = %s AND part_number = %s
             AND storage_type = %s;
-        """
+        """  # noqa: S608
         params = (deposition_id, content_type, format_type, part_number, storage_type)
 
         try:
@@ -780,9 +782,9 @@ class FileActivityDb:
                 if result and result[0]:
                     # Convert string timestamp to datetime object
                     timestamp_str = str(result[0])  # Ensure string type
-                    return datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+                    return datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007
                 return None
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to get timestamp for %s: %s", file_path, str(e))
             return None
 
@@ -828,7 +830,7 @@ class FileActivityDb:
             WHERE deposition_id = %s AND content_type = %s
             AND format_type = %s AND part_number = %s
             AND storage_type = %s;
-        """
+        """  # noqa: S608
 
         update_params = (timestamp_str, deposition_id, content_type, format_type, part_number, storage_type)
 
@@ -845,7 +847,7 @@ class FileActivityDb:
                     WHERE deposition_id = %s AND content_type = %s
                     AND format_type = %s AND part_number = %s
                     AND storage_type = %s;
-                """
+                """  # noqa: S608
 
                 check_params = (deposition_id, content_type, format_type, part_number, storage_type)
 
@@ -857,7 +859,7 @@ class FileActivityDb:
                     count = int(results[0][0])
                     return count > 0
                 return False
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to update timestamp for %s: %s", file_path, str(e))
             return False
 
