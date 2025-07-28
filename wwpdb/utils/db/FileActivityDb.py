@@ -197,7 +197,7 @@ class FileActivityDb:
             return
 
         try:
-            with self.__db_core._connection():
+            with self.__db_core.connection():
                 if not os.path.isdir(directory):
                     raise ValueError("Invalid directory: %s" % directory)  # noqa: TRY301
 
@@ -319,7 +319,7 @@ class FileActivityDb:
             logger.debug("Executing check SQL: %s", check_sql)
 
         # Execute the SQL to check for existing record using our helper method
-        existing_record = self.__db_core._executeSelectQuery(check_sql, check_params)
+        existing_record = self.__db_core.executeSelectQuery(check_sql, check_params)
 
         if not existing_record or int(existing_record[0][0]) < record["version_number"]:
             # Use the new record's timestamp since we're updating to latest version
@@ -351,7 +351,7 @@ class FileActivityDb:
                 logger.debug("Executing insert SQL: %s", insert_sql)
 
             # Use our helper method for UPDATE/INSERT operations
-            self.__db_core._executeUpdateQuery(insert_sql, insert_params)
+            self.__db_core.executeUpdateQuery(insert_sql, insert_params)
 
     def __updateDbRecord(self, record: Dict[str, Any]) -> None:
         """
@@ -363,7 +363,7 @@ class FileActivityDb:
         Raises:
             Exception: For database operation failures
         """
-        with self.__db_core._connection():
+        with self.__db_core.connection():
             self.__updateDbRecordInternal(record)
 
     def __updateDbRecords(self, group_files: Dict[Tuple[str, str, str, int, str], Dict[str, Any]]) -> None:
@@ -510,7 +510,7 @@ class FileActivityDb:
         # Combine all query parts
         base_query = " ".join(query_parts)
 
-        with self.__db_core._connection():
+        with self.__db_core.connection():
             try:
                 # Log the constructed query and parameters for debugging
                 if self.__verbose:
@@ -518,7 +518,7 @@ class FileActivityDb:
                     logger.debug("With parameters: %s", params)
 
                 # Use our helper method for parameterized SELECT query
-                results = self.__db_core._executeSelectQuery(base_query, tuple(params))
+                results = self.__db_core.executeSelectQuery(base_query, tuple(params))
 
                 # Log the result count for debugging
                 if self.__verbose:
@@ -527,7 +527,7 @@ class FileActivityDb:
                 # For empty results, check if the table exists and has data
                 if not results and self.__verbose:
                     check_table_sql = f"SELECT COUNT(*) FROM {table_name}"  # noqa: S608
-                    count_result = self.__db_core._executeSelectQuery(check_table_sql)
+                    count_result = self.__db_core.executeSelectQuery(check_table_sql)
                     if count_result and count_result[0][0] == 0:
                         logger.info("The table %s exists but is empty", table_name)
 
@@ -577,11 +577,11 @@ class FileActivityDb:
             err = "Must provide --confirmed flag to purge database"
             raise ValueError(err)
 
-        with self.__db_core._connection():
+        with self.__db_core.connection():
             try:
                 table_name = self.__db_core.getTableName()
                 truncate_sql = f"TRUNCATE TABLE {table_name}"
-                self.__db_core._executeUpdateQuery(truncate_sql)
+                self.__db_core.executeUpdateQuery(truncate_sql)
                 logger.info("Successfully purged all data from %s table.", table_name)
             except Exception as err:  # noqa: BLE001
                 logger.error("Failed to purge database: %s", err)
@@ -609,7 +609,7 @@ class FileActivityDb:
 
         # No regex check for development machines where ID range may be D_800000 to D_999999
 
-        with self.__db_core._connection():
+        with self.__db_core.connection():
             try:
                 table_name = self.__db_core.getTableName()
 
@@ -620,7 +620,7 @@ class FileActivityDb:
                 """  # noqa: S608
 
                 # Use our helper method to get results
-                count_result = self.__db_core._executeSelectQuery(count_sql, (deposition_id,))
+                count_result = self.__db_core.executeSelectQuery(count_sql, (deposition_id,))
                 record_count = count_result[0][0] if count_result else 0
 
                 # Execute the delete with parameterized query
@@ -628,7 +628,7 @@ class FileActivityDb:
                     DELETE FROM {table_name}
                     WHERE deposition_id = %s;
                 """  # noqa: S608
-                self.__db_core._executeUpdateQuery(delete_sql, (deposition_id,))
+                self.__db_core.executeUpdateQuery(delete_sql, (deposition_id,))
 
                 logger.info("Successfully purged %d records for deposition ID: %s", record_count, deposition_id)
             except Exception as err:  # noqa: BLE001
@@ -667,10 +667,10 @@ class FileActivityDb:
 
         params: List[Union[int, str]] = [total_hours]
 
-        with self.__db_core._connection():
+        with self.__db_core.connection():
             try:
                 # Use our helper method for parameterized SELECT query
-                results = self.__db_core._executeSelectQuery(query, tuple(params))
+                results = self.__db_core.executeSelectQuery(query, tuple(params))
 
                 if not results:
                     logger.info("No records found for the specified criteria.")
@@ -723,7 +723,7 @@ class FileActivityDb:
 
         # Update the database
         try:
-            with self.__db_core._connection():
+            with self.__db_core.connection():
                 self.__updateDbRecordInternal(record)
             return True
         except Exception as e:  # noqa: BLE001
@@ -767,12 +767,12 @@ class FileActivityDb:
         params = (deposition_id, content_type, format_type, part_number, storage_type)
 
         try:
-            with self.__db_core._connection():
+            with self.__db_core.connection():
                 if self.__verbose:
                     logger.debug("Executing query: %s", query)
 
                 # Use the db_core for parameterized SELECT query
-                results = self.__db_core._executeSelectQuery(query, params)
+                results = self.__db_core.executeSelectQuery(query, params)
                 if not results:
                     return None
 
@@ -835,11 +835,11 @@ class FileActivityDb:
         update_params = (timestamp_str, deposition_id, content_type, format_type, part_number, storage_type)
 
         try:
-            with self.__db_core._connection():
+            with self.__db_core.connection():
                 if self.__verbose:
                     logger.debug("Executing update: %s", update_sql)
                 # Use the db_core for parameterized updates
-                self.__db_core._executeUpdateQuery(update_sql, update_params)
+                self.__db_core.executeUpdateQuery(update_sql, update_params)
 
                 # Check if the record exists after update
                 check_sql = f"""
@@ -852,7 +852,7 @@ class FileActivityDb:
                 check_params = (deposition_id, content_type, format_type, part_number, storage_type)
 
                 # Use the db_core to check if record exists
-                results = self.__db_core._executeSelectQuery(check_sql, check_params)
+                results = self.__db_core.executeSelectQuery(check_sql, check_params)
 
                 # Check if we got results and the count is > 0
                 if results and len(results) > 0:

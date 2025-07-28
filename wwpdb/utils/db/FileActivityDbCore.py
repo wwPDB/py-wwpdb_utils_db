@@ -111,7 +111,7 @@ class FileActivityDbCore:
             logger.error("Unable to connect to the database: %s", err)
             raise
 
-    def _executeSelectQuery(self, query: str, params: Optional[Union[Tuple[Any, ...], List[Any], Dict[str, Any]]] = None) -> List[Tuple[Any, ...]]:
+    def executeSelectQuery(self, query: str, params: Optional[Union[Tuple[Any, ...], List[Any], Dict[str, Any]]] = None) -> List[Tuple[Any, ...]]:
         """
         Execute a SELECT query with parameters and return results.
 
@@ -145,7 +145,7 @@ class FileActivityDbCore:
                 cursor.close()
             return []
 
-    def _executeUpdateQuery(self, query: str, params: Optional[Union[Tuple[Any, ...], List[Any], Dict[str, Any]]] = None) -> bool:
+    def executeUpdateQuery(self, query: str, params: Optional[Union[Tuple[Any, ...], List[Any], Dict[str, Any]]] = None) -> bool:
         """
         Execute an UPDATE/INSERT/DELETE query with parameters.
 
@@ -182,7 +182,7 @@ class FileActivityDbCore:
             return False
 
     @contextmanager
-    def _connection(self) -> Generator[None, None, None]:
+    def connection(self) -> Generator[None, None, None]:
         """
         Context manager for database connection lifecycle.
 
@@ -191,10 +191,10 @@ class FileActivityDbCore:
         if this context manager created it.
 
         Usage:
-            with self._connection():
+            with self.connection():
                 # Database operations using helper methods
-                self._executeSelectQuery(...)
-                self._executeUpdateQuery(...)
+                self.executeSelectQuery(...)
+                self.executeUpdateQuery(...)
 
         Yields:
             None
