@@ -192,7 +192,9 @@ class FileActivityDb:
         """
         # Check if tracking is enabled
         if not self.isTrackingEnabled():
-            logger.warning("File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
+            logger.warning(
+                "File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration."
+            )
             print("NOTE: File activity tracking is disabled in site configuration.")  # noqa: T201
             return
 
@@ -400,7 +402,13 @@ class FileActivityDb:
         return 24  # Default to last 24 hours
 
     def getFileActivity(
-        self, hours: Optional[int] = None, days: Optional[int] = None, deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL", storage_types: str = "ALL"
+        self,
+        hours: Optional[int] = None,
+        days: Optional[int] = None,
+        deposition_ids: str = "ALL",
+        file_types: str = "ALL",
+        formats: str = "ALL",
+        storage_types: str = "ALL",
     ) -> List[str]:
         """
         Retrieve file activity based on specified criteria.
@@ -421,7 +429,9 @@ class FileActivityDb:
         """
         # Check if tracking is enabled
         if not self.isTrackingEnabled():
-            logger.warning("File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
+            logger.warning(
+                "File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration."
+            )
             print("NOTE: File activity tracking is disabled in site configuration.")  # noqa: T201
             return []
 
@@ -431,7 +441,9 @@ class FileActivityDb:
         total_hours = self.__calculateTimeRange(hours, days)
 
         table_name = self.__db_core.getTableName()
-        query_parts = [f"SELECT deposition_id, content_type, format_type, part_number, version_number, storage_type FROM {table_name} WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)"]   # noqa: S608,E501
+        query_parts = [
+            f"SELECT deposition_id, content_type, format_type, part_number, version_number, storage_type FROM {table_name} WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)"
+        ]  # noqa: S608,E501
         params: List[Union[int, str]] = [total_hours]
 
         # No need to filter by site_id as it's been removed from schema
@@ -478,12 +490,12 @@ class FileActivityDb:
             for fmt_in in formats_list:
                 fmt = fmt_in.strip()
                 # Map common file extensions to format_type values
-                if fmt.lower() == 'cif':
-                    mapped_fmt = 'pdbx'
-                elif fmt.lower() == 'xml':
-                    mapped_fmt = 'xml'
-                elif fmt.lower() == 'json':
-                    mapped_fmt = 'json'
+                if fmt.lower() == "cif":
+                    mapped_fmt = "pdbx"
+                elif fmt.lower() == "xml":
+                    mapped_fmt = "xml"
+                elif fmt.lower() == "json":
+                    mapped_fmt = "json"
                 else:
                     mapped_fmt = fmt
 
@@ -542,12 +554,12 @@ class FileActivityDb:
                     # Use PathInfo.getFilePath to consistently reconstruct file paths
                     # This ensures paths follow the OneDep conventions for all storage types
                     file_path = path_info.getFilePath(
-                        dataSetId=deposition_id,      # e.g., "D_1000001"
-                        contentType=content_type,     # e.g., "model"
-                        formatType=format_type,       # e.g., "pdbx"
-                        fileSource=storage_type,      # e.g., "archive"
+                        dataSetId=deposition_id,  # e.g., "D_1000001"
+                        contentType=content_type,  # e.g., "model"
+                        formatType=format_type,  # e.g., "pdbx"
+                        fileSource=storage_type,  # e.g., "archive"
                         versionId=str(version_number),  # e.g., "3"
-                        partNumber=str(part_number)  # e.g., "0"
+                        partNumber=str(part_number),  # e.g., "0"
                     )
                     file_paths.append(file_path)
 
@@ -652,7 +664,9 @@ class FileActivityDb:
         """
         # Check if tracking is enabled
         if not self.isTrackingEnabled():
-            logger.warning("File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration.")
+            logger.warning(
+                "File activity tracking is disabled in site configuration. To enable tracking, set SITE_FILE_ACTIVITY_DB_SUPPORT=True in the configuration."
+            )
             print("NOTE: File activity tracking is disabled in site configuration.")  # noqa: T201
             return
 

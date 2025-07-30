@@ -237,8 +237,11 @@ class FileActivityUtil:
         """
         parser = self.__createParser("Load file metadata into database")
         parser.add_argument("--load-dir", required=True, help="Directory containing files to process")
-        parser.add_argument("--ignore-storage-types", default="session,wf-instance",
-                            help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
+        parser.add_argument(
+            "--ignore-storage-types",
+            default="session,wf-instance",
+            help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.",
+        )
         try:
             parsed_args = parser.parse_args(self.__parseArgs(args))
             self.__createDbWithVerbose(parsed_args)
@@ -294,7 +297,11 @@ class FileActivityUtil:
         group.add_argument("--days", type=int, help="Time range in days")
         parser.add_argument("--deposition-ids", required=True, help="List or range of deposition IDs or ALL")
         parser.add_argument("--file-types", required=True, help="Comma-separated list of file types or ALL")
-        parser.add_argument("--formats", default="ALL", help="Comma-separated list of file formats or ALL. Common extensions (cif,xml,json) are mapped to internal formats (pdbx,xml,json).")
+        parser.add_argument(
+            "--formats",
+            default="ALL",
+            help="Comma-separated list of file formats or ALL. Common extensions (cif,xml,json) are mapped to internal formats (pdbx,xml,json).",
+        )
         parser.add_argument("--storage-types", default="ALL", help="Comma-separated list of storage types or ALL")
         try:
             parsed_args = parser.parse_args(self.__parseArgs(args))
@@ -407,11 +414,14 @@ Use -v/--verbose to enable detailed logging
         "--deposition-ids",
         required=True,
         help="Deposition IDs to filter. Options: 'ALL' for all IDs, single ID (D_8000210001), "
-             "range (D_8000210000-D_8000210100), or comma-separated list (D_8000210001,D_8000210002)",
+        "range (D_8000210000-D_8000210100), or comma-separated list (D_8000210001,D_8000210002)",
     )
     query_parser.add_argument("--file-types", required=True, help="Comma-separated list of file types (e.g., model,structure,pdbx) or 'ALL'")
-    query_parser.add_argument("--formats", default="ALL",
-                              help="Comma-separated list of file formats (e.g., cif,xml,json) or 'ALL' (default). Note: 'cif' maps to 'pdbx' format in the database.")
+    query_parser.add_argument(
+        "--formats",
+        default="ALL",
+        help="Comma-separated list of file formats (e.g., cif,xml,json) or 'ALL' (default). Note: 'cif' maps to 'pdbx' format in the database.",
+    )
     query_parser.add_argument("--storage-types", default="ALL", help="Comma-separated list of storage types (e.g., archive,deposit,session) or 'ALL' (default)")
     query_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
@@ -429,8 +439,11 @@ Use -v/--verbose to enable detailed logging
     load_parser.formatter_class = argparse.RawDescriptionHelpFormatter
     load_parser.add_argument("--load-dir", required=True, help="Directory containing files to process (should contain subdirectories with files)")
     # site_id has been removed from the schema
-    load_parser.add_argument("--ignore-storage-types", default="session,wf-instance",
-                             help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.")
+    load_parser.add_argument(
+        "--ignore-storage-types",
+        default="session,wf-instance",
+        help="Comma-separated list of storage types to ignore (e.g., session,wf-instance). Defaults to session,wf-instance. Set to empty string to process all types.",
+    )
     load_parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     # Purge command
@@ -475,7 +488,7 @@ Use -v/--verbose to enable detailed logging
 
     # Configure logging based on verbosity - handle both global and subcommand verbose flags
     # Get verbose flag from the appropriate namespace
-    verbose_enabled = getattr(args, 'verbose', False)
+    verbose_enabled = getattr(args, "verbose", False)
 
     if verbose_enabled:
         logging.getLogger().setLevel(logging.DEBUG)

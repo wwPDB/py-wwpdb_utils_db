@@ -10,6 +10,7 @@
 """
 Test cases for FileActivityUtil module - tests utility methods for database operations.
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Vivek Reddy Chithari"
 __email__ = "vivek.chithari@rcsb.org"
@@ -34,7 +35,8 @@ if not os.path.exists(TESTOUTPUT):  # pragma: no cover
 
 class DummyFileActivityDb(FileActivityDb):
     """Mock FileActivityDb for testing"""
-    def __init__(self) -> None:
+
+    def __init__(self) -> None:  # pylint: disable=super-init-not-called
         self.purged: bool = False
         self.loadedDirectory: Optional[str] = None
         self.displayCalled: bool = False
@@ -50,15 +52,22 @@ class DummyFileActivityDb(FileActivityDb):
         self.displayCalled = True
         print("Dummy display output")  # noqa: T201
 
-    def getFileActivity(self, hours: Optional[int] = None, days: Optional[int] = None,
-                        deposition_ids: str = "ALL", file_types: str = "ALL", formats: str = "ALL", storage_types: str = "ALL") -> List[str]:
+    def getFileActivity(
+        self,
+        hours: Optional[int] = None,
+        days: Optional[int] = None,
+        deposition_ids: str = "ALL",
+        file_types: str = "ALL",
+        formats: str = "ALL",
+        storage_types: str = "ALL",
+    ) -> List[str]:
         self.queryParams = {
             "hours": hours,
             "days": days,
             "deposition_ids": deposition_ids,
             "file_types": file_types,
             "formats": formats,
-            "storage_types": storage_types
+            "storage_types": storage_types,
         }
         return ["dummy/file/path"]
 
@@ -79,7 +88,7 @@ class FileActivityUtilTests(unittest.TestCase):
     @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
     def testPurgeWithoutConfirmation(self) -> None:
         """Test purge command without confirmation flag"""
-        with patch('sys.stderr', new=StringIO()) as fake_err:
+        with patch("sys.stderr", new=StringIO()) as fake_err:
             ret = self.util.purgeAllData([])
             self.assertEqual(ret, 1)
             self.assertIn("Must provide --confirmed flag to purge database", fake_err.getvalue())
@@ -88,30 +97,30 @@ class FileActivityUtilTests(unittest.TestCase):
     def testPurgeWithCancel(self) -> None:
         """Test purge command with cancellation simulation (production ignores cancellation)"""
         # Even if input returns 'n', production does not cancel purge since --confirmed is provided
-        with patch('builtins.input', return_value='n'), patch('sys.stdout', new=StringIO()):
-            ret = self.util.purgeAllData(['--confirmed'])
+        with patch("builtins.input", return_value="n"), patch("sys.stdout", new=StringIO()):
+            ret = self.util.purgeAllData(["--confirmed"])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.purged)
 
     def testPurgeWithConfirm(self) -> None:
         """Test purge command with confirmation"""
-        with patch('builtins.input', return_value='y'):
-            ret = self.util.purgeAllData(['--confirmed'])
+        with patch("builtins.input", return_value="y"):
+            ret = self.util.purgeAllData(["--confirmed"])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.purged)
 
     def testDisplayWithHours(self) -> None:
         """Test display command with hours parameter"""
-        with patch('sys.stdout', new=StringIO()) as fake_out:
-            ret = self.util.displayActivity(['--hours', '24'])
+        with patch("sys.stdout", new=StringIO()) as fake_out:
+            ret = self.util.displayActivity(["--hours", "24"])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.displayCalled)
             self.assertIn("Dummy display output", fake_out.getvalue())
 
     def testDisplayWithDays(self) -> None:
         """Test display command with days parameter"""
-        with patch('sys.stdout', new=StringIO()) as _fake_out:  # noqa: F841
-            ret = self.util.displayActivity(['--days', '7'])
+        with patch("sys.stdout", new=StringIO()) as _fake_out:  # noqa: F841
+            ret = self.util.displayActivity(["--days", "7"])
             self.assertEqual(ret, 0)
             self.assertTrue(self.dummy_db.displayCalled)
 
@@ -120,23 +129,18 @@ class FileActivityUtilTests(unittest.TestCase):
         testDir = os.path.join(self.testDir, "test_load")
         if not os.path.exists(testDir):
             os.makedirs(testDir)
-        ret = self.util.populateFromDirectory(['--load-dir', testDir])
+        ret = self.util.populateFromDirectory(["--load-dir", testDir])
         self.assertEqual(ret, 0)
         self.assertEqual(self.dummy_db.loadedDirectory, testDir)
 
     def testQueryFileActivity(self) -> None:
         """Test query command with various parameters"""
-        args = [
-            '--hours', '24',
-            '--deposition-ids', 'D_1000000000',
-            '--file-types', 'model',
-            '--formats', 'pdbx'
-        ]
-        with patch('sys.stdout', new=StringIO()) as fake_out:
+        args = ["--hours", "24", "--deposition-ids", "D_1000000000", "--file-types", "model", "--formats", "pdbx"]
+        with patch("sys.stdout", new=StringIO()) as fake_out:
             ret = self.util.getActivity(args)
             self.assertEqual(ret, 0)
-            self.assertEqual(self.dummy_db.queryParams['hours'], 24)
-            self.assertEqual(self.dummy_db.queryParams['deposition_ids'], 'D_1000000000')
+            self.assertEqual(self.dummy_db.queryParams["hours"], 24)
+            self.assertEqual(self.dummy_db.queryParams["deposition_ids"], "D_1000000000")
             self.assertIn("dummy/file/path", fake_out.getvalue())
 
 

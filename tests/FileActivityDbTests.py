@@ -34,20 +34,18 @@ logger = logging.getLogger(__name__)
 
 class DummyMyDbQuery:
     """Mock database query class for testing."""
+
     def __init__(self) -> None:
         self.commands: List[str] = []
         self.test_data: Dict[str, List[List[Any]]] = {
-            'version_check': [[1, datetime.now().strftime('%Y-%m-%d %H:%M:%S')]],  # noqa: DTZ005
-            'activity_query': [
-                ['file1.cif'],
-                ['file2.pdb']
-            ],
-            'count_query': [[5]],
-            'display_query': [
+            "version_check": [[1, datetime.now().strftime("%Y-%m-%d %H:%M:%S")]],  # noqa: DTZ005
+            "activity_query": [["file1.cif"], ["file2.pdb"]],
+            "count_query": [[5]],
+            "display_query": [
                 # Format: site_id, deposition_id, content_type, created_date
-                ['WWPDB_TEST', 'D_1000000000', 'model', '2024-02-18 10:00:00'],
-                ['WWPDB_PROD', 'D_1000000001', 'validation', '2024-02-18 11:00:00']
-            ]
+                ["WWPDB_TEST", "D_1000000000", "model", "2024-02-18 10:00:00"],
+                ["WWPDB_PROD", "D_1000000001", "validation", "2024-02-18 11:00:00"],
+            ],
         }
         self.closed: bool = False
 
@@ -58,14 +56,14 @@ class DummyMyDbQuery:
             raise Exception(err)  # noqa: TRY002 pylint: disable=broad-exception-raised
         # Store the SQL query in commands
         self.commands.append(sql.strip())
-        if 'version_number' in sql:
-            return self.test_data['version_check']
-        if 'COUNT' in sql:
-            return self.test_data['count_query']
-        if 'DISTINCT site_id, deposition_id, content_type, created_date' in sql:
-            return self.test_data['display_query']
-        if 'SELECT location FROM file_activity_log' in sql:
-            return self.test_data['activity_query']
+        if "version_number" in sql:
+            return self.test_data["version_check"]
+        if "COUNT" in sql:
+            return self.test_data["count_query"]
+        if "DISTINCT site_id, deposition_id, content_type, created_date" in sql:
+            return self.test_data["display_query"]
+        if "SELECT location FROM file_activity_log" in sql:
+            return self.test_data["activity_query"]
         return []
 
     def sqlCommand(self, sqlList: List[str]) -> None:
@@ -95,7 +93,7 @@ class FileActivityDbTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         """Clean up test fixtures."""
-        if hasattr(self, 'db'):
+        if hasattr(self, "db"):
             self.db.close()
         if os.path.exists(self.test_dir):
             for root, dirs, files in os.walk(self.test_dir, topdown=False):
@@ -122,7 +120,7 @@ class FileActivityDbTests(unittest.TestCase):
             "D_1000000001_model_P1.cif.V1",
             "D_1000000002_sf_P1.cif.V2",
             "D_1000000003_structure-factors_P1.pdbx.V1",
-            "D_1000000004_validation-report_P1.pdf.V1"
+            "D_1000000004_validation-report_P1.pdf.V1",
         ]
         for filename in test_cases:
             with self.subTest(filename=filename):
@@ -148,8 +146,8 @@ class FileActivityDbTests(unittest.TestCase):
             "D_123_no_part.cif",
             "D_123_type_P1.cif.VX",  # Invalid version
             "D_123_type_PX.cif.V1",  # Invalid part number
-            "D_123_type.cif.V1",     # Missing part number
-            "model_P1.cif.V1"        # Missing deposition ID
+            "D_123_type.cif.V1",  # Missing part number
+            "model_P1.cif.V1",  # Missing deposition ID
         ]
         for name in invalid_names:
             with self.subTest(filename=name):
@@ -171,12 +169,7 @@ class FileActivityDbTests(unittest.TestCase):
 
     def testDisplayFileActivityDb(self) -> None:
         """Test display of file activity database contents."""
-        test_cases = [
-            {'hours': 24},
-            {'days': 7},
-            {'hours': 48},
-            {'days': 1}
-        ]
+        test_cases = [{"hours": 24}, {"days": 7}, {"hours": 48}, {"days": 1}]
         for test in test_cases:
             with self.subTest(params=test):
                 # Just verify the method can be called without error
@@ -227,7 +220,7 @@ class FileActivityDbTests(unittest.TestCase):
                 "D_1000000000_validation-annotate_P1.xml.V1",
                 "D_1000000001_structure-release_P1.cif.V1",
                 "D_1000000001_structure-release_P1.cif.V2",
-                "D_1000000001_structure-release_P1.cif.V3"
+                "D_1000000001_structure-release_P1.cif.V3",
             ]
 
             for fname in test_files:
@@ -242,36 +235,27 @@ class FileActivityDbTests(unittest.TestCase):
         """Test retrieving file activity records."""
         test_cases = [
             {
-                'params': {'hours': 24, 'deposition_ids': 'ALL'},
-                'expected_count': 0  # Empty database
+                "params": {"hours": 24, "deposition_ids": "ALL"},
+                "expected_count": 0,  # Empty database
             },
             {
-                'params': {'days': 7, 'deposition_ids': 'D_1000000000', 'file_types': 'model'},
-                'expected_count': 0  # Empty database
+                "params": {"days": 7, "deposition_ids": "D_1000000000", "file_types": "model"},
+                "expected_count": 0,  # Empty database
             },
             {
-                'params': {
-                    'hours': 24,
-                    'deposition_ids': 'D_1000000000-D_1000000001',
-                    'formats': 'cif,xml'
-                },
-                'expected_count': 0  # Empty database
+                "params": {"hours": 24, "deposition_ids": "D_1000000000-D_1000000001", "formats": "cif,xml"},
+                "expected_count": 0,  # Empty database
             },
             {
-                'params': {
-                    'days': 30,
-                    'deposition_ids': 'D_1000000000,D_1000000001',
-                    'file_types': 'model,validation',
-                    'formats': 'ALL'
-                },
-                'expected_count': 0  # Empty database
-            }
+                "params": {"days": 30, "deposition_ids": "D_1000000000,D_1000000001", "file_types": "model,validation", "formats": "ALL"},
+                "expected_count": 0,  # Empty database
+            },
         ]
 
         for test in test_cases:
-            with self.subTest(params=test['params']):
-                if isinstance(test['params'], dict):
-                    results = self.db.getFileActivity(**test['params'])
+            with self.subTest(params=test["params"]):
+                if isinstance(test["params"], dict):
+                    results = self.db.getFileActivity(**test["params"])
                     # Should return empty list for empty database or disabled tracking
                     self.assertIsInstance(results, list)
                 else:

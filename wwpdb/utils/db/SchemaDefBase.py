@@ -36,9 +36,7 @@ _AttrInfoDict = Dict[str, Union[str, int, List[str], _ListMultiStr]]
 _ValueDict = Dict[str, Union[str, int, bool, _AttrInfoDict, _OptTupleStr]]
 
 # SchemaDictType: TypeAlias = dict[str, dict[str, str | dict[str, str | int | bool | dict[str, str | list[str]]]]]
-SchemaDictType = Dict[
-    str, Dict[str, Union[str, _ValueDict]]
-]
+SchemaDictType = Dict[str, Dict[str, Union[str, _ValueDict]]]
 
 
 class SchemaDefBase:
