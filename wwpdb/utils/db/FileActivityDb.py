@@ -442,7 +442,7 @@ class FileActivityDb:
 
         table_name = self.__db_core.getTableName()
         query_parts = [
-            f"SELECT deposition_id, content_type, format_type, part_number, version_number, storage_type FROM {table_name} WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)"
+            f"SELECT deposition_id, content_type, format_type, part_number, version_number, storage_type FROM {table_name} WHERE created_date >= DATE_SUB(NOW(), INTERVAL %s HOUR)"  # noqa: S608,E501
         ]  # noqa: S608,E501
         params: List[Union[int, str]] = [total_hours]
 

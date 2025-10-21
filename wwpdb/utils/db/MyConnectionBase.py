@@ -108,11 +108,18 @@ class MyConnectionBase:
             self.__dbHost = self._cI.get("SITE_DISTRO_DB_HOST_NAME")
             self.__dbPort = self._cI.get("SITE_DISTRO_DB_PORT_NUMBER")
             self.__dbSocket = self._cI.get("SITE_DISTRO_DB_SOCKET")
-
             self.__dbUser = self._cI.get("SITE_DISTRO_DB_USER_NAME")
             self.__dbPw = self._cI.get("SITE_DISTRO_DB_PASSWORD")
 
         elif resourceName == "STATUS":
+            self.__databaseName = self._cI.get("SITE_MESSAGE_DB_DATABASE_NAME")
+            self.__dbHost = self._cI.get("SITE_MESSAGE_DB_HOST_NAME")
+            self.__dbPort = self._cI.get("SITE_MESSAGE_DB_PORT_NUMBER")
+            self.__dbSocket = self._cI.get("SITE_MESSAGE_DB_SOCKET")
+            self.__dbUser = self._cI.get("SITE_MESSAGE_DB_USER_NAME")
+            self.__dbPw = self._cI.get("SITE__MESSAGE_DB_PASSWORD")
+
+        elif resourceName == "MESSAGE":
             self.__databaseName = self._cI.get("SITE_DB_DATABASE_NAME")
             self.__dbHost = self._cI.get("SITE_DB_HOST_NAME")
             self.__dbPort = self._cI.get("SITE_DB_PORT_NUMBER")
@@ -120,6 +127,7 @@ class MyConnectionBase:
 
             self.__dbUser = self._cI.get("SITE_DB_USER_NAME")
             self.__dbPw = self._cI.get("SITE_DB_PASSWORD")
+
         else:
             pass
 
