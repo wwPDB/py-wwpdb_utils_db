@@ -102,7 +102,7 @@ class FileActivityUtil:
             self.__verbose = True
             # Create a new db instance with verbose=True
             self.db = FileActivityDb(verbose=True)
-            logging.debug("Verbose mode enabled - detailed logging activated")
+            logging.debug("Verbose mode enabled - detailed logging activated")  # noqa: LOG015
 
     def purgeAllData(self, args: Union[str, List[str]]) -> int:
         """
@@ -492,7 +492,7 @@ Use -v/--verbose to enable detailed logging
 
     if verbose_enabled:
         logging.getLogger().setLevel(logging.DEBUG)
-        logging.debug("Verbose mode enabled")
+        logging.debug("Verbose mode enabled")  # noqa: LOG015
 
     # Create utility instance with verbose flag
     util = FileActivityUtil(verbose=verbose_enabled)
