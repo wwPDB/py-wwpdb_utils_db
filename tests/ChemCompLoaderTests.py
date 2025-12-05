@@ -30,11 +30,11 @@ import scandir
 # from pdbx_v2.adapter.IoAdapterPy       import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
+from wwpdb.utils.testing.Features import Features
 
 from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
 from wwpdb.utils.db.MyDbUtil import MyDbConnect
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.testing.Features import Features
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")

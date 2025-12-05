@@ -29,12 +29,12 @@ import traceback
 import unittest
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
+from wwpdb.utils.testing.Features import Features
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
-from wwpdb.utils.testing.Features import Features
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")

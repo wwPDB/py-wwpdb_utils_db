@@ -32,10 +32,10 @@ import scandir
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
-
 from wwpdb.io.file.DataFile import DataFile
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
+
 from wwpdb.utils.db.MyConnectionBase import MyConnectionBase
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery

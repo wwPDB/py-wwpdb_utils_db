@@ -37,6 +37,7 @@ import sys
 import time
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
+
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 

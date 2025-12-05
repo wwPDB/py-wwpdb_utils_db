@@ -23,9 +23,10 @@ from io import StringIO
 from typing import Dict, List, Optional, Union
 from unittest.mock import patch
 
+from wwpdb.utils.testing.Features import Features
+
 from wwpdb.utils.db.FileActivityDb import FileActivityDb
 from wwpdb.utils.db.FileActivityUtil import FileActivityUtil
-from wwpdb.utils.testing.Features import Features
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 TESTOUTPUT = os.path.join(HERE, "test-output", platform.python_version())

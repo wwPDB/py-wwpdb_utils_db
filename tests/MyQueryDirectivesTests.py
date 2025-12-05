@@ -26,11 +26,12 @@ import time
 import traceback
 import unittest
 
+from wwpdb.utils.testing.Features import Features
+
 from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.db.MyQueryDirectives import MyQueryDirectives
 from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
-from wwpdb.utils.testing.Features import Features
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")

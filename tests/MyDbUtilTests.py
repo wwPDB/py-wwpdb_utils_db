@@ -26,9 +26,10 @@ import time
 import traceback
 import unittest
 
+from wwpdb.utils.testing.Features import Features
+
 from wwpdb.utils.db.MyDbAdapter import MyDbAdapter  # noqa: F401  pylint: disable=unused-import
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
-from wwpdb.utils.testing.Features import Features
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")

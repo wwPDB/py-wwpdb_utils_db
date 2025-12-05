@@ -30,9 +30,9 @@ import traceback
 import unittest
 
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
-
 from wwpdb.io.file.DataFile import DataFile
 from wwpdb.utils.config.ConfigInfo import getSiteId
+
 from wwpdb.utils.db.StatusHistory import StatusHistory
 
 # Not used but simple import test

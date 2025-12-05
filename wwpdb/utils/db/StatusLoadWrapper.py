@@ -20,6 +20,7 @@ import sys
 import traceback
 
 from wwpdb.io.locator.PathInfo import PathInfo
+
 from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
 

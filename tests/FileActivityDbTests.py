@@ -24,9 +24,10 @@ import unittest
 from datetime import datetime
 from typing import Any, Dict, List
 
+from wwpdb.utils.testing.Features import Features
+
 from wwpdb.utils.db.FileActivityDb import FileActivityDb
 from wwpdb.utils.db.FileMetadataParser import FileMetadataParser
-from wwpdb.utils.testing.Features import Features
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

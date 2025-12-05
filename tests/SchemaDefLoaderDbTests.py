@@ -35,6 +35,7 @@ from mmcif_utils.bird.PdbxFamilyIo import PdbxFamilyIo
 from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
 from mmcif_utils.bird.PdbxPrdUtils import PdbxPrdUtils
 from mmcif_utils.chemcomp.PdbxChemCompIo import PdbxChemCompIo
+from wwpdb.utils.testing.Features import Features
 
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 from wwpdb.utils.db.ChemCompSchemaDef import ChemCompSchemaDef
@@ -43,7 +44,6 @@ from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.db.PdbxSchemaDef import PdbxSchemaDef
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
-from wwpdb.utils.testing.Features import Features
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")

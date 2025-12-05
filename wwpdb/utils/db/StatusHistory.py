@@ -24,7 +24,6 @@ import sys
 import traceback
 
 from mmcif_utils.pdbx.PdbxIo import PdbxStatusHistoryIo
-
 from wwpdb.io.locator.PathInfo import PathInfo
 
 

@@ -92,8 +92,7 @@ class DBLoadUtil:
         """ """
         fn = os.path.join(self.__sessionPath, filename)
         f = open(fn, "w")
-        for entryfile in filelist:
-            f.write(entryfile + "\n")
+        f.writelines(entryfile + "\n" for entryfile in filelist)
         #
         f.close()
 

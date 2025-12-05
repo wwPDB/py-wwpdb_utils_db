@@ -30,8 +30,9 @@ else:
     from .mock_import import mocksetup  # noqa: F401,TID252 pylint: disable=unused-import,import-error
 
 from wwpdb.utils.config.ConfigInfo import getSiteId
-from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 from wwpdb.utils.testing.Features import Features
+
+from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "Needs MySql test server for testing")

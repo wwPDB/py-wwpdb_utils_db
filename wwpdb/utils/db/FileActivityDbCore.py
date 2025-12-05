@@ -25,6 +25,7 @@ from contextlib import contextmanager
 from typing import Any, Dict, Generator, List, Optional, TextIO, Tuple, Union, cast
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
+
 from wwpdb.utils.db.MyDbUtil import MyDbConnect
 
 logger = logging.getLogger(__name__)
@@ -138,7 +139,7 @@ class FileActivityDbCore:
                 cursor.execute(query)
             results = cursor.fetchall()
             cursor.close()
-            return cast(List[Tuple[Any, ...]], results)
+            return cast("List[Tuple[Any, ...]]", results)
         except Exception as e:  # noqa: BLE001
             logger.error("Database error executing SELECT: %s", str(e))
             if cursor is not None:
