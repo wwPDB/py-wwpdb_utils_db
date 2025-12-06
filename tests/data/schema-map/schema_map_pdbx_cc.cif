@@ -84,6 +84,7 @@ chem_comp                               pdbx_release_status                 char
 chem_comp                               pdbx_processing_site                char     0 0 10  0 
 chem_comp                               pdbx_initial_date                   datetime 0 0 15  0 
 chem_comp                               pdbx_modified_date                  datetime 0 0 15  0 
+chem_comp                               pdbx_comp_type                      char     0 0 80  0 
 chem_comp_angle                         Component_ID                        char     1 1 10  0 
 chem_comp_angle                         comp_id                             char     1 1 10  0 
 chem_comp_angle                         atom_id_1                           char     1 1 6   0 
@@ -570,6 +571,7 @@ chem_comp                               pdbx_processing_site
 'Missing example'                                                                                                                                                                                 
 chem_comp                               pdbx_initial_date                   'Date component was added to database.' 'Missing example' 
 chem_comp                               pdbx_modified_date                  'Date component was last modified.' 'Missing example' 
+chem_comp                               pdbx_comp_type                      'A type classification of this chemical component.' 'Missing example' 
 chem_comp_angle                         Component_ID                        'Structure identifier' 'Structure identifier' 
 chem_comp_angle                         comp_id                             
 ; This data item is a pointer to _chem_comp.id in the CHEM_COMP
@@ -1290,6 +1292,7 @@ chem_comp                               pdbx_release_status                 5 1 
 chem_comp                               pdbx_processing_site                3 1 1 
 chem_comp                               pdbx_initial_date                   7 1 1 
 chem_comp                               pdbx_modified_date                  7 1 1 
+chem_comp                               pdbx_comp_type                      5 1 1 
 chem_comp_angle                         Component_ID                        3 1 1 
 chem_comp_angle                         comp_id                             3 1 1 
 chem_comp_angle                         atom_id_1                           3 1 1 
@@ -1535,6 +1538,7 @@ chem_comp                               pdbx_release_status                 '_ch
 chem_comp                               pdbx_processing_site                '_chem_comp.pdbx_processing_site'                                  ? ?               
 chem_comp                               pdbx_initial_date                   '_chem_comp.pdbx_initial_date'                                     ? ?               
 chem_comp                               pdbx_modified_date                  '_chem_comp.pdbx_modified_date'                                    ? ?               
+chem_comp                               pdbx_comp_type                      '_chem_comp.pdbx_comp_type'                                        ? ?               
 chem_comp_angle                         Component_ID                        ?                                                                  ? 'datablockid()' 
 chem_comp_angle                         comp_id                             '_chem_comp_angle.comp_id'                                         ? ?               
 chem_comp_angle                         atom_id_1                           '_chem_comp_angle.atom_id_1'                                       ? ?               
