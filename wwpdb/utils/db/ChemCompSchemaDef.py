@@ -1979,7 +1979,7 @@ class ChemCompSchemaDef(SchemaDefBase):
                                                                           'PRECISION': 0,
                                                                           'PRIMARY_KEY': False,
                                                                           'SQL_TYPE': 'VARCHAR',
-                                                                          'WIDTH': 10},
+                                                                          'WIDTH': 28},
                                                   'MODIFIED_RESIDUE_ID_LINKING_ATOM': {'NULLABLE': True,
                                                                                        'ORDER': 10,
                                                                                        'PRECISION': 0,
