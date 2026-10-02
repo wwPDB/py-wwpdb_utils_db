@@ -16,6 +16,7 @@
 #  3-Mar-2016 jdw  add port parameter option to connect method -
 # 11-Aug-2016 jdw  add connection pool wrapper
 # 11-Aug-2016 jdw  add chunked fetch method
+# 30-Sep-2026 ep   replace sqlalchemy pool.manage() with shared sqlalchemy engines (create_engine) in MyDbPool
 #
 ##
 """
@@ -34,20 +35,18 @@ import os
 import sys
 import traceback
 import warnings
+from typing import Any, Dict
 
 import MySQLdb
+
+from wwpdb.utils.db.MyDbPool import getConnection
 
 # from operator import itemgetter, attrgetter
 
 #
+# Connection pooling is shared with MyConnectionBase via MyDbPool -- one SQLAlchemy engine
+# (QueuePool) per distinct set of connection arguments.  close() returns connections to the pool.
 #
-if True:  # pylint: disable=using-constant-test
-    try:
-        from sqlalchemy import pool
-
-        MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True, recycle=1800)
-    except:  # noqa: E722 pylint: disable=bare-except
-        pass
 
 
 class MyDbConnect:
@@ -146,20 +145,17 @@ class MyDbConnect:
         # self.__lfh.write("+MyDbConnect.connect() Connection to server %s host %s dsn %s user %s pw %s socket %s port %d \n" %
         #                    (self.__dbServer, self.__dbHost, self.__dbName, self.__dbUser, self.__dbPw, self.__dbSocket, self.__dbPort))
         try:
-            if self.__dbSocket is None:
-                dbcon = MySQLdb.connect(
-                    db="%s" % self.__dbName, user="%s" % self.__dbUser, passwd="%s" % self.__dbPw, host="%s" % self.__dbHost, port=self.__dbPort, local_infile=1
-                )
-            else:
-                dbcon = MySQLdb.connect(
-                    db="%s" % self.__dbName,
-                    user="%s" % self.__dbUser,
-                    passwd="%s" % self.__dbPw,
-                    host="%s" % self.__dbHost,
-                    port=self.__dbPort,
-                    unix_socket="%s" % self.__dbSocket,
-                    local_infile=1,
-                )
+            connectKw: Dict[str, Any] = {
+                "db": "%s" % self.__dbName,
+                "user": "%s" % self.__dbUser,
+                "passwd": "%s" % self.__dbPw,
+                "host": "%s" % self.__dbHost,
+                "port": int(str(self.__dbPort)),
+                "local_infile": 1,
+            }
+            if self.__dbSocket is not None:
+                connectKw["unix_socket"] = "%s" % self.__dbSocket
+            dbcon = getConnection(connectKw)
 
             self.__dbcon = dbcon
         except Exception as e:  # noqa: BLE001

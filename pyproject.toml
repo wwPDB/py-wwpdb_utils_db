@@ -28,7 +28,7 @@ dependencies = [
     "mysqlclient",
     "rcsb.utils.multiproc",
     "scandir",
-    "sqlalchemy ~= 1.3",
+    "sqlalchemy >= 2.0",
     "sqlparse",
     "wwpdb.io",
     "wwpdb.utils.config",

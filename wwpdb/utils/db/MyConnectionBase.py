@@ -9,6 +9,7 @@
 # 30-Jan-2017 jdw all authentication now taken from configuration file -
 # 16-Feb-2017 jdw add resource 'status'
 # 20-Apr-2017 jdw adjusting pooling configuration
+# 30-Sep-2026 ep  replace sqlalchemy pool.manage() with shared sqlalchemy engines (create_engine) in MyDbPool
 ##
 """
 Base class for managing database connection which handles application specific authentication.
@@ -23,22 +24,17 @@ __version__ = "V0.07"
 
 import logging
 import sys
+from typing import Any, Dict
 
-import MySQLdb
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+
+from wwpdb.utils.db.MyDbPool import getConnection
 
 logger = logging.getLogger(__name__)
 #
+# Connection pooling is shared with MyDbUtil.MyDbConnect via MyDbPool -- one SQLAlchemy engine
+# (QueuePool) per distinct set of connection arguments.  closeConnection() returns connections to the pool.
 #
-if True:  # pylint: disable=using-constant-test
-    try:
-        from sqlalchemy import pool
-
-        MySQLdb = pool.manage(MySQLdb, pool_size=12, max_overflow=12, timeout=30, echo=True, recycle=1800)
-    except:  # noqa: E722 pylint: disable=bare-except
-        logger.exception("Creating MYSQL connection pool failing")
-
-
-from wwpdb.utils.config.ConfigInfo import ConfigInfo  # noqa: E402
 
 
 class MyConnectionBase:
@@ -190,25 +186,17 @@ class MyConnectionBase:
             self.closeConnection()
 
         try:
-            if self.__dbSocket is None:
-                dbcon = MySQLdb.connect(
-                    db="%s" % self.__databaseName,
-                    user="%s" % self.__dbUser,
-                    passwd="%s" % self.__dbPw,
-                    host="%s" % self.__dbHost,
-                    port=self.__dbPort,
-                    local_infile=1,
-                )
-            else:
-                dbcon = MySQLdb.connect(
-                    db="%s" % self.__databaseName,
-                    user="%s" % self.__dbUser,
-                    passwd="%s" % self.__dbPw,
-                    host="%s" % self.__dbHost,
-                    port=self.__dbPort,
-                    unix_socket="%s" % self.__dbSocket,
-                    local_infile=1,
-                )
+            connectKw: Dict[str, Any] = {
+                "db": "%s" % self.__databaseName,
+                "user": "%s" % self.__dbUser,
+                "passwd": "%s" % self.__dbPw,
+                "host": "%s" % self.__dbHost,
+                "port": int(str(self.__dbPort)),
+                "local_infile": 1,
+            }
+            if self.__dbSocket is not None:
+                connectKw["unix_socket"] = "%s" % self.__dbSocket
+            dbcon = getConnection(connectKw)
 
             self._dbCon = dbcon
             return True
