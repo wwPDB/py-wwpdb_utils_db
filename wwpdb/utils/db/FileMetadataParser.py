@@ -113,7 +113,7 @@ class FileMetadataParser:
             logger.warning("Failed to parse file path %s: %s", file_path, str(e))
             return None
 
-    def extractFileKey(self, file_path: str) -> Optional[Tuple[str, str, str, int, Optional[int]]]:
+    def extractFileKey(self, file_path: str) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[int], Optional[int]]:
         """
         Extract the key components from a file path.
 
@@ -133,4 +133,4 @@ class FileMetadataParser:
             return metadata_tuple
         except Exception as e:  # noqa: BLE001
             logger.warning("Failed to extract file key from %s: %s", file_path, str(e))
-            return None
+            return (None, None, None, None, None)

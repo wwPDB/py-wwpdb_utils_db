@@ -26,7 +26,7 @@ import os
 import sys
 from datetime import datetime
 from types import TracebackType
-from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, Union, cast
 
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.config.ConfigInfo import getSiteId
@@ -255,7 +255,7 @@ class FileActivityDb:
                                         logger.warning("Skipping unrecognized file: %s", file_entry.path)
                                         continue
 
-                                    deposition_id, content_type, format_type, part_number, version_number = file_key
+                                    deposition_id, content_type, format_type, part_number, version_number = cast(Tuple[str, str, str, int, int], file_key)
 
                                     if version_number is None:
                                         version_number = 1
@@ -562,7 +562,8 @@ class FileActivityDb:
                         versionId=str(version_number),  # e.g., "3"
                         partNumber=str(part_number),  # e.g., "0"
                     )
-                    file_paths.append(file_path)
+                    if file_path:
+                        file_paths.append(file_path)
 
                 return file_paths
             except Exception as err:  # noqa: BLE001
