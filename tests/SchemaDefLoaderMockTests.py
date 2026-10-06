@@ -21,7 +21,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, cast
 from unittest import mock
 
 from mmcif.api.DataCategory import DataCategory
@@ -29,7 +29,7 @@ from mmcif.api.PdbxContainers import DataContainer
 from mmcif.io.IoAdapterPy import IoAdapterPy
 
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDefDict
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -86,33 +86,41 @@ _SCHEMA: SchemaDictType = {
         "INDICES": {"p1": {"TYPE": "UNIQUE", "ATTRIBUTES": ("STRUCTURE_ID",)}},
         "TABLE_DELETE_ATTRIBUTE": "STRUCTURE_ID",
     },
-    "PDBX_CHEM_COMP_DESCRIPTOR": {
-        "TABLE_ID": "PDBX_CHEM_COMP_DESCRIPTOR",
-        "TABLE_NAME": "pdbx_chem_comp_descriptor",
-        "TABLE_TYPE": "transactional",
-        "ATTRIBUTES": {"STRUCTURE_ID": "Structure_ID", "DESCRIPTOR": "descriptor"},
-        "ATTRIBUTE_INFO": {
-            "STRUCTURE_ID": {"SQL_TYPE": "VARCHAR", "WIDTH": 10, "PRECISION": 0, "NULLABLE": False, "PRIMARY_KEY": True, "ORDER": 1},
-            "DESCRIPTOR": {"SQL_TYPE": "TEXT", "WIDTH": 200, "PRECISION": 0, "NULLABLE": True, "PRIMARY_KEY": False, "ORDER": 2},
+    # No INDICES - not needed for loading
+    "PDBX_CHEM_COMP_DESCRIPTOR": cast(
+        TableDefDict,
+        {
+            "TABLE_ID": "PDBX_CHEM_COMP_DESCRIPTOR",
+            "TABLE_NAME": "pdbx_chem_comp_descriptor",
+            "TABLE_TYPE": "transactional",
+            "ATTRIBUTES": {"STRUCTURE_ID": "Structure_ID", "DESCRIPTOR": "descriptor"},
+            "ATTRIBUTE_INFO": {
+                "STRUCTURE_ID": {"SQL_TYPE": "VARCHAR", "WIDTH": 10, "PRECISION": 0, "NULLABLE": False, "PRIMARY_KEY": True, "ORDER": 1},
+                "DESCRIPTOR": {"SQL_TYPE": "TEXT", "WIDTH": 200, "PRECISION": 0, "NULLABLE": True, "PRIMARY_KEY": False, "ORDER": 2},
+            },
+            "ATTRIBUTE_MAP": {
+                "STRUCTURE_ID": (None, None, "datablockid()", None),
+                "DESCRIPTOR": ("pdbx_chem_comp_descriptor", "descriptor", None, None),
+            },
+            "TABLE_DELETE_ATTRIBUTE": "STRUCTURE_ID",
         },
-        "ATTRIBUTE_MAP": {
-            "STRUCTURE_ID": (None, None, "datablockid()", None),
-            "DESCRIPTOR": ("pdbx_chem_comp_descriptor", "descriptor", None, None),
+    ),
+    # No TABLE_TYPE or INDICES - not needed for loading
+    "UNMAPPED": cast(
+        TableDefDict,
+        {
+            "TABLE_ID": "UNMAPPED",
+            "TABLE_NAME": "unmapped",
+            "ATTRIBUTES": {"STRUCTURE_ID": "Structure_ID", "OTHER": "other"},
+            "ATTRIBUTE_INFO": {
+                "STRUCTURE_ID": {"SQL_TYPE": "VARCHAR", "WIDTH": 10, "PRECISION": 0, "NULLABLE": False, "PRIMARY_KEY": True, "ORDER": 1},
+                "OTHER": {"SQL_TYPE": "VARCHAR", "WIDTH": 10, "PRECISION": 0, "NULLABLE": True, "PRIMARY_KEY": False, "ORDER": 2},
+            },
+            # Function mapping that is not supported - ignored
+            "ATTRIBUTE_MAP": {"STRUCTURE_ID": (None, None, "datablockid()", None), "OTHER": (None, None, "unknownfunc()", None)},
+            "TABLE_DELETE_ATTRIBUTE": "STRUCTURE_ID",
         },
-        "TABLE_DELETE_ATTRIBUTE": "STRUCTURE_ID",
-    },
-    "UNMAPPED": {
-        "TABLE_ID": "UNMAPPED",
-        "TABLE_NAME": "unmapped",
-        "ATTRIBUTES": {"STRUCTURE_ID": "Structure_ID", "OTHER": "other"},
-        "ATTRIBUTE_INFO": {
-            "STRUCTURE_ID": {"SQL_TYPE": "VARCHAR", "WIDTH": 10, "PRECISION": 0, "NULLABLE": False, "PRIMARY_KEY": True, "ORDER": 1},
-            "OTHER": {"SQL_TYPE": "VARCHAR", "WIDTH": 10, "PRECISION": 0, "NULLABLE": True, "PRIMARY_KEY": False, "ORDER": 2},
-        },
-        # Function mapping that is not supported - ignored
-        "ATTRIBUTE_MAP": {"STRUCTURE_ID": (None, None, "datablockid()", None), "OTHER": (None, None, "unknownfunc()", None)},
-        "TABLE_DELETE_ATTRIBUTE": "STRUCTURE_ID",
-    },
+    ),
 }
 
 ROWSEP = "$##$\n"

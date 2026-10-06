@@ -18,8 +18,9 @@ __version__ = "V0.01"
 import copy
 import io
 import unittest
+from typing import cast
 
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDef
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDef, TableDefDict
 
 _SCHEMA: SchemaDictType = {
     "SAMPLE_TABLE": {
@@ -54,13 +55,17 @@ _SCHEMA: SchemaDictType = {
         "MAP_MERGE_INDICES": {"entity": {"TYPE": "EQUI-JOIN", "ATTRIBUTES": ("id",)}},
         "TABLE_DELETE_ATTRIBUTE": "STRUCTURE_ID",
     },
-    "OTHER": {
-        "TABLE_ID": "OTHER",
-        "TABLE_NAME": "other",
-        "ATTRIBUTES": {"ID": "id"},
-        "ATTRIBUTE_INFO": {"ID": {"SQL_TYPE": "INTEGER", "WIDTH": 10, "PRECISION": 0, "NULLABLE": False, "PRIMARY_KEY": True, "ORDER": 1}},
-        "ATTRIBUTE_MAP": {"ID": ("other", "id", None, None)},
-    },
+    # Deliberately incomplete (no TABLE_TYPE or INDICES) to exercise the accessor fallbacks
+    "OTHER": cast(
+        TableDefDict,
+        {
+            "TABLE_ID": "OTHER",
+            "TABLE_NAME": "other",
+            "ATTRIBUTES": {"ID": "id"},
+            "ATTRIBUTE_INFO": {"ID": {"SQL_TYPE": "INTEGER", "WIDTH": 10, "PRECISION": 0, "NULLABLE": False, "PRIMARY_KEY": True, "ORDER": 1}},
+            "ATTRIBUTE_MAP": {"ID": ("other", "id", None, None)},
+        },
+    ),
 }
 
 

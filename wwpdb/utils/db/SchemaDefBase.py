@@ -26,17 +26,50 @@ __version__ = "V0.001"
 
 import sys
 from operator import itemgetter
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, Optional, Sequence, Tuple, Union
+
+from typing_extensions import NotRequired, TypedDict
 
 # Python 3.8 does not have TypeAlias
 
-_OptTupleStr = Tuple[Optional[str], ...]  # ('pdbx_reference_entity_poly_link', 'atom_id_1', None, None),
-_ListMultiStr = Tuple[str, ...]  # ('family_prd_id', 'prd_id', 'ordinal')
-_AttrInfoDict = Dict[str, Union[str, int, List[str], _ListMultiStr]]
-_ValueDict = Dict[str, Union[str, int, bool, _AttrInfoDict, _OptTupleStr]]
 
-# SchemaDictType: TypeAlias = dict[str, dict[str, str | dict[str, str | int | bool | dict[str, str | list[str]]]]]
-SchemaDictType = Dict[str, Dict[str, Union[str, _ValueDict]]]
+class AttributeInfoDict(TypedDict):
+    """Column definition: ATTRIBUTE_INFO[attributeId]"""
+
+    SQL_TYPE: str
+    WIDTH: Union[int, str]  # PdbDistroSchemaDef and MysqlSchemaImporter store some widths as strings
+    PRECISION: int
+    NULLABLE: bool
+    PRIMARY_KEY: bool
+    ORDER: int
+
+
+class IndexDict(TypedDict):
+    """Index definition: INDICES[indexName] and MAP_MERGE_INDICES[categoryName]"""
+
+    TYPE: str  # UNIQUE, SEARCH, FULLTEXT or EQUI-JOIN
+    ATTRIBUTES: Sequence[str]  # ('family_prd_id', 'prd_id', 'ordinal')
+
+
+# (instance category, instance attribute, function, function args) - e.g. ('pdbx_reference_entity_poly_link', 'atom_id_1', None, None)
+AttributeMapTuple = Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]
+
+
+class TableDefDict(TypedDict):
+    """Table definition: schemaDefDict[tableId]"""
+
+    TABLE_ID: str
+    TABLE_NAME: str
+    TABLE_TYPE: str
+    ATTRIBUTES: Dict[str, str]
+    ATTRIBUTE_INFO: Dict[str, AttributeInfoDict]
+    INDICES: Dict[str, IndexDict]
+    TABLE_DELETE_ATTRIBUTE: NotRequired[str]
+    ATTRIBUTE_MAP: NotRequired[Dict[str, AttributeMapTuple]]
+    MAP_MERGE_INDICES: NotRequired[Dict[str, IndexDict]]
+
+
+SchemaDictType = Dict[str, TableDefDict]
 
 
 class SchemaDefBase:
