@@ -25,6 +25,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import Any, Optional
 
 from wwpdb.utils.testing.Features import Features
 
@@ -34,15 +35,22 @@ from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class MyDbUtilTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stderr
         self.__verbose = True
-        self.__dbCon = None
+        self.__dbCon: Any = None
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.close()
 
-    def open(self, dbUserId=None, dbUserPwd=None, dbHost=None, dbName=None, dbSocket=None):
+    def open(
+        self,
+        dbUserId: Optional[str] = None,
+        dbUserPwd: Optional[str] = None,
+        dbHost: Optional[str] = None,
+        dbName: Optional[str] = None,
+        dbSocket: Optional[str] = None,
+    ) -> bool:
         myC = MyDbConnect(
             dbServer="mysql", dbHost=dbHost, dbName=dbName, dbUser=dbUserId, dbPw=dbUserPwd, dbSocket=dbSocket, verbose=self.__verbose, log=self.__lfh
         )
@@ -53,7 +61,7 @@ class MyDbUtilTests(unittest.TestCase):
             return True
         return False
 
-    def close(self):
+    def close(self) -> bool:
         if self.__dbCon is not None:
             if self.__verbose:
                 self.__lfh.write("\nDatabase connection closed MyDbUtilTests close at %s\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
@@ -62,7 +70,7 @@ class MyDbUtilTests(unittest.TestCase):
             return True
         return False
 
-    def testOpen1(self):
+    def testOpen1(self) -> None:
         """Test case -  all values specified
 
         Environment setup --
@@ -91,7 +99,7 @@ class MyDbUtilTests(unittest.TestCase):
             "\nCompleted MyDbUtilTests testOpen1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testOpen2(self):
+    def testOpen2(self) -> None:
         """Test case -  w/o socket
 
         Environment setup --
@@ -120,7 +128,7 @@ class MyDbUtilTests(unittest.TestCase):
             "\nCompleted MyDbUtilTests testOpen2 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testOpen3(self):
+    def testOpen3(self) -> None:
         """Test case -  w/o socket w/ localhost
 
         Environment setup --
@@ -149,7 +157,7 @@ class MyDbUtilTests(unittest.TestCase):
             "\nCompleted MyDbUtilTests testOpen3 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testPool1(self):
+    def testPool1(self) -> None:
         """Test case -  connection pool management -
 
         Setup -
@@ -179,7 +187,7 @@ class MyDbUtilTests(unittest.TestCase):
             "\nCompleted MyDbUtilTests testPool1 at %s (%f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testPoolQuery(self):
+    def testPoolQuery(self) -> None:
         """Test case -  connection pool management -
 
         Setup -
@@ -214,7 +222,7 @@ class MyDbUtilTests(unittest.TestCase):
         )
 
 
-def suiteOpen():
+def suiteOpen() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyDbUtilTests("testOpen1"))
     suiteSelect.addTest(MyDbUtilTests("testOpen2"))
@@ -222,7 +230,7 @@ def suiteOpen():
     return suiteSelect
 
 
-def suitePool():
+def suitePool() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyDbUtilTests("testPool1"))
     suiteSelect.addTest(MyDbUtilTests("testPoolQuery"))

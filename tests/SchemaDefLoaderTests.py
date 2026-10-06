@@ -41,16 +41,16 @@ if not os.path.exists(TESTOUTPUT):  # pragma: no cover
 
 
 class SchemaDefLoaderTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stderr
         self.__verbose = False
         self.__loadPathList = [os.path.join(HERE, "data", "PRD", "PRD_000001.cif"), os.path.join(HERE, "data", "PRD", "PRD_000012.cif")]
         self.__ioObj = IoAdapterPy(verbose=self.__verbose, log=self.__lfh)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def testLoadFile(self):
+    def testLoadFile(self) -> None:
         """Test case - for loading BIRD definition data files"""
         self.__lfh.write("\nStarting SchemaDefLoaderTests testLoadFile\n")
         try:
@@ -68,7 +68,7 @@ class SchemaDefLoaderTests(unittest.TestCase):
             self.__lfh.write("\nCreated table %s load file %s\n" % (tId, fn))
 
 
-def loadSuite():  # pragma: no cover
+def loadSuite() -> unittest.TestSuite:  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderTests("testLoadFile"))
     return suiteSelect

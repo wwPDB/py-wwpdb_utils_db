@@ -18,8 +18,6 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",    
 ]
 dependencies = [
@@ -30,6 +28,7 @@ dependencies = [
     "scandir",
     "sqlalchemy >= 2.0",
     "sqlparse",
+    "typing_extensions",
     "wwpdb.io",
     "wwpdb.utils.config",
 ]
@@ -89,8 +88,9 @@ preview = false
 explicit-preview-rules = true
 
 ignore = [
-  "C402",     #  Unnecessary generator (rewrite as a `dict` comprehension)
-  "EXE001",   # Shebang is present but file is not executabl
+  "C402",     # Unnecessary generator (rewrite as a `dict` comprehension)
+  "EXE001",   # Shebang is present but file is not executable
+  "D419",     # Docstring is empty
   "FA100",    # Add `from __future__ import annotations` to simplify `typing.Optional`
   "FBT002",   # Boolean default positional argument in function definition
   "FBT001",   # Boolean-typed positional argument in function definition
@@ -131,7 +131,7 @@ ignore = [
 # -------------------- default environment scripts ------------------
 [tool.hatch.envs.default]
 skip-install = true
-dependencies = ["mypy", "ruff >=0.6.9", "wwpdb.utils.testing", "scandir", "mysqlclient", "sqlalchemy ~= 1.3", "scandir"]
+dependencies = ["mypy", "ruff >=0.6.9", "wwpdb.utils.testing", "scandir", "mysqlclient", "sqlalchemy", "scandir", "rcsb.utils.multiproc"]
 
 
 [tool.hatch.envs.default.scripts]
@@ -167,8 +167,8 @@ run = ["tox"]
 
 # -------------------------  Mypy disable ---------
 [[tool.mypy.overrides]]
-#module = ["mmcif.*", "wwpdb.*", "tests.*", "commonsetup", "gemmi.*", "pygal.*"]
-module = ["mmcif_utils.*", "mmcif.*", "wwpdb.*", "rcsb.utils.multiproc.*", "sqlalchemy.*", "scandir", "sqlparse"]
+# XXXXXX UPDATE
+module = ["mmcif_utils.*", "mmcif.*", "wwpdb.*", "rcsb.utils.multiproc.*", "sqlalchemy.*", "scandir", "sqlparse", "typing_extensions"]
 ignore_missing_imports = true
 
 [tool.mypy]
@@ -181,3 +181,5 @@ exclude = [
 #"wwpdb/utils/dp/electron_density/*" = ["G004", "G001"]  #  Logging statement uses f-string
 
 #"tests/*" = ["TID252", "PLC1901", "S311", "T201"]
+"tests/*.py" = ["ARG005", "PT027", "DTZ001", "S101", "S108"]
+"tests/FileActivityDbMockTests.py" = ["S608"]

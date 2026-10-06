@@ -13,10 +13,10 @@ from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
 
 class DBLoaderTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
-    def testDbLoaderImport(self):
+    def testDbLoaderImport(self) -> None:
         """Test case -  noop - as cannot instantiate"""
         # pylint: disable=unnecessary-pass
 

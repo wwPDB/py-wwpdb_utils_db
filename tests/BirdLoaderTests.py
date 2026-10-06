@@ -31,6 +31,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import Any, List, Optional, Tuple
 
 from mmcif_utils.bird.PdbxPrdIo import PdbxPrdIo
 from wwpdb.utils.testing.Features import Features
@@ -43,35 +44,36 @@ from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class BirdLoaderTests(unittest.TestCase):
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         super(BirdLoaderTests, self).__init__(methodName)
-        self.__loadPathList = []
-        self.__tddFileList = []
+        self.__loadPathList: List[str] = []
+        self.__tddFileList: List[Tuple[str, str]] = []
+        self.__dbCon: Any = None
         self.__lfh = sys.stderr
         self.__verbose = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__databaseName = "prdv4"
         self.__topCachePath = "/data/components/prd-v3"
         self.open()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.close()
 
-    def open(self, dbUserId=None, dbUserPwd=None):
+    def open(self, dbUserId: Optional[str] = None, dbUserPwd: Optional[str] = None) -> bool:
         myC = MyDbConnect(dbName=self.__databaseName, dbUser=dbUserId, dbPw=dbUserPwd, verbose=self.__verbose, log=self.__lfh)
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
         return False
 
-    def close(self):
+    def close(self) -> None:
         if self.__dbCon is not None:
             self.__dbCon.close()
 
-    def testBirdSchemaCreate(self):
+    def testBirdSchemaCreate(self) -> None:
         """Test case -  create table schema using BIRD schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -79,7 +81,7 @@ class BirdLoaderTests(unittest.TestCase):
             msd = BirdSchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = msd.getTableIdList()
             myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
-            sqlL = []
+            sqlL: List[str] = []
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=msd.getDatabaseName(), tableDefObj=tableDefObj))
@@ -102,7 +104,7 @@ class BirdLoaderTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testPrdPathList(self):
+    def testPrdPathList(self) -> None:
         """Test case -  get the path list of PRD definitions in the CVS repository."""
         self.__lfh.write("\nStarting BirdLoaderTests testPrdPathList\n")
         try:
@@ -115,7 +117,7 @@ class BirdLoaderTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-    def testMakeLoadPrdFiles(self):
+    def testMakeLoadPrdFiles(self) -> None:
         """Test case - for loading BIRD definition data files"""
         self.__lfh.write("\nStarting BirdLoaderTests resrMakeLoadPrdFiles\n")
         startTime = time.time()
@@ -136,7 +138,7 @@ class BirdLoaderTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testBirdBatchImport(self):
+    def testBirdBatchImport(self) -> None:
         """Test case -  import loadable files"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdBatchImport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -177,7 +179,7 @@ class BirdLoaderTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testBirdInsertImport(self):
+    def testBirdInsertImport(self) -> None:
         """Test case -  import loadable data via SQL inserts"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdInsertImport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -207,7 +209,7 @@ class BirdLoaderTests(unittest.TestCase):
                         vList = []
                         aList = []
                         for tid, nm in zip(tableAttributeIdList, tableAttributeNameList):
-                            if len(row[tid]) > 0 and row[id] != r"\N":
+                            if len(row[tid]) > 0 and row[tid] != r"\N":
                                 vList.append(row[tid])
                                 aList.append(nm)
                         insertTemplate = myAd.insertTemplateSQL(databaseName, tableName, aList)
@@ -229,7 +231,7 @@ class BirdLoaderTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testBirdBatchInsertImport(self):
+    def testBirdBatchInsertImport(self) -> None:
         """Test case -  import loadable data via SQL inserts -"""
         startTime = time.time()
         self.__lfh.write("\nStarting BirdLoaderTests testBirdBatchInsertImport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -260,7 +262,7 @@ class BirdLoaderTests(unittest.TestCase):
                         vList = []
                         aList = []
                         for tid, nm in zip(tableAttributeIdList, tableAttributeNameList):
-                            if len(row[tid]) > 0 and row[id] != r"\N":
+                            if len(row[tid]) > 0 and row[tid] != r"\N":
                                 vList.append(row[tid])
                                 aList.append(nm)
                         sqlL.append((myAd.insertTemplateSQL(databaseName, tableName, aList), vList))
@@ -281,7 +283,7 @@ class BirdLoaderTests(unittest.TestCase):
         )
 
 
-def loadBatchFileSuite():
+def loadBatchFileSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(BirdLoaderTests("testBirdSchemaCreate"))
     # suiteSelect.addTest(BirdLoaderTests("testPrdPathList"))
@@ -290,14 +292,14 @@ def loadBatchFileSuite():
     return suiteSelect
 
 
-def loadBatchInsertSuite1():
+def loadBatchInsertSuite1() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(BirdLoaderTests("testBirdSchemaCreate"))
     suiteSelect.addTest(BirdLoaderTests("testBirdInsertImport"))
     return suiteSelect
 
 
-def loadBatchInsertSuite2():
+def loadBatchInsertSuite2() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(BirdLoaderTests("testBirdSchemaCreate"))
     suiteSelect.addTest(BirdLoaderTests("testBirdBatchInsertImport"))

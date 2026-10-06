@@ -20,20 +20,21 @@ import sys
 import time
 import traceback
 import unittest
+from typing import TextIO
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 
 
 class PdbDistroSchemaReportTests(unittest.TestCase):
-    def setUp(self):
-        self.__lfh = sys.stdout
+    def setUp(self) -> None:
+        self.__lfh: TextIO = sys.stdout
         self.__verbose = False
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def testSelect1(self):
+    def testSelect1(self) -> None:
         """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting PdbDistroSchemaReportTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -80,6 +81,10 @@ class PdbDistroSchemaReportTests(unittest.TestCase):
             for oTup in oList:
                 sqlGen.addOrderByAttributeId(attributeTuple=oTup)
             sqlS = sqlGen.getSql()
+            self.assertIsNotNone(sqlS)
+            self.assertTrue(str(sqlS).lstrip().startswith("SELECT"))
+            for sTup in sList:
+                self.assertIn(sd.getQualifiedAttributeName(sTup), str(sqlS))
             if self.__verbose:
                 self.__lfh.write("\n\n+MyDbSqlGenTests table creation SQL string\n %s\n\n" % sqlS)
             sqlGen.clear()
@@ -94,7 +99,7 @@ class PdbDistroSchemaReportTests(unittest.TestCase):
         )
 
 
-def suiteSelect():
+def suiteSelect() -> unittest.TestSuite:
     suiteSelectA = unittest.TestSuite()
     suiteSelectA.addTest(PdbDistroSchemaReportTests("testSelect1"))
     return suiteSelectA
