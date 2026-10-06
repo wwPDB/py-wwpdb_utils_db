@@ -19,7 +19,7 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from typing import ClassVar
+from typing import ClassVar, TextIO
 
 from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
@@ -27,7 +27,7 @@ from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 class MessageSchemaDef(SchemaDefBase):
     """A data class containing schema definitions for deposition related messages."""
 
-    _databaseName = "wwpdb_message_v1"
+    _databaseName: ClassVar[str] = "wwpdb_message_v1"
     _schemaDefDict: ClassVar[SchemaDictType] = {
         "DEP_MESSAGE_INFO": {
             "TABLE_ID": "DEP_MESSAGE_INFO",
@@ -97,7 +97,7 @@ class MessageSchemaDef(SchemaDefBase):
         },
     }
 
-    def __init__(self, verbose=True, log=sys.stderr):
+    def __init__(self, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         super(MessageSchemaDef, self).__init__(
             databaseName=MessageSchemaDef._databaseName, schemaDefDict=MessageSchemaDef._schemaDefDict, verbose=verbose, log=log
         )

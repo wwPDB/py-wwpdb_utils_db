@@ -19,7 +19,7 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from typing import ClassVar
+from typing import ClassVar, Optional, TextIO
 
 from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
@@ -27,7 +27,7 @@ from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 class DaInternalSchemaDef(SchemaDefBase):
     """A data class containing schema definitions for data processing status history."""
 
-    _databaseName = "da_internal_combine"
+    _databaseName: ClassVar[str] = "da_internal_combine"
     # fmt: off
     _schemaDefDict: ClassVar[SchemaDictType] = {
         'AUDIT_AUTHOR': {'ATTRIBUTES': {'IDENTIFIER_ORCID': 'identifier_ORCID',
@@ -3107,7 +3107,7 @@ class DaInternalSchemaDef(SchemaDefBase):
                      'TABLE_TYPE': 'transactional'}}
     # fmt: on
 
-    def __init__(self, verbose=True, log=sys.stderr, databaseName=None):
+    def __init__(self, verbose: bool = True, log: TextIO = sys.stderr, databaseName: Optional[str] = None) -> None:
         if databaseName is None:
             super(DaInternalSchemaDef, self).__init__(
                 databaseName=DaInternalSchemaDef._databaseName, schemaDefDict=DaInternalSchemaDef._schemaDefDict, verbose=verbose, log=log

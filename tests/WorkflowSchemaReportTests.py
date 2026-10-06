@@ -20,20 +20,21 @@ import sys
 import time
 import traceback
 import unittest
+from typing import TextIO
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.WorkflowSchemaDef import WorkflowSchemaDef
 
 
 class WorkflowSchemaReportTests(unittest.TestCase):
-    def setUp(self):
-        self.__lfh = sys.stdout
+    def setUp(self) -> None:
+        self.__lfh: TextIO = sys.stdout
         self.__verbose = True
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def testSelect1(self):
+    def testSelect1(self) -> None:
         """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting WorkflowSchemaReportTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -54,6 +55,8 @@ class WorkflowSchemaReportTests(unittest.TestCase):
                 if "ORDINAL_ID" in aIdList:
                     sqlGen.addOrderByAttributeId(attributeTuple=(tableId, "ORDINAL_ID"))
                 sqlS = sqlGen.getSql()
+                self.assertIsNotNone(sqlS)
+                self.assertIn("FROM %s.%s" % (sd.getDatabaseName(), sd.getTableName(tableId)), str(sqlS))
                 if self.__verbose:
                     self.__lfh.write("\n\n+MyDbSqlGenTests table creation SQL string\n %s\n\n" % sqlS)
                 sqlGen.clear()
@@ -68,7 +71,7 @@ class WorkflowSchemaReportTests(unittest.TestCase):
         )
 
 
-def suiteSelect():  # pragma: no cover
+def suiteSelect() -> unittest.TestSuite:  # pragma: no cover
     suiteSelectA = unittest.TestSuite()
     suiteSelectA.addTest(WorkflowSchemaReportTests("testSelect1"))
     return suiteSelectA

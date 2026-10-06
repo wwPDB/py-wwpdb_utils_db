@@ -19,7 +19,7 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from typing import ClassVar
+from typing import ClassVar, TextIO
 
 from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
@@ -27,7 +27,7 @@ from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 class StatusHistorySchemaDef(SchemaDefBase):
     """A data class containing schema definitions for data processing status history."""
 
-    _databaseName = "da_internal"
+    _databaseName: ClassVar[str] = "da_internal"
     # fmt: off
     _schemaDefDict: ClassVar[SchemaDictType] = {
         "PDBX_DATABASE_STATUS_HISTORY": {
@@ -129,7 +129,7 @@ class StatusHistorySchemaDef(SchemaDefBase):
     }
     # fmt: on
 
-    def __init__(self, verbose=True, log=sys.stderr):
+    def __init__(self, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         super(StatusHistorySchemaDef, self).__init__(
             databaseName=StatusHistorySchemaDef._databaseName, schemaDefDict=StatusHistorySchemaDef._schemaDefDict, verbose=verbose, log=log
         )

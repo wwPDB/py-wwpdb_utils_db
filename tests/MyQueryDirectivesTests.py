@@ -25,6 +25,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import Any, Dict, List, Optional, cast
 
 from wwpdb.utils.testing.Features import Features
 
@@ -36,12 +37,12 @@ from wwpdb.utils.db.PdbDistroSchemaDef import PdbDistroSchemaDef
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class MyQueryDirectivesTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__databaseName = "stat"
         self.__lfh = sys.stdout
         self.__verbose = True
-        self.__dbCon = None
-        self.__domD = {
+        self.__dbCon: Any = None
+        self.__domD: Dict[str, Any] = {
             "solution": "sad",
             "spaceg": "P 21 21 21",
             "software": "REFMAC",
@@ -97,11 +98,11 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         # ok = self.open()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         # self.close()
         pass
 
-    def open(self, dbUserId=None, dbUserPwd=None):
+    def open(self, dbUserId: Optional[str] = None, dbUserPwd: Optional[str] = None) -> bool:
         myC = MyDbConnect(dbName=self.__databaseName, dbUser=dbUserId, dbPw=dbUserPwd, verbose=self.__verbose, log=self.__lfh)
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
@@ -109,12 +110,12 @@ class MyQueryDirectivesTests(unittest.TestCase):
             return True
         return False
 
-    def close(self):
+    def close(self) -> None:
         if self.__dbCon is not None:
             self.__lfh.write("\nDatabase connection closed MyQueryDirectivesTest close at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
             self.__dbCon.close()
 
-    def testDirective1(self):
+    def testDirective1(self) -> None:
         """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyQueryDirectivesTest testDirective1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -136,7 +137,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testDirectiveWithQuery0(self):
+    def testDirectiveWithQuery0(self) -> None:
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF:xtype",
             "SELECT_ITEM:2:ITEM:DOM_REF:ytype",
@@ -168,7 +169,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery1(self):
+    def testDirectiveWithQuery1(self) -> None:
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF:xtype",
             "SELECT_ITEM:2:ITEM:DOM_REF:ytype",
@@ -177,7 +178,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery2(self):
+    def testDirectiveWithQuery2(self) -> None:
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF:xtype",
             "SELECT_ITEM:2:ITEM:DOM_REF:ytype",
@@ -192,7 +193,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery3(self):
+    def testDirectiveWithQuery3(self) -> None:
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF:xtype",
             "SELECT_ITEM:2:ITEM:DOM_REF:ytype",
@@ -211,7 +212,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery4(self):
+    def testDirectiveWithQuery4(self) -> None:
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF:xtype",
             "SELECT_ITEM:2:ITEM:DOM_REF:ytype",
@@ -222,7 +223,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery5(self):
+    def testDirectiveWithQuery5(self) -> None:
         # broken -- problem with automatic addition of equi-join conditions.
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF:xtype",
@@ -236,7 +237,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery6(self):
+    def testDirectiveWithQuery6(self) -> None:
         qdL = [
             "SELECT_ITEM:1:ITEM:DOM_REF_0:multikey",
             "SELECT_ITEM:2:ITEM:DOM_REF_1:multikey",
@@ -246,7 +247,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithDistroQuery(qdL=qdL, domD=self.__domD)
 
-    def testDirectiveWithQuery7(self):
+    def testDirectiveWithQuery7(self) -> None:
         """
         pdbx_database_status_history
 
@@ -290,7 +291,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
         ]
         self.__testDirectiveWithHistoryQuery(qdL=qdL, domD=myDomD)
 
-    def __testDirectiveWithDistroQuery(self, qdL, domD):
+    def __testDirectiveWithDistroQuery(self, qdL: List[str], domD: Dict[str, Any]) -> None:
         """Test case -  selection everything for a simple condition - (Distro Schema)"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyQueryDirectivesTest __testDirectiveWithDistroQuery at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -304,7 +305,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
                 self.__lfh.write("\n\n+testDirectiveWithDistroQuery SQL\n %s\n\n" % sqlS)
             self.__lfh.flush()
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
-            rowList = myQ.selectRows(queryString=sqlS)
+            rowList = myQ.selectRows(queryString=cast("str", sqlS))
             if self.__verbose:
                 self.__lfh.write("\n+testDirectiveWithDistroQuery mysql server returns row length %d\n" % len(rowList))
                 self.__lfh.flush()
@@ -321,7 +322,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def __testDirectiveWithHistoryQuery(self, qdL, domD):
+    def __testDirectiveWithHistoryQuery(self, qdL: List[str], domD: Dict[str, Any]) -> None:
         """Test case -  selection everything for a simple condition -"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyQueryDirectivesTest __testDirectiveWithHistoryQuery at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -335,7 +336,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
                 self.__lfh.write("\n\n+testDirectiveWithHistoryQuery SQL\n %s\n\n" % sqlS)
             self.__lfh.flush()
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
-            rowList = myQ.selectRows(queryString=sqlS)
+            rowList = myQ.selectRows(queryString=cast("str", sqlS))
             if self.__verbose:
                 self.__lfh.write("\n+testDirectiveWithHistoryQuery mysql server returns row length %d\n" % len(rowList))
                 self.__lfh.flush()
@@ -353,13 +354,13 @@ class MyQueryDirectivesTests(unittest.TestCase):
         )
 
 
-def suiteSelect1():
+def suiteSelect1() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyQueryDirectivesTests("testDirective1"))
     return suiteSelect
 
 
-def suiteSelectQuery():
+def suiteSelectQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyQueryDirectivesTests("testDirectiveWithQuery1"))
     suiteSelect.addTest(MyQueryDirectivesTests("testDirectiveWithQuery2"))

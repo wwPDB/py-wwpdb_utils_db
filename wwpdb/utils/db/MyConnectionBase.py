@@ -24,7 +24,7 @@ __version__ = "V0.07"
 
 import logging
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional, TextIO, Union, cast
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 
@@ -38,22 +38,22 @@ logger = logging.getLogger(__name__)
 
 
 class MyConnectionBase:
-    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
+    def __init__(self, siteId: Optional[str] = None, verbose: bool = False, log: TextIO = sys.stderr) -> None:  # noqa: ARG002 pylint: disable=unused-argument
         #
         self.__siteId = siteId
         self._cI = ConfigInfo(self.__siteId)
-        self._dbCon = None
-        self.__authD = {}
-        self.__databaseName = None
-        self.__dbHost = None
-        self.__dbUser = None
-        self.__dbPw = None
-        self.__dbSocket = None
-        self.__dbPort = None
+        self._dbCon: Optional[Any] = None
+        self.__authD: Dict[str, Any] = {}
+        self.__databaseName: Optional[str] = None
+        self.__dbHost: Optional[str] = None
+        self.__dbUser: Optional[str] = None
+        self.__dbPw: Optional[str] = None
+        self.__dbSocket: Optional[str] = None
+        self.__dbPort: Optional[Union[int, str]] = None
         self.__dbPort = 3306
         self.__dbServer = "mysql"
 
-    def setResource(self, resourceName=None):
+    def setResource(self, resourceName: Optional[str] = None) -> None:
         #
         if resourceName == "PRD":
             self.__databaseName = self._cI.get("SITE_REFDATA_PRD_DB_NAME")
@@ -155,10 +155,10 @@ class MyConnectionBase:
         self.__authD["DB_SERVER"] = self.__dbServer
         #
 
-    def getAuth(self):
+    def getAuth(self) -> Dict[str, Any]:
         return self.__authD
 
-    def setAuth(self, authD):
+    def setAuth(self, authD: Dict[str, Any]) -> None:
         try:
             self.__authD = authD
             self.__databaseName = self.__authD["DB_NAME"]
@@ -174,7 +174,7 @@ class MyConnectionBase:
         except:  # noqa: E722 pylint: disable=bare-except
             pass
 
-    def openConnection(self):
+    def openConnection(self) -> bool:
         """Create a database connection and return a connection object.
 
         Returns None on failure
@@ -215,10 +215,10 @@ class MyConnectionBase:
 
         return False
 
-    def getConnection(self):
+    def getConnection(self) -> Optional[Any]:
         return self._dbCon
 
-    def closeConnection(self):
+    def closeConnection(self) -> bool:
         """Close db session"""
         if self._dbCon is not None:
             self._dbCon.close()
@@ -226,9 +226,10 @@ class MyConnectionBase:
             return True
         return False
 
-    def getCursor(self):
+    def getCursor(self) -> Optional[Any]:
         try:
-            return self._dbCon.cursor()
+            # With no open connection this raises (and is logged) as before
+            return cast("Any", self._dbCon).cursor()
         except:  # noqa: E722 pylint: disable=bare-except
             logger.exception("+MyConnectionBase(getCursor) failing.\n")
 

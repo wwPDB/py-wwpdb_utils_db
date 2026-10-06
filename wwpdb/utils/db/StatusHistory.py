@@ -22,9 +22,13 @@ import datetime
 import os
 import sys
 import traceback
+from typing import TYPE_CHECKING, Dict, List, Optional, TextIO, Tuple, cast
 
 from mmcif_utils.pdbx.PdbxIo import PdbxStatusHistoryIo
-from wwpdb.io.locator.PathInfo import PathInfo
+
+if TYPE_CHECKING:
+    from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoDictType
+from wwpdb.io.locator.PathInfo import PathInfo, PathInfoStorageType, PathInfoVersionId
 
 
 class StatusHistory:
@@ -33,7 +37,14 @@ class StatusHistory:
 
     """
 
-    def __init__(self, siteId=None, fileSource="archive", sessionPath=None, verbose=False, log=sys.stderr):
+    def __init__(
+        self,
+        siteId: Optional[str] = None,
+        fileSource: PathInfoStorageType = "archive",
+        sessionPath: Optional[str] = None,
+        verbose: bool = False,
+        log: TextIO = sys.stderr,
+    ) -> None:
         self.__verbose = verbose
         self.__lfh = log
         self.__debug = False
@@ -41,13 +52,13 @@ class StatusHistory:
         self.__sessionPath = sessionPath
         self.__siteId = siteId
         #
-        self.__inpFilePath = None
-        self.__entryId = None
-        self.__pdbId = None
+        self.__inpFilePath: Optional[str] = None
+        self.__entryId: Optional[str] = None
+        self.__pdbId: Optional[str] = None
         #
         self.__setup()
 
-    def __setup(self):
+    def __setup(self) -> None:
         if self.__sessionPath is not None:
             self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
         else:
@@ -61,16 +72,16 @@ class StatusHistory:
         self.__timeFormat = "%Y-%m-%d:%H:%M"
         #
 
-    def __setEntryId(self, entryId, pdbId):
+    def __setEntryId(self, entryId: str, pdbId: Optional[str]) -> bool:
         """Set the file path of the status history file and read any existing content --"""
         self.__entryId = entryId
         self.__pdbId = pdbId
         self.__inpFilePath = self.__pI.getStatusHistoryFilePath(dataSetId=entryId, fileSource=self.__fileSource, versionId="latest")
         if self.__exists():
-            return self.__pio.setFilePath(filePath=self.__inpFilePath, idCode=entryId)
+            return self.__pio.setFilePath(filePath=cast("str", self.__inpFilePath), idCode=entryId)
         return False
 
-    def __setInpPath(self, inpPath, entryId, pdbId):
+    def __setInpPath(self, inpPath: str, entryId: str, pdbId: Optional[str]) -> bool:
         """Set the file path of the status history file and read any existing content --"""
         self.__entryId = entryId
         self.__pdbId = pdbId
@@ -79,11 +90,11 @@ class StatusHistory:
             return self.__pio.setFilePath(filePath=self.__inpFilePath, idCode=entryId)
         return False
 
-    def __new(self, entryId):
+    def __new(self, entryId: str) -> bool:
         """Create a new status history category using base category style content definition --"""
         return self.__pio.newContainer(containerName=entryId, overWrite=True)
 
-    def setEntryId(self, entryId, pdbId, inpPath=None, overWrite=False):
+    def setEntryId(self, entryId: str, pdbId: Optional[str], inpPath: Optional[str] = None, overWrite: bool = False) -> int:
         """Open an existing status history file from the archive directory and read the container corresponding to the input
         entry id.    An alternate file path can be provided to override reading input from the archive directory.
 
@@ -103,7 +114,7 @@ class StatusHistory:
 
         return self.__getRowCount()
 
-    def store(self, entryId, outPath=None, versionId="latest"):
+    def store(self, entryId: str, outPath: Optional[str] = None, versionId: PathInfoVersionId = "latest") -> bool:
         if self.__getRowCount() < 1:
             return False
         if outPath is None:
@@ -114,34 +125,36 @@ class StatusHistory:
         if self.__verbose:
             self.__lfh.write("+StatusHistory.store() %s storing %d history records in file path %s\n" % (entryId, self.__getRowCount(), outFilePath))
         #
-        return self.__pio.write(outFilePath)
+        return self.__pio.write(cast("str", outFilePath))
 
-    def __exists(self):
+    def __exists(self) -> bool:
         """Return True if a status history file exists or false otherwise."""
-        if os.access(self.__inpFilePath, os.R_OK):
+        if os.access(cast("str", self.__inpFilePath), os.R_OK):
             return True
         return False
 
-    def getNow(self):
+    def getNow(self) -> str:
         return self.__getNow()
 
-    def __getNow(self):
+    def __getNow(self) -> str:
         """Return a CIF style date-timestamp value for current local time -"""
         today = datetime.datetime.today()  # No timezone  # noqa: DTZ002
         return str(today.strftime(self.__timeFormat))  # noqa: DTZ007
 
-    def dateTimeOk(self, dateTime):
+    def dateTimeOk(self, dateTime: Optional[str]) -> bool:
         try:
             tS = self.__makeTimeStamp(dateTime)
             if (tS is not None) and (len(tS) < 16):
                 return False
-            datetime.datetime.strptime(tS, self.__timeFormat)  # noqa: DTZ007
+            datetime.datetime.strptime(cast("str", tS), self.__timeFormat)  # noqa: DTZ007
             return True
         except:  # noqa: E722  pylint: disable=bare-except
             return False
 
-    def __makeTimeStamp(self, inpTimeStamp):
+    def __makeTimeStamp(self, inpTimeStamp: Optional[str]) -> Optional[str]:
         try:
+            # None is not narrowed here - len(None) raises TypeError, handled by the except clause below
+            inpTimeStamp = cast("str", inpTimeStamp)
             inpT = ""
             if len(inpTimeStamp) < 10:
                 return inpT
@@ -158,7 +171,7 @@ class StatusHistory:
                 traceback.print_exc(file=self.__lfh)
             return inpTimeStamp
 
-    def __getRowCount(self):
+    def __getRowCount(self) -> int:
         return self.__pio.getRowCount(catName=self.__statusCategory)
 
     # def __updatePriorEndDate(self, dateEnd=None):
@@ -170,16 +183,16 @@ class StatusHistory:
     #     else:
     #         return False
 
-    def get(self):
+    def get(self) -> List[Dict[str, Optional[str]]]:
         return self.__pio.getAttribDictList(catName=self.__statusCategory)
 
-    def getLastStatusAndDate(self):
+    def getLastStatusAndDate(self) -> Tuple[Optional[str], Optional[str]]:
         tup = self.__lastStatusAndDate()
         if (self.__pdbId is None) and (len(tup) > 3):
             self.__pdbId = tup[3]
         return (tup[0], tup[1])
 
-    def __lastStatusAndDate(self):
+    def __lastStatusAndDate(self) -> Tuple[Optional[str], Optional[str], Optional[int], Optional[str]]:
         """Return the last status code, time stamp, and ordinal index in the current data context."""
         try:
             nRows = self.__getRowCount()
@@ -189,7 +202,7 @@ class StatusHistory:
                 tOrd = (-1, -1)
                 for ii, d in enumerate(dList):
                     if int(str(d["ordinal"])) > tOrd[1]:
-                        tOrd = (ii, int(d["ordinal"]))
+                        tOrd = (ii, int(cast("str", d["ordinal"])))
                 dA = dList[tOrd[0]]
                 return (dA["status_code_end"], dA["date_end"], int(str(dA["ordinal"])), dA["pdb_id"])
             return (None, None, None, None)
@@ -206,7 +219,7 @@ class StatusHistory:
     #     except:  # noqa: E722  pylint: disable=bare-except
     #         return False
 
-    def nextRecord(self, statusCodeNext="AUTH", dateNext=None, annotator=None, details=None):
+    def nextRecord(self, statusCodeNext: str = "AUTH", dateNext: Optional[str] = None, annotator: Optional[str] = None, details: Optional[str] = None) -> bool:
         """ """
         try:
             statusLast, dateLast, _ordinalLast, pdbId = self.__lastStatusAndDate()
@@ -221,7 +234,15 @@ class StatusHistory:
         except:  # noqa: E722  pylint: disable=bare-except
             return False
 
-    def add(self, statusCodeBegin="PROC", dateBegin=None, statusCodeEnd="PROC", dateEnd=None, annotator=None, details=None):
+    def add(
+        self,
+        statusCodeBegin: Optional[str] = "PROC",
+        dateBegin: Optional[str] = None,
+        statusCodeEnd: Optional[str] = "PROC",
+        dateEnd: Optional[str] = None,
+        annotator: Optional[str] = None,
+        details: Optional[str] = None,
+    ) -> bool:
         return self.__appendRow(
             entryId=self.__entryId,
             pdbId=self.__pdbId,
@@ -233,7 +254,17 @@ class StatusHistory:
             details=details,
         )
 
-    def __appendRow(self, entryId, pdbId, statusCodeBegin="PROC", dateBegin=None, statusCodeEnd="PROC", dateEnd=None, annotator=None, details=None):
+    def __appendRow(
+        self,
+        entryId: Optional[str],
+        pdbId: Optional[str],
+        statusCodeBegin: Optional[str] = "PROC",
+        dateBegin: Optional[str] = None,
+        statusCodeEnd: Optional[str] = "PROC",
+        dateEnd: Optional[str] = None,
+        annotator: Optional[str] = None,
+        details: Optional[str] = None,
+    ) -> bool:
         """
         Append a row to the status history list --
 
@@ -241,7 +272,7 @@ class StatusHistory:
 
         return True for success or false otherwise
         """
-        uD = {}
+        uD: Dict[str, str] = {}
 
         nRows = self.__getRowCount()
         if self.__verbose:
@@ -290,12 +321,13 @@ class StatusHistory:
         else:
             uD["annotator"] = "UNASSIGNED"
 
+        iOrdinal: Optional[int]
         if nRows == 0:
             iOrdinal = 0
         else:
-            _t, tt, iOrdinal, _ttt = self.__lastStatusAndDate()
+            _t, _tt, iOrdinal, _ttt = self.__lastStatusAndDate()
 
-        uD["ordinal"] = str(iOrdinal + 1)
+        uD["ordinal"] = str(cast("int", iOrdinal) + 1)
         #
         # Compute the time delta -
         #
@@ -306,10 +338,10 @@ class StatusHistory:
             uD["delta_days"] = "0.0000"
         #
 
-        ok = self.__pio.appendRowByAttribute(rowAttribDict=uD, catName=self.__statusCategory)
+        ok = self.__pio.appendRowByAttribute(rowAttribDict=cast("PdbxStyleIoDictType", uD), catName=self.__statusCategory)
         return ok
 
-    def __deltaDate(self, dateTimeEnd, dateTimeBegin, fail=-1):
+    def __deltaDate(self, dateTimeEnd: str, dateTimeBegin: str, fail: float = -1) -> float:
         try:
             tEnd = datetime.datetime.strptime(dateTimeEnd, self.__timeFormat)  # noqa: DTZ007
             tBegin = datetime.datetime.strptime(dateTimeBegin, self.__timeFormat)  # noqa: DTZ007

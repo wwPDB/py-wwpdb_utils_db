@@ -22,6 +22,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import List, cast
 
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 from wwpdb.utils.db.MessageSchemaDef import MessageSchemaDef
@@ -36,14 +37,14 @@ if not os.path.exists(TESTOUTPUT):  # pragma: no cover
 
 
 class MyDbSqlGenTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stdout
         self.__verbose = False
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def testMessageSchemaCreate(self):
+    def testMessageSchemaCreate(self) -> None:
         """Test case -  create table schema using message schema definition as an example"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testMessageSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -51,7 +52,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             msd = MessageSchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = msd.getTableIdList()
             myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
-            sqlL = []
+            sqlL: List[str] = []
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=msd.getDatabaseName(), tableDefObj=tableDefObj))
@@ -69,7 +70,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testMessageImportExport(self):
+    def testMessageImportExport(self) -> None:
         """Test case -  import and export commands --"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testMessageImportExport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -81,7 +82,7 @@ class MyDbSqlGenTests(unittest.TestCase):
 
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
-                exportPath = os.path.join(TESTOUTPUT, tableDefObj.getName() + ".tdd")
+                exportPath = os.path.join(TESTOUTPUT, cast("str", tableDefObj.getName()) + ".tdd")
                 sqlExport = myAd.exportTable(databaseName, tableDefObj, exportPath=exportPath)
                 if self.__verbose:  # pragma: no cover
                     self.__lfh.write("\n\n+MyDbSqlGenTests table export SQL string\n %s\n\n" % sqlExport)
@@ -100,7 +101,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testBirdSchemaCreate(self):
+    def testBirdSchemaCreate(self) -> None:
         """Test case -  create table schema using message schema definition as an example"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testBirdSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -108,7 +109,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             msd = BirdSchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = msd.getTableIdList()
             myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
-            sqlL = []
+            sqlL: List[str] = []
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=msd.getDatabaseName(), tableDefObj=tableDefObj))
@@ -126,7 +127,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testPrdChemCompSchemaCreate(self):
+    def testPrdChemCompSchemaCreate(self) -> None:
         """Test case -  create table schema using message schema definition as an example"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testPrdChemCompSchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -134,7 +135,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             msd = PrdChemCompSchemaDef(verbose=self.__verbose, log=self.__lfh)
             tableIdList = msd.getTableIdList()
             myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
-            sqlL = []
+            sqlL: List[str] = []
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=msd.getDatabaseName(), tableDefObj=tableDefObj))
@@ -152,7 +153,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testBirdImportExport(self):
+    def testBirdImportExport(self) -> None:
         """Test case -  import and export commands --"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testBirdImportExport at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -164,7 +165,7 @@ class MyDbSqlGenTests(unittest.TestCase):
 
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
-                exportPath = os.path.join(TESTOUTPUT, tableDefObj.getName() + ".tdd")
+                exportPath = os.path.join(TESTOUTPUT, cast("str", tableDefObj.getName()) + ".tdd")
                 sqlExport = myAd.exportTable(databaseName, tableDefObj, exportPath=exportPath)
                 if self.__verbose:  # pragma: no cover
                     self.__lfh.write("\n\n+MyDbSqlGenTests table export SQL string\n %s\n\n" % sqlExport)
@@ -183,7 +184,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testSelect1(self):
+    def testSelect1(self) -> None:
         """Test case -  selection everything for a simple condition-"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testSelect1 at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -214,7 +215,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             "\nCompleted MyDbSqlGenTests testSelect1 at %s (%d seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testSelectDistro(self):
+    def testSelectDistro(self) -> None:
         """Test case -  selection, condition and ordering methods using distro schema"""
         startTime = time.time()
         self.__lfh.write("\nStarting MyDbSqlGenTests testSelectDistro at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -245,7 +246,7 @@ class MyDbSqlGenTests(unittest.TestCase):
             # aIdList = sd.getAttributeIdList(tableId)
             sqlGen = MyDbQuerySqlGen(schemaDefObj=sd, verbose=self.__verbose, log=self.__lfh)
 
-            sTableIdList = []
+            sTableIdList: List[str] = []
             for sTup in sList:
                 sqlGen.addSelectAttributeId(attributeTuple=(sTup[0], sTup[1]))
                 sTableIdList.append(sTup[0])
@@ -273,18 +274,18 @@ class MyDbSqlGenTests(unittest.TestCase):
         )
 
 
-def suite():  # pragma: no cover
-    return unittest.makeSuite(MyDbSqlGenTests, "test")
+def suite() -> unittest.TestSuite:  # pragma: no cover
+    return unittest.TestLoader().loadTestsFromTestCase(MyDbSqlGenTests)
 
 
-def suiteMessageSchema():  # pragma: no cover
+def suiteMessageSchema() -> unittest.TestSuite:  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyDbSqlGenTests("testMessageSchemaCreate"))
     suiteSelect.addTest(MyDbSqlGenTests("testMessageImportExport"))
     return suiteSelect
 
 
-def suiteBirdSchema():  # pragma: no cover
+def suiteBirdSchema() -> unittest.TestSuite:  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyDbSqlGenTests("testBirdSchemaCreate"))
     suiteSelect.addTest(MyDbSqlGenTests("testPrdChemCompSchemaCreate"))
@@ -292,7 +293,7 @@ def suiteBirdSchema():  # pragma: no cover
     return suiteSelect
 
 
-def suitesSelect():  # pragma: no cover
+def suitesSelect() -> unittest.TestSuite:  # pragma: no cover
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(MyDbSqlGenTests("testSelect1"))
     suiteSelect.addTest(MyDbSqlGenTests("testSelectDistro"))

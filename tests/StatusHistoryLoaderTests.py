@@ -27,6 +27,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import Optional
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
 from wwpdb.utils.testing.Features import Features
@@ -39,13 +40,13 @@ from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class StatusHistoryLoaderTests(unittest.TestCase):
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         super(StatusHistoryLoaderTests, self).__init__(methodName)
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__ioObj = IoAdapterPy(verbose=self.__verbose, log=self.__lfh)
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__msd = StatusHistorySchemaDef(verbose=self.__verbose, log=self.__lfh)
@@ -53,21 +54,21 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         self.__databaseName = "da_internal"
         self.open()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.close()
 
-    def open(self, dbUserId=None, dbUserPwd=None):
+    def open(self, dbUserId: Optional[str] = None, dbUserPwd: Optional[str] = None) -> bool:
         myC = MyDbConnect(dbName=self.__databaseName, dbUser=dbUserId, dbPw=dbUserPwd, verbose=self.__verbose, log=self.__lfh)
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
         return False
 
-    def close(self):
+    def close(self) -> None:
         if self.__dbCon is not None:
             self.__dbCon.close()
 
-    def testStatusHistorySchemaCreate(self):
+    def testStatusHistorySchemaCreate(self) -> None:
         """Test case -  create table schema using status history schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting StatusHistoryLoaderTests testStatusHistorySchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -98,7 +99,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testFileInventorySchemaCreate(self):
+    def testFileInventorySchemaCreate(self) -> None:
         """Test case -  create table schema for file inventory table using status history schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting StatusHistoryLoaderTests testFileInventorySchemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -129,7 +130,7 @@ class StatusHistoryLoaderTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testLoadInventoryFile(self):
+    def testLoadInventoryFile(self) -> None:
         """Test case - create batch load files for all chemical component definition data files -"""
         self.__lfh.write("\nStarting StatusHistoryLoaderTests testLoadInventoryFile\n")
         startTime = time.time()
@@ -170,13 +171,13 @@ class StatusHistoryLoaderTests(unittest.TestCase):
         )
 
 
-def createHistoryFullSchemaSuite():
+def createHistoryFullSchemaSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(StatusHistoryLoaderTests("testStatusHistorySchemaCreate"))
     return suiteSelect
 
 
-def createFileInventoryLoadSuite():
+def createFileInventoryLoadSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(StatusHistoryLoaderTests("testFileInventorySchemaCreate"))
     suiteSelect.addTest(StatusHistoryLoaderTests("testLoadInventoryFile"))

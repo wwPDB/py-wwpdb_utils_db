@@ -23,6 +23,7 @@ import os
 import sys
 import traceback
 from optparse import OptionParser  # pylint: disable=deprecated-module
+from typing import Optional, TextIO
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.session.WebRequest import InputRequest
@@ -31,12 +32,12 @@ from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
 
 
 class StatusHistoryExec:
-    def __init__(self, defSiteId="WWWDPB_INTERNAL_RU", sessionId=None, verbose=True, log=sys.stderr):
+    def __init__(self, defSiteId: str = "WWWDPB_INTERNAL_RU", sessionId: Optional[str] = None, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         self.__lfh = log
         self.__verbose = verbose
         self.__setup(defSiteId=defSiteId, sessionId=sessionId)
 
-    def __setup(self, defSiteId=None, sessionId=None):
+    def __setup(self, defSiteId: Optional[str] = None, sessionId: Optional[str] = None) -> None:
         """Simulate the web application environment for managing session storage of  temporaty data files."""
         self.__siteId = getSiteId(defaultSiteId=defSiteId)
         #
@@ -61,7 +62,7 @@ class StatusHistoryExec:
         self.__reqObj.printIt(ofh=self.__lfh)
         #
 
-    def doCreateStatusHistory(self, numProc=1, overWrite=False):
+    def doCreateStatusHistory(self, numProc: int = 1, overWrite: bool = False) -> None:
         """ """
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
@@ -74,7 +75,7 @@ class StatusHistoryExec:
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
 
-    def doLoadStatusHistory(self, numProc=1, newTable=False):
+    def doLoadStatusHistory(self, numProc: int = 1, newTable: bool = False) -> bool:
         """ """
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
@@ -86,7 +87,7 @@ class StatusHistoryExec:
 
         return False
 
-    def doLoadEntryStatusHistory(self, entryId):
+    def doLoadEntryStatusHistory(self, entryId: str) -> bool:
         """Load/reload status history file for the input entryId"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
@@ -95,7 +96,7 @@ class StatusHistoryExec:
             traceback.print_exc(file=self.__lfh)
         return False
 
-    def doCreateEntryStatusHistory(self, entryId, overWrite=False):
+    def doCreateEntryStatusHistory(self, entryId: str, overWrite: bool = False) -> None:
         """ """
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
@@ -104,7 +105,7 @@ class StatusHistoryExec:
         except:  # noqa: E722  pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
 
-    def doCreateStatusHistorySchema(self):
+    def doCreateStatusHistorySchema(self) -> bool:
         """Create/recreate status history schema -"""
         try:
             shu = StatusHistoryUtils(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
@@ -114,7 +115,7 @@ class StatusHistoryExec:
         return False
 
 
-def main():
+def main() -> None:
     usage = "usage: %prog [options]"
     parser = OptionParser(usage)
 

@@ -33,17 +33,30 @@ import os
 import sys
 import time
 import traceback
+from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple, ValuesView
 
+from mmcif.io.IoAdapterBase import IoAdapterBase
 from mmcif.io.IoAdapterCore import IoAdapterCore
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbQuery
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, TableDef
 
 
 class SchemaDefLoader:
     """Map PDBx/mmCIF instance data to SQL loadable data using external schema definition."""
 
-    def __init__(self, schemaDefObj, ioObj=None, dbCon=None, workPath=".", cleanUp=False, warnings="default", verbose=True, log=sys.stderr):
+    def __init__(
+        self,
+        schemaDefObj: SchemaDefBase,
+        ioObj: Optional[IoAdapterBase] = None,
+        dbCon: Optional[Any] = None,
+        workPath: str = ".",
+        cleanUp: bool = False,
+        warnings: str = "default",
+        verbose: bool = True,
+        log: TextIO = sys.stderr,
+    ) -> None:
         if ioObj is None:
             ioObj = IoAdapterCore()
         self.__lfh = log
@@ -60,16 +73,16 @@ class SchemaDefLoader:
         self.__rowSep = "$##$\n"
         #
         self.__warningAction = warnings
-        self.__overWrite = {}
+        self.__overWrite: Dict[Tuple[Optional[str], str], int] = {}
 
-    def setWarning(self, action):
+    def setWarning(self, action: str) -> bool:
         if action in ["error", "ignore", "default"]:
             self.__warningAction = action
             return True
         self.__warningAction = "default"
         return False
 
-    def setDelimiters(self, colSep=None, rowSep=None):
+    def setDelimiters(self, colSep: Optional[str] = None, rowSep: Optional[str] = None) -> bool:
         """Set column and row delimiters for intermediate data files used for
         batch-file loading operations.
         """
@@ -77,7 +90,13 @@ class SchemaDefLoader:
         self.__rowSep = rowSep if rowSep is not None else "$##$\n"
         return True
 
-    def load(self, inputPathList=None, containerList=None, loadType="batch-file", deleteOpt=None):
+    def load(
+        self,
+        inputPathList: Optional[List[str]] = None,
+        containerList: Optional[List[Any]] = None,
+        loadType: str = "batch-file",
+        deleteOpt: Optional[str] = None,
+    ) -> bool:
         """Load data for each table defined in the current schema definition object.
         Data are extracted from the input file list.
 
@@ -105,7 +124,7 @@ class SchemaDefLoader:
         elif containerList is not None:
             tableDataDict, containerNameList = self.__process(containerList)
         else:
-            tableDataDict = containerNameList = []
+            tableDataDict = containerNameList = []  # type: ignore[assignment]  # known bug: a list is assigned here, tableDataDict.items() then fails
         #
         #
         if self.__verbose:
@@ -129,11 +148,17 @@ class SchemaDefLoader:
 
         return False
 
-    def __cleanUpFile(self, filePath):
+    def __cleanUpFile(self, filePath: str) -> None:
         with contextlib.suppress(Exception):
             os.remove(filePath)
 
-    def makeLoadFilesMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002 pylint: disable=unused-argument
+    def makeLoadFilesMulti(
+        self,
+        dataList: List[str],
+        procName: str,
+        optionsD: Dict[str, Any],  # noqa: ARG002 pylint: disable=unused-argument
+        workingDir: str,  # noqa: ARG002 pylint: disable=unused-argument
+    ) -> Tuple[List[str], List[str], List[Tuple[str, str]], List[Any]]:
         """Create a loadable data file for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
 
@@ -145,7 +170,7 @@ class SchemaDefLoader:
         r1, r2 = self.makeLoadFiles(inputPathList=dataList, partName=procName)
         return dataList, r1, r2, []
 
-    def makeLoadFiles(self, inputPathList, append=False, partName="1"):
+    def makeLoadFiles(self, inputPathList: List[str], append: bool = False, partName: str = "1") -> Tuple[List[str], List[Tuple[str, str]]]:
         """Create a loadable data file for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
 
@@ -157,7 +182,9 @@ class SchemaDefLoader:
         tableDataDict, containerNameList = self.__fetch(inputPathList)
         return containerNameList, self.__export(tableDataDict, colSep=self.__colSep, rowSep=self.__rowSep, append=append, partName=partName)
 
-    def loadBatchFiles(self, loadList=None, containerNameList=None, deleteOpt=None):
+    def loadBatchFiles(
+        self, loadList: Optional[List[Tuple[str, str]]] = None, containerNameList: Optional[List[str]] = None, deleteOpt: Optional[str] = None
+    ) -> bool:
         """Load data for each table defined in the current schema definition object using
 
         Data source options:
@@ -174,7 +201,7 @@ class SchemaDefLoader:
         """
         #
         startTime = time.time()
-        for tableId, loadPath in loadList:
+        for tableId, loadPath in loadList:  # type: ignore[union-attr]  # loadList=None default is not iterable (latent bug)
             ok = self.__batchFileImport(tableId, loadPath, sqlFilePath=None, containerNameList=containerNameList, deleteOpt=deleteOpt)
             if not ok:
                 break
@@ -189,20 +216,26 @@ class SchemaDefLoader:
             )
         return ok
 
-    def fetchMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002  pylint: disable=unused-argument
+    def fetchMulti(
+        self,
+        dataList: List[str],
+        procName: str,  # noqa: ARG002 pylint: disable=unused-argument
+        optionsD: Dict[str, Any],  # noqa: ARG002 pylint: disable=unused-argument
+        workingDir: str,  # noqa: ARG002 pylint: disable=unused-argument
+    ) -> Tuple[List[str], List[str], List[Dict[str, List[Dict[str, str]]]], List[Any]]:
         """Method to comply with the MultiProcPoolUtil interface. This method should only
         be used with MultiProcPoolUtil, passing its name through the argument 'workerMethod'.
         """
         tableDataDict, containerNameList = self.__fetch(loadPathList=dataList)
         return dataList, containerNameList, [tableDataDict], []
 
-    def fetch(self, inputPathList):
+    def fetch(self, inputPathList: List[str]) -> Tuple[Dict[str, List[Dict[str, str]]], List[str]]:
         """Return a dictionary of loadable data for each table defined in the current schema
         definition object.   Data is extracted from the input file list.
         """
         return self.__fetch(inputPathList)
 
-    def __fetch(self, loadPathList):
+    def __fetch(self, loadPathList: List[str]) -> Tuple[Dict[str, List[Dict[str, str]]], List[str]]:
         """Internal method to create loadable data corresponding to the table schema definition
         from the input list of data files.
 
@@ -213,8 +246,8 @@ class SchemaDefLoader:
         """
         startTime = time.time()
         #
-        containerNameList = []
-        tableDataDict = {}
+        containerNameList: List[str] = []
+        tableDataDict: Dict[str, List[Dict[str, str]]] = {}
         tableIdList = self.__sD.getTableIdList()
         for lPath in loadPathList:
             myContainerList = self.__ioObj.readFile(lPath)
@@ -229,10 +262,10 @@ class SchemaDefLoader:
 
         return tableDataDict, containerNameList
 
-    def process(self, containerList):
+    def process(self, containerList: List[Any]) -> Tuple[Dict[str, List[Dict[str, str]]], List[str]]:
         return self.__process(containerList)
 
-    def __process(self, containerList):
+    def __process(self, containerList: List[Any]) -> Tuple[Dict[str, List[Dict[str, str]]], List[str]]:
         """Internal method to create loadable data corresponding to the table schema definition
         from the input container list.
 
@@ -242,8 +275,8 @@ class SchemaDefLoader:
         """
         startTime = time.time()
         #
-        containerNameList = []
-        tableDataDict = {}
+        containerNameList: List[str] = []
+        tableDataDict: Dict[str, List[Dict[str, str]]] = {}
         tableIdList = self.__sD.getTableIdList()
         self.__mapData(containerList, tableIdList, tableDataDict)
         containerNameList.extend([myC.getName() for myC in containerList])
@@ -259,7 +292,7 @@ class SchemaDefLoader:
 
         return tableDataDict, containerNameList
 
-    def export(self, tableDict, append=False, partName="1"):
+    def export(self, tableDict: Dict[str, List[Dict[str, str]]], append: bool = False, partName: str = "1") -> List[Tuple[str, str]]:
         """Method to create a loadable file from the table dictionary returned
         from __fetch.
 
@@ -268,10 +301,12 @@ class SchemaDefLoader:
         """
         return self.__export(tableDict=tableDict, append=append, partName=partName)
 
-    def __export(self, tableDict, colSep="&##&\t", rowSep="$##$\n", append=False, partName="1"):
+    def __export(
+        self, tableDict: Dict[str, List[Dict[str, str]]], colSep: str = "&##&\t", rowSep: str = "$##$\n", append: bool = False, partName: str = "1"
+    ) -> List[Tuple[str, str]]:
         modeOpt = "a" if append else "w"
 
-        exportList = []
+        exportList: List[Tuple[str, str]] = []
         for tableId, rowList in tableDict.items():
             tObj = self.__sD.getTable(tableId)
             schemaAttributeIdList = tObj.getAttributeIdList()
@@ -288,7 +323,14 @@ class SchemaDefLoader:
                 exportList.append((tableId, fn))
         return exportList
 
-    def __evalMapFunction(self, dataContainer, rowList, attributeId, functionName, functionArgs=None):  # noqa: ARG002  pylint: disable=unused-argument
+    def __evalMapFunction(
+        self,
+        dataContainer: Any,
+        rowList: Iterable[Dict[str, str]],
+        attributeId: str,
+        functionName: Optional[str],
+        functionArgs: Optional[str] = None,  # noqa: ARG002 pylint: disable=unused-argument
+    ) -> bool:
         if functionName == "datablockid()":
             val = dataContainer.getName()
             for rowD in rowList:
@@ -296,7 +338,7 @@ class SchemaDefLoader:
             return True
         return False
 
-    def __mapData(self, containerList, tableIdList, tableDataDict):
+    def __mapData(self, containerList: List[Any], tableIdList: List[str], tableDataDict: Dict[str, List[Dict[str, str]]]) -> Dict[str, List[Dict[str, str]]]:
         """
         Process instance data in the input container list and map these data to the
         table schema definitions in the input table list.
@@ -322,6 +364,7 @@ class SchemaDefLoader:
                 #
                 otherAttributeIdList = tObj.getMapOtherAttributeIdList()
 
+                rowList: Iterable[Dict[str, str]]
                 if numMapCategories == 1:
                     rowList = self.__mapInstanceCategory(tObj, mapCategoryNameList[0], myContainer)
                 elif numMapCategories >= 1:
@@ -337,7 +380,7 @@ class SchemaDefLoader:
                 tableDataDict[tableId].extend(rowList)
         return tableDataDict
 
-    def __mapInstanceCategory(self, tObj, categoryName, myContainer):
+    def __mapInstanceCategory(self, tObj: TableDef, categoryName: str, myContainer: Any) -> List[Dict[str, str]]:
         """Extract data from the input instance category and map these data to the organization
         in the input table schema definition object.
 
@@ -347,7 +390,7 @@ class SchemaDefLoader:
         mapped from the input instance category.
         """
         #
-        retList = []
+        retList: List[Dict[str, str]] = []
         catObj = myContainer.getObj(categoryName)
         if catObj is None:
             return retList
@@ -361,7 +404,7 @@ class SchemaDefLoader:
         curAttributeIdList = tObj.getMapInstanceAttributeIdList(categoryName)
 
         for row in catObj.getRowList():
-            d = {}
+            d: Dict[str, str] = {}
             for atId in schemaAttributeIdList:
                 d[atId] = nullValueDict[atId]
 
@@ -393,7 +436,7 @@ class SchemaDefLoader:
 
         return retList
 
-    def __mapInstanceCategoryList(self, tObj, categoryNameList, myContainer):
+    def __mapInstanceCategoryList(self, tObj: TableDef, categoryNameList: List[str], myContainer: Any) -> ValuesView[Dict[str, str]]:
         """Extract data from the input instance categories and map these data to the organization
         in the input table schema definition object.
 
@@ -404,7 +447,7 @@ class SchemaDefLoader:
         mapped from the input instance category.
         """
         #
-        mD = {}
+        mD: Dict[Tuple[Any, ...], Dict[str, str]] = {}
         for categoryName in categoryNameList:
             catObj = myContainer.getObj(categoryName)
             if catObj is None:
@@ -421,15 +464,16 @@ class SchemaDefLoader:
             # dictionary of merging indices for each attribute in this category -
             #
             indL = tObj.getMapMergeIndexAttributes(categoryName)
+            atName: Optional[str]
 
             for row in catObj.getRowList():
                 # initialize full table row --
-                d = {}
+                d: Dict[str, str] = {}
                 for atId in schemaAttributeIdList:
                     d[atId] = nullValueDict[atId]
 
                 # assign merge index
-                mK = []
+                mK: List[Any] = []
                 for atName in indL:
                     try:
                         mK.append(row[attributeIndexDict[atName]])
@@ -466,7 +510,7 @@ class SchemaDefLoader:
 
         return mD.values()
 
-    def delete(self, tableId, containerNameList=None, deleteOpt="all"):  # noqa: ARG002  pylint: disable=unused-argument
+    def delete(self, tableId: str, containerNameList: Optional[List[str]] = None, deleteOpt: str = "all") -> bool:  # noqa: ARG002  pylint: disable=unused-argument
         #
         startTime = time.time()
         sqlCommandList = self.__getSqlDeleteList(tableId, containerNameList=None, deleteOpt=deleteOpt)
@@ -487,7 +531,7 @@ class SchemaDefLoader:
             self.__lfh.write("+SchemaDefLoader(delete) failse for %s\n" % tableId)
         return False
 
-    def __getSqlDeleteList(self, tableId, containerNameList=None, deleteOpt="all"):
+    def __getSqlDeleteList(self, tableId: str, containerNameList: Optional[List[str]] = None, deleteOpt: str = "all") -> List[str]:
         """Return the SQL delete commands for the input table and container name list."""
         databaseName = self.__sD.getDatabaseName()
         sqlGen = MyDbAdminSqlGen(self.__verbose, self.__lfh)
@@ -496,7 +540,7 @@ class SchemaDefLoader:
         tableDefObj = self.__sD.getTable(tableId)
         tableName = tableDefObj.getName()
 
-        sqlDeleteList = []
+        sqlDeleteList: List[str] = []
         if deleteOpt in ["selected", "delete"] and containerNameList is not None:
             deleteAttributeName = tableDefObj.getDeleteAttributeName()
             sqlDeleteList = sqlGen.deleteFromListSQL(databaseName, tableName, deleteAttributeName, containerNameList, chunkSize=50)
@@ -507,7 +551,14 @@ class SchemaDefLoader:
             self.__lfh.write("+SchemaDefLoader(__getSqlDeleteList) delete SQL for %s : %r\n" % (tableId, sqlDeleteList))
         return sqlDeleteList
 
-    def __batchFileImport(self, tableId, tableLoadPath, sqlFilePath=None, containerNameList=None, deleteOpt="all"):  # noqa: ARG002 pylint: disable=unused-argument
+    def __batchFileImport(
+        self,
+        tableId: str,
+        tableLoadPath: str,
+        sqlFilePath: Optional[str] = None,
+        containerNameList: Optional[List[str]] = None,  # noqa: ARG002 pylint: disable=unused-argument
+        deleteOpt: Optional[str] = "all",
+    ) -> bool:
         """Batch load the input table using data in the input loadable data file.
 
         if sqlFilePath is provided then any generated SQL commands are preserved in this file.
@@ -559,10 +610,22 @@ class SchemaDefLoader:
             )
         return ret
 
-    def loadBatchData(self, tableId, rowList=None, containerNameList=None, deleteOpt="selected"):
+    def loadBatchData(
+        self,
+        tableId: str,
+        rowList: Optional[Iterable[Dict[str, str]]] = None,
+        containerNameList: Optional[List[str]] = None,
+        deleteOpt: Optional[str] = "selected",
+    ) -> bool:
         return self.__batchInsertImport(tableId, rowList=rowList, containerNameList=containerNameList, deleteOpt=deleteOpt)
 
-    def __batchInsertImport(self, tableId, rowList=None, containerNameList=None, deleteOpt="selected"):
+    def __batchInsertImport(
+        self,
+        tableId: str,
+        rowList: Optional[Iterable[Dict[str, str]]] = None,
+        containerNameList: Optional[List[str]] = None,
+        deleteOpt: Optional[str] = "selected",
+    ) -> bool:
         """Load the input table using bacth inserts of the input list of dictionaries (i.e. d[attributeId]=value).
 
         The containerNameList corresponding to the data within loadable data in rowList can be provided
@@ -586,7 +649,7 @@ class SchemaDefLoader:
         tableAttributeIdList = tableDefObj.getAttributeIdList()
         tableAttributeNameList = tableDefObj.getAttributeNameList()
         #
-        sqlDeleteList = None
+        sqlDeleteList: Optional[List[str]] = None
         if deleteOpt in ["selected", "delete"] and containerNameList is not None:
             deleteAttributeName = tableDefObj.getDeleteAttributeName()
             sqlDeleteList = sqlGen.deleteFromListSQL(databaseName, tableName, deleteAttributeName, containerNameList, chunkSize=10)
@@ -595,10 +658,10 @@ class SchemaDefLoader:
         elif deleteOpt in ["all", "truncate"]:
             sqlDeleteList = [sqlGen.truncateTableSQL(databaseName, tableName)]
 
-        sqlInsertList = []
-        for row in rowList:
-            vList = []
-            aList = []
+        sqlInsertList: List[Tuple[str, List[str]]] = []
+        for row in rowList:  # type: ignore[union-attr]  # rowList=None default is not iterable (latent bug)
+            vList: List[str] = []
+            aList: List[str] = []
             for tid, nm in zip(tableAttributeIdList, tableAttributeNameList):
                 if len(row[tid]) > 0 and row[tid] != r"\N":
                     vList.append(row[tid])

@@ -23,43 +23,47 @@ __version__ = "V0.01"
 
 import sys
 import traceback
+from typing import Any, Dict, List, Optional, TextIO, Tuple, cast
 
 # from mmcif.api.PdbxContainers import *
 from mmcif.api.PdbxContainers import CifName
 from mmcif.io.PdbxReader import PdbxReader
 
+from wwpdb.utils.db.SchemaDefBase import SchemaDictType
+
 
 class PdbxSchemaMapReader:
-    def __init__(self, verbose=True, log=sys.stderr):
+    def __init__(self, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         self.__lfh = log
         self.__verbose = verbose
-        self.__tableNameList = []
-        self.__atDefList = []
-        self.__atMapList = []
-        self.__tableAbbrev = {}
-        self.__attribAbbrev = {}
+        self.__tableNameList: List[str] = []
+        self.__atDefList: List[Dict[str, str]] = []
+        self.__atMapList: List[Dict[str, str]] = []
+        self.__tableAbbrev: Dict[str, str] = {}
+        self.__attribAbbrev: Dict[str, Dict[str, str]] = {}
 
-    def read(self, schemaMapFile):
+    def read(self, schemaMapFile: str) -> bool:
         self.__tableNameList, self.__atDefList, self.__atMapList, self.__tableAbbrev, self.__attribAbbrev = self.__readSchemaMap(schemaMapFile)
         # self.dump(self.__lfh)
         return True
 
-    def dump(self, ofh):
+    def dump(self, ofh: TextIO) -> None:
         ofh.write("Table name list: %s\n" % self.__tableNameList)
-        for d in self.__atDefList:
+        for d in self.__atDefList:  # noqa: FURB122
             ofh.write("\n\nAttribute def: %s\n" % d.items())
 
         for d in self.__atMapList:
             ofh.write("\n\nAttribute map: %s\n" % d.items())
 
-        for k, v in self.__tableAbbrev.items():
+        for k, v in self.__tableAbbrev.items():  # noqa: FURB122
             ofh.write("Table %s - abbreviation %s\n" % (k, v))
 
         for tN, d in self.__attribAbbrev.items():
             for k, v in d.items():
                 ofh.write("Table %s - attribute %s  abbreviation %s\n" % (tN, k, v))
 
-    def __convertDataType(self, dtype, width=0, precision=0):  # noqa: ARG002 pylint:  disable=unused-argument
+    def __convertDataType(self, dtype: str, width: int = 0, precision: int = 0) -> Optional[str]:  # noqa: ARG002 pylint:  disable=unused-argument
+        retType: Optional[str]
         if dtype.lower() in ["char", "varchar", "text"]:
             if width < 65000:
                 retType = "VARCHAR"
@@ -77,28 +81,28 @@ class PdbxSchemaMapReader:
 
         return retType
 
-    def __toBool(self, flag):
+    def __toBool(self, flag: str) -> bool:
         if flag.lower() == "y" or flag.lower() == "yes" or flag == "1":
             return True
         return False
 
-    def __getTableAbbrev(self, tableName):
+    def __getTableAbbrev(self, tableName: str) -> str:
         if tableName in self.__tableAbbrev:
             return self.__tableAbbrev[tableName]
         return tableName
 
-    def __getAttributeAbbrev(self, tableName, attributeName):
+    def __getAttributeAbbrev(self, tableName: str, attributeName: str) -> str:
         try:
             return self.__attribAbbrev[tableName][attributeName]
         except:  # noqa: E722  pylint: disable=bare-except
             return attributeName
 
-    def makeSchemaDef(self):
-        sD = {}
+    def makeSchemaDef(self) -> SchemaDictType:
+        sD: Dict[str, Dict[str, Any]] = {}
         for tableName in self.__tableNameList:
             if tableName in ["rcsb_columninfo", "columninfo", "tableinfo", "rcsb_tableinfo"]:
                 continue
-            d = {}
+            d: Dict[str, Any] = {}
             tableAbbrev = self.__getTableAbbrev(tableName)
             tU = tableAbbrev.upper()
             d["TABLE_ID"] = tU
@@ -109,12 +113,12 @@ class PdbxSchemaMapReader:
             d["ATTRIBUTE_MAP"] = {}
             #
             # create a sub list for this table -
-            infoL = []
+            infoL: List[Dict[str, str]] = []
             for atD in self.__atDefList:
                 if atD["table_name"] == tableName:
                     infoL.append(atD)
             #
-            mapD = {}
+            mapD: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], None]] = {}
             for atD in self.__atMapList:
                 if atD["target_table_name"] == tableName:
                     attributeName = atD["target_attribute_name"]
@@ -136,13 +140,13 @@ class PdbxSchemaMapReader:
                         mapD[atU] = (catNameM, attNameM, fId, None)
 
             #
-            indexList = []
+            indexList: List[str] = []
             for ii, atD in enumerate(infoL):
                 attributeName = atD["attribute_name"]
                 attributeAbbrev = self.__getAttributeAbbrev(tableName, attributeName)
                 atU = attributeAbbrev.upper()
                 #
-                td = {}
+                td: Dict[str, Any] = {}
                 # 'data_type','index_flag','null_flag','width','precision','populated'
                 td["SQL_TYPE"] = self.__convertDataType(atD["data_type"], width=int(atD["width"]))
                 td["WIDTH"] = int(atD["width"])
@@ -159,8 +163,8 @@ class PdbxSchemaMapReader:
             #
             if self.__verbose and len(indexList) > 16:
                 self.__lfh.write("+WARNING - %s index list exceeds max length %d\n" % (tableName, len(indexList)))
-            mergeDict = {}
-            deleteAttributeList = []
+            mergeDict: Dict[Optional[str], List[str]] = {}
+            deleteAttributeList: List[str] = []
             for atU in indexList:
                 tN = d["ATTRIBUTE_MAP"][atU][0]
                 aN = d["ATTRIBUTE_MAP"][atU][1]
@@ -193,20 +197,20 @@ class PdbxSchemaMapReader:
                 self.__lfh.write("+WARNING - No merge index possible for table %s\n" % tableName)
 
             sD[tU] = d
-        return sD
+        return cast("SchemaDictType", sD)
 
-    def __readSchemaMap(self, schemaMapFile):
+    def __readSchemaMap(self, schemaMapFile: str) -> Tuple[List[str], List[Dict[str, str]], List[Dict[str, str]], Dict[str, str], Dict[str, Dict[str, str]]]:
         """Read RCSB schema map file and return the list of table names, attribute definitions,
         attribute mapping, table and attribute abbreviations.
         """
-        tableNameList = []
-        atDefList = []
-        atMapList = []
-        tableAbbrevD = {}
-        attribAbbrevD = {}
+        tableNameList: List[str] = []
+        atDefList: List[Dict[str, str]] = []
+        atMapList: List[Dict[str, str]] = []
+        tableAbbrevD: Dict[str, str] = {}
+        attribAbbrevD: Dict[str, Dict[str, str]] = {}
         try:
             #
-            myContainerList = []
+            myContainerList: List[Any] = []
             ifh = open(schemaMapFile)
             pRd = PdbxReader(ifh)
             pRd.read(myContainerList)
@@ -227,12 +231,12 @@ class PdbxSchemaMapReader:
                     #
                     catObj = myContainer.getObj("rcsb_attribute_def")
                     atList = ["table_name", "attribute_name", "data_type", "index_flag", "null_flag", "width", "precision", "populated"]
-                    indList = []
+                    indList: List[int] = []
                     if catObj is not None:
                         for at in atList:
                             indList.append(catObj.getAttributeIndex(at))
                         for row in catObj.getRowList():
-                            d = {}
+                            d: Dict[str, str] = {}
                             for ii, at in enumerate(atList):
                                 d[at] = row[indList[ii]]
                             atDefList.append(d)

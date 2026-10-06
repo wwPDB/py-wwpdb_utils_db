@@ -91,7 +91,7 @@ class FileActivityDbCore:
             db_user = config.get("SITE_FILE_ACTIVITY_DB_USER_NAME")
             db_pw = config.get("SITE_FILE_ACTIVITY_DB_PASSWORD")
 
-            myC = MyDbConnect(  # type: ignore
+            myC = MyDbConnect(
                 dbServer="mysql",
                 dbHost=db_host,
                 dbName=db_name,
@@ -102,7 +102,7 @@ class FileActivityDbCore:
                 verbose=self._verbose,
                 log=self._lfh,
             )
-            self._dbcon = myC.connect()  # type: ignore
+            self._dbcon = myC.connect()
             if self._dbcon:
                 self._closed = False  # Mark connection as open
             else:

@@ -18,8 +18,9 @@ __version__ = "V0.01"
 import os
 import sys
 import traceback
+from typing import Optional, TextIO, cast
 
-from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.io.locator.PathInfo import PathInfo, PathInfoStorageType, PathInfoVersionId
 
 from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 
@@ -27,7 +28,7 @@ from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 class StatusLoadWrapper:
     """Update release status items."""
 
-    def __init__(self, siteId, verbose=False, log=sys.stderr):
+    def __init__(self, siteId: Optional[str], verbose: bool = False, log: TextIO = sys.stderr) -> None:
         """
         :param `verbose`:  boolean flag to activate verbose logging.
         :param `log`:      stream for logging.
@@ -39,10 +40,13 @@ class StatusLoadWrapper:
         #
         self.__pI = PathInfo(siteId=self.__siteId, sessionPath=".", verbose=self.__verbose, log=self.__lfh)
 
-    def dbLoad(self, depSetId, fileSource="deposit", versionId="latest", mileStone="deposit"):
+    def dbLoad(
+        self, depSetId: str, fileSource: PathInfoStorageType = "deposit", versionId: PathInfoVersionId = "latest", mileStone: Optional[str] = "deposit"
+    ) -> bool:
         try:
             self.__lfh.write("+StatusLoadWrapper.dbload() site %s loading data set %s %s %s %s\n" % (self.__siteId, depSetId, fileSource, mileStone, versionId))
-            pdbxFilePath = self.__pI.getModelPdbxFilePath(dataSetId=depSetId, fileSource=fileSource, versionId=versionId, mileStone=mileStone)
+            # A None path raises TypeError in os.path.split() and is handled by the except clause
+            pdbxFilePath = cast("str", self.__pI.getModelPdbxFilePath(dataSetId=depSetId, fileSource=fileSource, versionId=versionId, mileStone=mileStone))
             fD, _fN = os.path.split(pdbxFilePath)  # pylint: disable=unused-variable
             dbLd = DbLoadingApi(log=self.__lfh, verbose=self.__verbose)
             return dbLd.doLoadStatus(pdbxFilePath, fD)

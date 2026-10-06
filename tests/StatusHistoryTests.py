@@ -47,7 +47,7 @@ if not os.path.exists(TESTOUTPUT):  # pragma: no cover
 
 @unittest.skip("Until can port tests")
 class StatusHistoryTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         #
         self.__verbose = True
         self.__lfh = sys.stdout
@@ -56,10 +56,10 @@ class StatusHistoryTests(unittest.TestCase):
         self.__siteId = getSiteId(defaultSiteId="WWPDB_DEPLOY_TEST")
         self.__sessionPath = "."
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def testReadWriteHistory(self):
+    def testReadWriteHistory(self) -> None:
         """Read and write history file --"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
@@ -80,7 +80,7 @@ class StatusHistoryTests(unittest.TestCase):
             #
             sH.add(statusCodeBegin="DEP", dateBegin=sH.getNow(), statusCodeEnd="HPUB", dateEnd=sH.getNow(), annotator="JW", details="Automated entry")
             sH.add(statusCodeBegin="DEP", dateBegin=sH.getNow(), statusCodeEnd="REL", dateEnd=sH.getNow(), annotator="JW", details="Automated entry")
-            (lastStatus, lastDate) = sH.getLastStatusAndDate()
+            lastStatus, lastDate = sH.getLastStatusAndDate()
             self.__lfh.write("+StatusHistoryTests.testReadWriteHistory() last values %r %r\n" % (lastStatus, lastDate))
             #
             ok = sH.store(entryId=sD["entry_id"], outPath=fp)
@@ -103,7 +103,7 @@ class StatusHistoryTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testCreateHistory(self):
+    def testCreateHistory(self) -> None:
         """Read existing entry and create initial status records as required -"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
@@ -181,18 +181,19 @@ class StatusHistoryTests(unittest.TestCase):
                 else:
                     pass
             #
-            (lastStatus, lastDate) = sH.getLastStatusAndDate()
+            lastStatus, lastDate = sH.getLastStatusAndDate()
             self.__lfh.write("+StatusHistoryTests.testCreateHistory() last values %r %r\n" % (lastStatus, lastDate))
             #
             #  Save the current status history file --
             ok = sH.store(entryId=sD["entry_id"])
+            self.__lfh.write("Store status is %r\n" % ok)
             #
             #
             # Recover the contents of the current history file -
             #
             sH = StatusHistory(siteId=self.__siteId, fileSource="archive", sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
-            ok = sH.setEntryId(entryId=sD["entry_id"], pdbId=sD["pdb_id"])
-            self.__lfh.write("Status is %r\n" % ok)
+            nRows = sH.setEntryId(entryId=sD["entry_id"], pdbId=sD["pdb_id"])
+            self.__lfh.write("Status is %r\n" % nRows)
             dList = sH.get()
             for ii, d in enumerate(dList):
                 self.__lfh.write("Row %r  : %r\n" % (ii, d.items()))
@@ -208,7 +209,7 @@ class StatusHistoryTests(unittest.TestCase):
         )
 
 
-def suiteReadWriteTests():
+def suiteReadWriteTests() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(StatusHistoryTests("testReadWriteHistory"))
     suiteSelect.addTest(StatusHistoryTests("testCreateHistory"))

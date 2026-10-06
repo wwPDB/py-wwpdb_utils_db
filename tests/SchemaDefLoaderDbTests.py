@@ -29,6 +29,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import Any, List, Optional
 
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from mmcif_utils.bird.PdbxFamilyIo import PdbxFamilyIo
@@ -43,18 +44,20 @@ from wwpdb.utils.db.DaInternalSchemaDef import DaInternalSchemaDef
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 from wwpdb.utils.db.PdbxSchemaDef import PdbxSchemaDef
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class SchemaDefLoaderDbTests(unittest.TestCase):
-    def __init__(self, methodName="runTest"):
+    def __init__(self, methodName: str = "runTest") -> None:
         super(SchemaDefLoaderDbTests, self).__init__(methodName)
         self.__lfh = sys.stderr
         self.__verbose = True
         self.__debug = False
+        self.__dbCon: Any = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stderr
         self.__verbose = True
         # default database
@@ -73,23 +76,23 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
         #
         self.open()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.close()
 
-    def open(self, dbUserId=None, dbUserPwd=None):
+    def open(self, dbUserId: Optional[str] = None, dbUserPwd: Optional[str] = None) -> bool:
         myC = MyDbConnect(dbName=self.__databaseName, dbUser=dbUserId, dbPw=dbUserPwd, verbose=self.__verbose, log=self.__lfh)
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
         return False
 
-    def close(self):
+    def close(self) -> None:
         if self.__dbCon is not None:
             self.__dbCon.close()
 
-    def testSchemaCreate(self):
+    def testSchemaCreate(self) -> None:
         """Create table schema for BIRD, chemical component, and PDBx data."""
-        sd = BirdSchemaDef()
+        sd: SchemaDefBase = BirdSchemaDef()
         self.__schemaCreate(schemaDefObj=sd)
         #
         sd = ChemCompSchemaDef()
@@ -98,7 +101,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
         sd = PdbxSchemaDef()
         self.__schemaCreate(schemaDefObj=sd)
 
-    def testLoadBirdReference(self):
+    def testLoadBirdReference(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testLoadBirdReference at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -120,7 +123,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testReloadBirdReference(self):
+    def testReloadBirdReference(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testReloadBirdReference at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -146,7 +149,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testLoadBirdReferenceWithSequence(self):
+    def testLoadBirdReferenceWithSequence(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testLoadBirdReferenceWithSequence at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -193,7 +196,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testLoadChemCompReference(self):
+    def testLoadChemCompReference(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testLoadChemCompReference at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -214,7 +217,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testLoadPdbxFiles(self):
+    def testLoadPdbxFiles(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testLoadPdbxFiles at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -235,7 +238,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testLoadChemCompExamples(self):
+    def testLoadChemCompExamples(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testLoadChemCompExamples at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -256,7 +259,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testGenSchemaDaInternal(self):
+    def testGenSchemaDaInternal(self) -> None:
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest testGenSchemaDaInternal at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
@@ -272,7 +275,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def __schemaCreateSQL(self, schemaDefObj):
+    def __schemaCreateSQL(self, schemaDefObj: SchemaDefBase) -> None:
         """Test case -  create table schema using schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __schemaCreateSQL at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -296,7 +299,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def __schemaCreate(self, schemaDefObj):
+    def __schemaCreate(self, schemaDefObj: SchemaDefBase) -> None:
         """Test case -  create table schema using schema definition"""
         startTime = time.time()
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __schemaCreate at %s\n" % time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -330,7 +333,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def __getPdbxPathList(self):
+    def __getPdbxPathList(self) -> List[str]:
         """Test case -  get the path list of PDBx instance example files -"""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getPdbxPathList\n")
         try:
@@ -341,7 +344,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-    def __getPrdPathList(self):
+    def __getPrdPathList(self) -> List[str]:
         """Test case -  get the path list of PRD definitions in the CVS repository."""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getPrdPathList\n")
         try:
@@ -354,7 +357,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-    def __getPrdFamilyPathList(self):
+    def __getPrdFamilyPathList(self) -> List[str]:
         """Test case -  get the path list of PRD Family definitions in the CVS repository."""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getPrdFamilyPathList\n")
         try:
@@ -367,7 +370,7 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-    def __getChemCompPathList(self):
+    def __getChemCompPathList(self) -> List[str]:
         """Test case -  get the path list of definitions in the CVS repository."""
         self.__lfh.write("\nStarting SchemaDefLoaderDbTest __getChemCompPathList\n")
         try:
@@ -381,13 +384,13 @@ class SchemaDefLoaderDbTests(unittest.TestCase):
             self.fail()
 
 
-def createSchemaSuite():
+def createSchemaSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderDbTests("testSchemaCreate"))
     return suiteSelect
 
 
-def loadReferenceSuite():
+def loadReferenceSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderDbTests("testLoadBirdReference"))
     suiteSelect.addTest(SchemaDefLoaderDbTests("testLoadChemCompReference"))
@@ -395,26 +398,26 @@ def loadReferenceSuite():
     return suiteSelect
 
 
-def loadReferenceWithSequenceSuite():
+def loadReferenceWithSequenceSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     # suiteSelect.addTest(SchemaDefLoaderDbTests("testLoadBirdReference"))
     suiteSelect.addTest(SchemaDefLoaderDbTests("testLoadBirdReferenceWithSequence"))
     return suiteSelect
 
 
-def reloadReferenceSuite():
+def reloadReferenceSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderDbTests("testReloadBirdReference"))
     return suiteSelect
 
 
-def loadSpecialReferenceSuite():
+def loadSpecialReferenceSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderDbTests("testLoadChemCompExamples"))
     return suiteSelect
 
 
-def genSchemaSQLSuite():
+def genSchemaSQLSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaDefLoaderDbTests("testGenSchemaDaInternal"))
     return suiteSelect

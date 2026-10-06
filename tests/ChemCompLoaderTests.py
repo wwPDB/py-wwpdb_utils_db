@@ -24,6 +24,7 @@ import sys
 import time
 import traceback
 import unittest
+from typing import Any, Dict, List, Optional, Tuple
 
 import scandir
 
@@ -39,34 +40,34 @@ from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "require MySql Test Environment")
 class ChemCompLoaderTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__lfh = sys.stderr
         self.__verbose = False
         self.__ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
         self.__topCachePath = "/data/components/ligand-dict-v3"
-        self.__dbCon = None
+        self.__dbCon: Any = None
         #
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def open(self, dbName=None, dbUserId=None, dbUserPwd=None):
+    def open(self, dbName: Optional[str] = None, dbUserId: Optional[str] = None, dbUserPwd: Optional[str] = None) -> bool:
         myC = MyDbConnect(dbName=dbName, dbUser=dbUserId, dbPw=dbUserPwd, verbose=self.__verbose, log=self.__lfh)
         self.__dbCon = myC.connect()
         if self.__dbCon is not None:
             return True
         return False
 
-    def close(self):
+    def close(self) -> None:
         if self.__dbCon is not None:
             self.__dbCon.close()
 
-    def __makeComponentPathList(self):
+    def __makeComponentPathList(self) -> List[str]:
         """Return the list of chemical component definition file paths in the current repository."""
 
         self.__lfh.write("\nStarting ChemCompLoaderTests __makeComponentPathList\n")
         startTime = time.time()
-        pathList = []
+        pathList: List[str] = []
         for root, _dirs, files in scandir.walk(self.__topCachePath, topdown=False):
             if "REMOVE" in root:
                 continue
@@ -81,7 +82,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         self.__lfh.write("\nFound %d files in %s\n" % (len(pathList), self.__topCachePath))
         return pathList
 
-    def testListFiles(self):
+    def testListFiles(self) -> None:
         """Test case - for loading chemical component definition data files -"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testListFiles\n")
         startTime = time.time()
@@ -96,7 +97,7 @@ class ChemCompLoaderTests(unittest.TestCase):
             "\nCompleted ChemCompLoaderTests testListFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testConnect(self):
+    def testConnect(self) -> None:
         """Test case - for creating a test connection"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testConnect\n")
         startTime = time.time()
@@ -112,7 +113,7 @@ class ChemCompLoaderTests(unittest.TestCase):
             "\nCompleted ChemCompLoaderTests testConnect at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def testLoadFiles(self):
+    def testLoadFiles(self) -> None:
         """Test case - create batch load files for all chemical component definition data files -"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testLoadFiles\n")
         startTime = time.time()
@@ -154,7 +155,13 @@ class ChemCompLoaderTests(unittest.TestCase):
             "\nCompleted ChemCompLoaderTests testLoadFiles at %s (%.2f seconds)\n" % (time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
-    def loadBatchFilesMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002  pylint: disable=unused-argument
+    def loadBatchFilesMulti(  # noqa: ARG002  pylint: disable=unused-argument
+        self,
+        dataList: List[Tuple[str, str]],
+        procName: str,  # noqa: ARG002  pylint: disable=unused-argument
+        optionsD: Dict[str, Any],  # noqa: ARG002  pylint: disable=unused-argument
+        workingDir: str,  # noqa: ARG002  pylint: disable=unused-argument
+    ) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]], List[Any]]:
         ccsd = ChemCompSchemaDef()
         self.open(dbName=ccsd.getDatabaseName())
         sdl = SchemaDefLoader(
@@ -165,9 +172,15 @@ class ChemCompLoaderTests(unittest.TestCase):
         self.close()
         return dataList, dataList, []
 
-    def makeComponentPathListMulti(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002  pylint: disable=unused-argument
+    def makeComponentPathListMulti(  # noqa: ARG002  pylint: disable=unused-argument
+        self,
+        dataList: List[str],
+        procName: str,  # noqa: ARG002  pylint: disable=unused-argument
+        optionsD: Dict[str, Any],  # noqa: ARG002  pylint: disable=unused-argument
+        workingDir: str,  # noqa: ARG002  pylint: disable=unused-argument
+    ) -> Tuple[List[str], List[str], List[Any]]:
         """Return the list of chemical component definition file paths in the current repository."""
-        pathList = []
+        pathList: List[str] = []
         for subdir in dataList:
             dd = os.path.join(self.__topCachePath, subdir)
             for root, _dirs, files in scandir.walk(dd, topdown=False):
@@ -178,7 +191,7 @@ class ChemCompLoaderTests(unittest.TestCase):
                         pathList.append(os.path.join(root, name))
         return dataList, pathList, []
 
-    def testLoadFilesMulti(self):
+    def testLoadFilesMulti(self) -> None:
         """Test case - create batch load files for all chemical component definition data files - (multiproc test)"""
         self.__lfh.write("\nStarting ChemCompLoaderTests testLoadFilesMulti\n")
         startTime = time.time()
@@ -247,7 +260,7 @@ class ChemCompLoaderTests(unittest.TestCase):
         )
 
 
-def loadSuite():
+def loadSuite() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(ChemCompLoaderTests("testConnect"))
     # suiteSelect.addTest(ChemCompLoaderTests("testListFiles"))

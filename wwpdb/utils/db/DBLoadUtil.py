@@ -19,6 +19,7 @@ License described at http://creativecommons.org/licenses/by/3.0/.
 import os
 import sys
 import traceback
+from typing import Any, List, Optional, TextIO, cast
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
@@ -36,46 +37,46 @@ __version__ = "V0.07"
 class DBLoadUtil:
     """Class responsible for loading model cif file(s) into da_internal database"""
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
+    def __init__(self, reqObj: Any = None, verbose: bool = False, log: TextIO = sys.stderr) -> None:
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
-        self.__sObj = None
-        self.__sessionId = None
-        self.__sessionPath = None
+        self.__sObj: Any = None
+        self.__sessionId: Optional[str] = None
+        self.__sessionPath: Optional[str] = None
         self.__siteId = str(self.__reqObj.getValue("WWPDB_SITE_ID"))
         self.__cI = ConfigInfo(self.__siteId)
         self.__cIcommon = ConfigInfoAppCommon(self.__siteId)
         #
         self.__getSession()
 
-    def doLoading(self, fileList):
+    def doLoading(self, fileList: Optional[List[str]]) -> None:
         """Update content database"""
         if not fileList:
             return
         #
         #
-        listfile = self.__getFileName(self.__sessionPath, "filelist", "txt")
-        sqlfile = os.path.join(self.__sessionPath, "dbload", "DB_LOADER.sql")
-        logfile1 = os.path.join(self.__sessionPath, "dbload", "db-loader.log")
-        clogfile1 = os.path.join(self.__sessionPath, "dbload", "sqlload.log")
+        listfile = self.__getFileName(cast("str", self.__sessionPath), "filelist", "txt")
+        sqlfile = os.path.join(cast("str", self.__sessionPath), "dbload", "DB_LOADER.sql")
+        logfile1 = os.path.join(cast("str", self.__sessionPath), "dbload", "db-loader.log")
+        clogfile1 = os.path.join(cast("str", self.__sessionPath), "dbload", "sqlload.log")
         #
         self.__genListFile(listfile, fileList)
-        self.__getLoadFile(self.__sessionPath, listfile, sqlfile, logfile1)
+        self.__getLoadFile(cast("str", self.__sessionPath), listfile, sqlfile, logfile1)
 
         try:
             if os.path.exists(sqlfile):
                 self.__lfh.write("DBLoadUtil::doLoading() about to load %s with log %s\n" % (sqlfile, clogfile1))
                 # sq = SqlLoader(log=self.__lfh, verbose=self.__verbose)
                 # sq.loadSql(sqlfile, clogfile1)
-                self.__loadData(self.__sessionPath, sqlfile, clogfile1)
+                self.__loadData(cast("str", self.__sessionPath), sqlfile, clogfile1)
             else:
                 self.__lfh.write("DBLoadUtil::doLoading() failed to produce load file\n")
         except Exception as e:  # noqa: BLE001
             self.__lfh.write("DbLoadiUtil::doLoading(): failing, with exception %s.\n" % str(e))
             traceback.print_exc(file=self.__lfh)
 
-    def __getFileName(self, path, root, ext):
+    def __getFileName(self, path: str, root: str, ext: str) -> str:
         """Create unique file name."""
         count = 1
         while True:
@@ -88,16 +89,16 @@ class DBLoadUtil:
             #
             return root + "_1." + ext
 
-    def __genListFile(self, filename, filelist):
+    def __genListFile(self, filename: str, filelist: List[str]) -> None:
         """ """
-        fn = os.path.join(self.__sessionPath, filename)
+        fn = os.path.join(cast("str", self.__sessionPath), filename)
         f = open(fn, "w")
         f.writelines(entryfile + "\n" for entryfile in filelist)
         #
         f.close()
 
-    def __getLoadFile(self, sessionPath, listfile, sqlfile, logfile):
-        fn = os.path.join(self.__sessionPath, listfile)
+    def __getLoadFile(self, sessionPath: str, listfile: str, sqlfile: str, logfile: str) -> None:
+        fn = os.path.join(cast("str", self.__sessionPath), listfile)
 
         mapping = self.__cIcommon.get_site_da_internal_schema_path()
 
@@ -120,7 +121,7 @@ class DBLoadUtil:
             self.__lfh.write("DbLoadUtil::__getLoadFile(): failing, with exception.\n")
             traceback.print_exc(file=self.__lfh)
 
-    def __loadData(self, dataDir, sqlfile, logfile):
+    def __loadData(self, dataDir: str, sqlfile: str, logfile: str) -> None:
         dbHost = self.__cI.get("SITE_DB_HOST_NAME")
         dbUser = self.__cI.get("SITE_DB_USER_NAME")
         dbPw = self.__cI.get("SITE_DB_PASSWORD")
@@ -130,7 +131,7 @@ class DBLoadUtil:
         cmd += "; " + "mysql -u " + dbUser + " -p" + dbPw + " -h " + dbHost + " -P " + str(dbPort) + " < " + sqlfile + " >& " + logfile
         os.system(cmd)  # noqa: S605
 
-    def __getSession(self):
+    def __getSession(self) -> None:
         """Join existing session or create new session as required."""
         #
         self.__sObj = self.__reqObj.newSessionObj()

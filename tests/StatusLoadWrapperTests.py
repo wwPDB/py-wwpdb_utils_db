@@ -37,17 +37,17 @@ from wwpdb.utils.db.StatusLoadWrapper import StatusLoadWrapper
 
 @unittest.skipUnless(Features().haveMySqlTestServer(), "Needs MySql test server for testing")
 class StatusLoadWrapperTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         #
         self.__verbose = True
         self.__lfh = sys.stdout
         self.__depId = "D_1000000001"
         self.__siteId = getSiteId(defaultSiteId="WWPDB_DEPLOY_TEST")
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
-    def testLoad(self):
+    def testLoad(self) -> None:
         """Load da_internal database -"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
@@ -66,7 +66,7 @@ class StatusLoadWrapperTests(unittest.TestCase):
         )
 
 
-def suiteLoadTests():
+def suiteLoadTests() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(StatusLoadWrapperTests("testLoad"))
     return suiteSelect

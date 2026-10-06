@@ -28,6 +28,7 @@ from datetime import datetime
 from types import TracebackType
 from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, Union, cast
 
+from typing_extensions import Self
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.config.ConfigInfo import getSiteId
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
@@ -89,7 +90,7 @@ class FileActivityDb:
         """
         self.__db_core.close()
 
-    def __enter__(self) -> "FileActivityDb":
+    def __enter__(self) -> Self:
         """
         Context manager entry.
 
@@ -255,7 +256,7 @@ class FileActivityDb:
                                         logger.warning("Skipping unrecognized file: %s", file_entry.path)
                                         continue
 
-                                    deposition_id, content_type, format_type, part_number, version_number = cast(Tuple[str, str, str, int, int], file_key)
+                                    deposition_id, content_type, format_type, part_number, version_number = cast("Tuple[str, str, str, int, int]", file_key)
 
                                     if version_number is None:
                                         version_number = 1

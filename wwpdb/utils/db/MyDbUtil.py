@@ -35,7 +35,7 @@ import os
 import sys
 import traceback
 import warnings
-from typing import Any, Dict
+from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, TextIO, Tuple, Union, cast  # pylint: disable=unused-import
 
 import MySQLdb
 
@@ -54,35 +54,35 @@ class MyDbConnect:
 
     def __init__(
         self,
-        dbServer="mysql",
-        dbHost="localhost",
-        dbName=None,
-        dbUser=None,
-        dbPw=None,
-        dbSocket=None,
-        dbPort=None,
-        verbose=False,  # noqa: ARG002
-        log=sys.stderr,  # noqa: ARG002
-    ):  # noqa: ARG002 pylint: disable=unused-argument
+        dbServer: str = "mysql",
+        dbHost: Optional[str] = "localhost",
+        dbName: Optional[str] = None,
+        dbUser: Optional[str] = None,
+        dbPw: Optional[str] = None,
+        dbSocket: Optional[str] = None,
+        dbPort: Optional[Union[int, str]] = None,
+        verbose: bool = False,  # noqa: ARG002 pylint: disable=unused-argument
+        log: TextIO = sys.stderr,  # noqa: ARG002
+    ) -> None:  # noqa: ARG002 pylint: disable=unused-argument
         self.__lfh = log
 
         if dbName is None:
-            self.__dbName = os.getenv("MYSQL_DB_NAME")
+            self.__dbName: Optional[str] = os.getenv("MYSQL_DB_NAME")
         else:
             self.__dbName = dbName
 
         if dbUser is None:
-            self.__dbUser = os.getenv("MYSQL_DB_USER")
+            self.__dbUser: Optional[str] = os.getenv("MYSQL_DB_USER")
         else:
             self.__dbUser = dbUser
 
         if dbPw is None:
-            self.__dbPw = os.getenv("MYSQL_DB_PW")
+            self.__dbPw: Optional[str] = os.getenv("MYSQL_DB_PW")
         else:
             self.__dbPw = dbPw
 
         if dbHost is None:
-            self.__dbHost = os.getenv("MYSQL_DB_HOST")
+            self.__dbHost: Optional[str] = os.getenv("MYSQL_DB_HOST")
         else:
             self.__dbHost = dbHost
 
@@ -90,7 +90,7 @@ class MyDbConnect:
             # try from the environment -
             tS = os.getenv("MYSQL_DB_SOCKET")
             if tS is not None:
-                self.__dbSocket = tS
+                self.__dbSocket: Optional[str] = tS
             else:
                 self.__dbSocket = None
         else:
@@ -100,7 +100,7 @@ class MyDbConnect:
             # try from the environment -
             tS = os.getenv("MYSQL_DB_PORT")
             if tS is not None:
-                self.__dbPort = int(tS)
+                self.__dbPort: int = int(tS)
             else:
                 self.__dbPort = 3306
         else:
@@ -112,9 +112,9 @@ class MyDbConnect:
             self.__lfh.write("+MyDbConnect. Unsupported server %s\n" % dbServer)
             sys.exit(1)
 
-        self.__dbcon = None
+        self.__dbcon: Optional[Any] = None
 
-    def setAuth(self, authD):
+    def setAuth(self, authD: Dict[str, Any]) -> None:
         try:
             self.__dbName = authD["DB_NAME"]
             self.__dbHost = authD["DB_HOST"]
@@ -123,7 +123,7 @@ class MyDbConnect:
             self.__dbSocket = authD["DB_SOCKET"]
             self.__dbServer = authD["DB_SERVER"]
             # treat port as optional with default of 3306
-            if "DB_PORT" in authD:
+            if "DB_PORT" in authD:  # noqa: SIM401
                 self.__dbPort = authD["DB_PORT"]
             else:
                 self.__dbPort = 3306
@@ -131,7 +131,7 @@ class MyDbConnect:
             self.__lfh.write("+MyDbConnect.setAuth failing  %r %s\n" % (authD.items(), str(e)))
             traceback.print_exc(file=self.__lfh)
 
-    def connect(self):
+    def connect(self) -> Optional[Any]:
         """Create a database connection and return a connection object.
 
         Returns None on failure
@@ -167,7 +167,7 @@ class MyDbConnect:
 
         return self.__dbcon
 
-    def close(self):
+    def close(self) -> bool:
         """Close any open database connection."""
         if self.__dbcon is not None:
             try:
@@ -182,7 +182,7 @@ class MyDbConnect:
 class MyDbQuery:
     """Parameterized SQL queries using Python DBI protocol..."""
 
-    def __init__(self, dbcon, verbose=True, log=sys.stderr):
+    def __init__(self, dbcon: Any, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         self.__dbcon = dbcon
         self.__lfh = log
         self.__verbose = verbose
@@ -192,7 +192,7 @@ class MyDbQuery:
         # self.__grpOps = ["BEGIN", "END"]
         self.__warningAction = "default"
 
-    def sqlBatchTemplateCommand(self, templateValueList, prependSqlList=None):
+    def sqlBatchTemplateCommand(self, templateValueList: Iterable[Tuple[str, Sequence[Any]]], prependSqlList: Optional[Sequence[str]] = None) -> bool:
         """Execute a batch sql commands followed by a single commit. Commands are
         are describe in a template with an associated list of values.
 
@@ -205,7 +205,7 @@ class MyDbQuery:
         self.__setWarningHandler()
         try:
             t = ""
-            v = []
+            v: Sequence[Any] = []
             curs = self.__dbcon.cursor()
             if (prependSqlList is not None) and (len(prependSqlList) > 0):
                 sqlCommand = "\n".join(prependSqlList)
@@ -236,7 +236,7 @@ class MyDbQuery:
             curs.close()
         return False
 
-    def sqlTemplateCommand(self, sqlTemplate=None, valueList=None):
+    def sqlTemplateCommand(self, sqlTemplate: Optional[str] = None, valueList: Optional[Sequence[Any]] = None) -> bool:
         """Execute sql template command with associated value list.
 
         Errors and warnings that generate exceptions are caught by this method.
@@ -254,39 +254,39 @@ class MyDbQuery:
         except MySQLdb.Error as e:
             if self.__verbose:
                 self.__lfh.write("MyDbQuery.sqlCommand MySQL message is:\n%s\n" % e)
-                self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % (sqlTemplate % tuple(valueList)))
+                self.__lfh.write("MyDbQuery.sqlCommand SQL command failed for:\n%s\n" % (cast("str", sqlTemplate) % tuple(valueList)))
             self.__dbcon.rollback()
             curs.close()
         except MySQLdb.Warning as e:
             if self.__verbose:
                 self.__lfh.write("MyDbQuery.sqlCommand MySQL message is:\n%s\n" % e)
-                self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
+                self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (cast("str", sqlTemplate) % tuple(valueList)))
             self.__dbcon.rollback()
             curs.close()
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (sqlTemplate % tuple(valueList)))
+                self.__lfh.write("MyDbQuery.sqlCommand generated warnings for command:\n%s\n" % (cast("str", sqlTemplate) % tuple(valueList)))
                 traceback.print_exc(file=self.__lfh)
             self.__dbcon.rollback()
             curs.close()
         return False
 
-    def setWarning(self, action):
+    def setWarning(self, action: str) -> bool:
         if action in ["error", "ignore", "default"]:
             self.__warningAction = action
             return True
         self.__warningAction = "default"
         return False
 
-    def __setWarningHandler(self):
+    def __setWarningHandler(self) -> None:
         if self.__warningAction == "error":
             warnings.simplefilter("error", MySQLdb.Warning)
         elif self.__warningAction in ["ignore", "default"]:
-            warnings.simplefilter(self.__warningAction)
+            warnings.simplefilter(cast("Literal['ignore', 'default']", self.__warningAction))
         else:
             warnings.simplefilter("default")
 
-    def sqlCommand(self, sqlCommandList):
+    def sqlCommand(self, sqlCommandList: Iterable[str]) -> bool:
         """Execute the input list of SQL commands catching exceptions from the server.
 
         The treatment of warning is controlled by a prior setting of self.setWarnings("error"|"ignore"|"default")
@@ -325,7 +325,7 @@ class MyDbQuery:
 
         return False
 
-    def sqlCommand2(self, queryString):
+    def sqlCommand2(self, queryString: str) -> Union[bool, List[Any]]:
         """Execute SQL command catching exceptions returning no data from the server."""
         with warnings.catch_warnings():
             warnings.simplefilter("error")
@@ -366,9 +366,9 @@ class MyDbQuery:
     #         for result in results:
     #             yield result
 
-    def selectRows(self, queryString):
+    def selectRows(self, queryString: str) -> List[Tuple[Any, ...]]:
         """Execute SQL command and return list of lists for the result set."""
-        rowList = []
+        rowList: List[Tuple[Any, ...]] = []
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             # warnings.simplefilter('error', MySQLdb.Warning)
@@ -406,7 +406,14 @@ class MyDbQuery:
 
         return []
 
-    def simpleQuery(self, selectList=None, fromList=None, condition="", orderList=None, returnObj=None):
+    def simpleQuery(
+        self,
+        selectList: Optional[Sequence[str]] = None,
+        fromList: Optional[Sequence[str]] = None,
+        condition: str = "",
+        orderList: Optional[Sequence[Tuple[str, str]]] = None,
+        returnObj: Optional[List[Any]] = None,
+    ) -> List[Any]:
         """ """
         if selectList is None:
             selectList = []
@@ -442,7 +449,7 @@ class MyDbQuery:
         curs.close()
         return returnObj
 
-    def testSelectQuery(self, count):
+    def testSelectQuery(self, count: int) -> bool:
         tSQL = "select %d" % count
         #
         try:

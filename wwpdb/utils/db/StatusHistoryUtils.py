@@ -27,18 +27,21 @@ import os.path
 import sys
 import time
 import traceback
+from typing import Any, Dict, List, Optional, TextIO, Tuple, cast
 
 import scandir
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
 from wwpdb.io.file.DataFile import DataFile
-from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.io.locator.PathInfo import PathInfo, PathInfoStorageType, PathInfoVersionId
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.session.WebRequest import InputRequest
 
 from wwpdb.utils.db.MyConnectionBase import MyConnectionBase
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 # try:
@@ -56,7 +59,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
     #
 
-    def __init__(self, reqObj, verbose=True, log=sys.stderr):
+    def __init__(self, reqObj: InputRequest, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         super(StatusHistoryUtils, self).__init__(verbose=verbose, log=log)
         self.__verbose = verbose
         self.__lfh = log
@@ -73,43 +76,45 @@ class StatusHistoryUtils(MyConnectionBase):
         #
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__cI = ConfigInfo(self.__siteId)
-        self.__fileSource = "archive"
-        self.__archPath = os.path.join(self.__cI.get("SITE_ARCHIVE_STORAGE_PATH"), "archive")
+        self.__fileSource: PathInfoStorageType = "archive"
+        self.__archPath: str = os.path.join(self.__cI.get("SITE_ARCHIVE_STORAGE_PATH"), "archive")
         self.__pI = PathInfo(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
 
-    def getEntryIdList(self):
+    def getEntryIdList(self) -> List[str]:
         dList, _pList = self.__makeEntryPathList(self.__archPath)
         rL = list(set(dList))
         return rL
 
-    def getStatusHistoryPathList(self):
+    def getStatusHistoryPathList(self) -> List[str]:
         if self.__verbose:
             logger.info("+StatusHistoryUtils.getStatusHistoryPathList() search archive path %r", self.__archPath)
-        hList = []
+        hList: List[str] = []
         tList, _pList = self.__makeEntryPathList(self.__archPath)
         dList = list(set(tList))
         for d in dList:
-            tPath = self.__pI.getStatusHistoryFilePath(dataSetId=d, fileSource=self.__fileSource, versionId="latest")
+            # os.access() raises TypeError for a None path, so a usable path is a str
+            tPath = cast("str", self.__pI.getStatusHistoryFilePath(dataSetId=d, fileSource=self.__fileSource, versionId="latest"))
             if os.access(tPath, os.R_OK):
                 hList.append(tPath)
         if self.__debug:
             logger.debug("+StatusHistoryUtils.getStatusHistoryPathList() pathlist is %r", hList)
         return hList
 
-    def getEntryStatusHistoryPathList(self, entryIdList):
-        hList = []
+    def getEntryStatusHistoryPathList(self, entryIdList: List[str]) -> List[str]:
+        hList: List[str] = []
         for d in entryIdList:
-            tPath = self.__pI.getStatusHistoryFilePath(dataSetId=d, fileSource=self.__fileSource, versionId="latest")
+            # os.access() raises TypeError for a None path, so a usable path is a str
+            tPath = cast("str", self.__pI.getStatusHistoryFilePath(dataSetId=d, fileSource=self.__fileSource, versionId="latest"))
             if os.access(tPath, os.R_OK):
                 hList.append(tPath)
         if self.__debug:
             logger.debug("+StatusHistoryUtils.getEntryStatusHistoryPathList() pathlist is %r", hList)
         return hList
 
-    def __makeEntryPathList(self, archivePath):
+    def __makeEntryPathList(self, archivePath: str) -> Tuple[List[str], List[str]]:
         """Return the list of entries in the archive directory names and paths -"""
-        pathList = []
-        dataList = []
+        pathList: List[str] = []
+        dataList: List[str] = []
         for root, dirs, _files in scandir.walk(archivePath, topdown=False):
             for d in dirs:
                 if d.startswith("D_") and len(d) == 12:
@@ -118,12 +123,12 @@ class StatusHistoryUtils(MyConnectionBase):
         return dataList, pathList
 
     #
-    def createHistory(self, entryIdList, overWrite=False, statusUpdateAuthWait=None):
+    def createHistory(self, entryIdList: List[str], overWrite: bool = False, statusUpdateAuthWait: Optional[str] = None) -> List[str]:
         """Read existing entry and create initial status records as required"""
         startTime = time.time()
         logger.debug("e========================================================================================================")
         logger.debug("Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
-        rList = []
+        rList: List[str] = []
         for entryId in entryIdList:
             ok = self.__createStatusHistoryFile(entryId, overWrite=overWrite, statusUpdateAuthWait=statusUpdateAuthWait)
             if ok:
@@ -133,11 +138,11 @@ class StatusHistoryUtils(MyConnectionBase):
         logger.debug("Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         return rList
 
-    def createHistoryMulti(self, entryIdList, numProc=2, overWrite=False):
+    def createHistoryMulti(self, entryIdList: List[str], numProc: int = 2, overWrite: bool = False) -> List[str]:
         startTime = time.time()
         logger.debug("========================================================================================================")
         logger.debug("Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
-        oD = {}
+        oD: Dict[str, Any] = {}
         oD["overWrite"] = overWrite
         mpu = MultiProcUtil(verbose=True)
         mpu.set(workerObj=self, workerMethod="createHistoryWorker")
@@ -147,15 +152,21 @@ class StatusHistoryUtils(MyConnectionBase):
         #
         endTime = time.time()
         logger.debug("Completed at %s (%.2f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
-        return retLists[0]
+        return cast("List[str]", retLists[0])
         #
 
-    def createHistoryWorker(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002 pylint: disable=unused-argument
-        if "overWrite" in optionsD:
+    def createHistoryWorker(
+        self,
+        dataList: List[str],
+        procName: str,  # noqa: ARG002 pylint: disable=unused-argument
+        optionsD: Dict[str, Any],
+        workingDir: str,  # noqa: ARG002 pylint: disable=unused-argument
+    ) -> Tuple[List[str], List[str], List[Any]]:
+        if "overWrite" in optionsD:  # noqa: SIM401
             overWrite = optionsD["overWrite"]
         else:
             overWrite = False
-        rList = []
+        rList: List[str] = []
         for entryId in dataList:
             ok = self.__createStatusHistoryFile(entryId=entryId, overWrite=overWrite, statusUpdateAuthWait=None)
             if ok:
@@ -163,7 +174,9 @@ class StatusHistoryUtils(MyConnectionBase):
         #
         return rList, rList, []
 
-    def __getModelFileTimeStamp(self, entryId, versionId="1", mileStone=None, defValue=None):
+    def __getModelFileTimeStamp(
+        self, entryId: str, versionId: PathInfoVersionId = "1", mileStone: Optional[str] = None, defValue: Optional[str] = None
+    ) -> Optional[str]:
         try:
             # Get the modification date for the model file with mileStone
             modelFilePath = self.__pI.getModelPdbxFilePath(entryId, wfInstanceId=None, fileSource=self.__fileSource, versionId=versionId, mileStone=mileStone)
@@ -180,7 +193,7 @@ class StatusHistoryUtils(MyConnectionBase):
 
         return defValue
 
-    def __createStatusHistoryFile(self, entryId, overWrite=False, statusUpdateAuthWait=None):
+    def __createStatusHistoryFile(self, entryId: str, overWrite: bool = False, statusUpdateAuthWait: Optional[str] = None) -> bool:
         """Read existing entry and create initial status records as required
 
         overWrite = controls if existing files are rewritten.
@@ -205,7 +218,7 @@ class StatusHistoryUtils(MyConnectionBase):
             #
             filePath = self.__pI.getModelPdbxFilePath(entryId, wfInstanceId=None, fileSource=self.__fileSource, versionId="latest", mileStone=None)
             ei = PdbxEntryInfoIo(verbose=self.__verbose, log=self.__lfh)
-            ei.setFilePath(filePath=filePath, idCode=entryId)
+            ei.setFilePath(filePath=cast("str", filePath), idCode=entryId)
             # sD = ei.getInfoD(contextType="history")
             _tId, pdbId, statusCode, _authReleaseCode, annotatorInitials, initialDepositionDate, beginProcessingDate, authorApprovalDate, releaseDate = (
                 ei.getCurrentStatusDetails()
@@ -232,7 +245,7 @@ class StatusHistoryUtils(MyConnectionBase):
                 return statusFlag
 
             if not sH.dateTimeOk(beginProcessingDate) and sH.dateTimeOk(endFirstStepDate):
-                beginProcessingDate = endFirstStepDate
+                beginProcessingDate = cast("str", endFirstStepDate)  # dateTimeOk() is False for None
 
             if not sH.dateTimeOk(endFirstStepDate) and sH.dateTimeOk(beginProcessingDate):
                 endFirstStepDate = beginProcessingDate
@@ -382,14 +395,14 @@ class StatusHistoryUtils(MyConnectionBase):
 
         return statusFlag
 
-    def __schemaCreate(self, schemaDefObj):
+    def __schemaCreate(self, schemaDefObj: SchemaDefBase) -> bool:
         """Create and load table schema using schema definition"""
         startTime = time.time()
         logger.debug("StatusHistoryUtils(__schemaCreate) Starting at %s\n", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         try:
             tableIdList = schemaDefObj.getTableIdList()
             sqlGen = MyDbAdminSqlGen(self.__verbose, self.__lfh)
-            sqlL = []
+            sqlL: List[str] = []
             for tableId in tableIdList:
                 tableDefObj = schemaDefObj.getTable(tableId)
                 sqlL.extend(sqlGen.createTableSQL(databaseName=schemaDefObj.getDatabaseName(), tableDefObj=tableDefObj))
@@ -419,7 +432,13 @@ class StatusHistoryUtils(MyConnectionBase):
     #     args = [iter(iterable)] * n
     #     return ([e for e in t if e is not None] for t in zip_longest(*args))
 
-    def loadBatchFilesWorker(self, dataList, procName, optionsD, workingDir):  # noqa: ARG002 pylint: disable=unused-argument
+    def loadBatchFilesWorker(
+        self,
+        dataList: List[Tuple[str, str]],
+        procName: str,  # noqa: ARG002 pylint: disable=unused-argument
+        optionsD: Dict[str, Any],
+        workingDir: str,  # noqa: ARG002 pylint: disable=unused-argument
+    ) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]], List[Any]]:
         """Load tabular batch files created for the chemical component definitions into the database server."""
         shsd = StatusHistorySchemaDef()
         myC = MyDbConnect(verbose=self.__verbose, log=self.__lfh)
@@ -434,11 +453,12 @@ class StatusHistoryUtils(MyConnectionBase):
         myC.close()
         return dataList, dataList, []
 
-    def loadStatusHistoryMulti(self, numProc=2, newTable=False):
+    def loadStatusHistoryMulti(self, numProc: int = 2, newTable: bool = False) -> bool:
         """Create batch load files for all status history data files - (multiprocessing version)"""
         if self.__verbose:
             logger.info("Starting")
         startTime = time.time()
+        ok: bool
         try:
             pathList = self.getStatusHistoryPathList()
             if self.__verbose:
@@ -451,7 +471,7 @@ class StatusHistoryUtils(MyConnectionBase):
                 schemaDefObj=shsd,
                 ioObj=self.__ioObj,
                 dbCon=None,
-                workPath=self.__sessionPath,
+                workPath=cast("str", self.__sessionPath),
                 cleanUp=False,
                 warnings="default",
                 verbose=self.__verbose,
@@ -483,7 +503,7 @@ class StatusHistoryUtils(MyConnectionBase):
                 schemaDefObj=shsd,
                 ioObj=self.__ioObj,
                 dbCon=self._dbCon,
-                workPath=self.__sessionPath,
+                workPath=cast("str", self.__sessionPath),
                 cleanUp=False,
                 warnings="default",
                 verbose=self.__verbose,
@@ -519,7 +539,7 @@ class StatusHistoryUtils(MyConnectionBase):
         logger.debug("Completed at %s (%.2f seconds)", time.localtime(), endTime - startTime)
         return False
 
-    def loadStatusHistory(self, newTable=False):
+    def loadStatusHistory(self, newTable: bool = False) -> bool:
         """Do a full batch load/reload of status history files from the current file source (e.g. archive)."""
         startTime = time.time()
         logger.debug("+StatusHistoryUtils(loadStatusHistory) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -543,7 +563,7 @@ class StatusHistoryUtils(MyConnectionBase):
                     schemaDefObj=sd,
                     ioObj=self.__ioObj,
                     dbCon=self._dbCon,
-                    workPath=self.__sessionPath,
+                    workPath=cast("str", self.__sessionPath),
                     cleanUp=False,
                     warnings="error",
                     verbose=self.__verbose,
@@ -565,7 +585,7 @@ class StatusHistoryUtils(MyConnectionBase):
         )
         return ok
 
-    def loadEntryStatusHistory(self, entryIdList):
+    def loadEntryStatusHistory(self, entryIdList: List[str]) -> bool:
         """Load/reload of status history files for the current entry list obtained from the current file source (e.g. archive)."""
         startTime = time.time()
         logger.debug("+StatusHistoryUtils(loadEntryStatusHistory) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -585,7 +605,7 @@ class StatusHistoryUtils(MyConnectionBase):
                     schemaDefObj=sd,
                     ioObj=self.__ioObj,
                     dbCon=self._dbCon,
-                    workPath=self.__sessionPath,
+                    workPath=cast("str", self.__sessionPath),
                     cleanUp=False,
                     warnings="error",
                     verbose=self.__verbose,
@@ -609,7 +629,7 @@ class StatusHistoryUtils(MyConnectionBase):
         )
         return ok
 
-    def createStatusHistorySchema(self):
+    def createStatusHistorySchema(self) -> bool:
         """Create/recreate status history database schema -"""
         startTime = time.time()
         logger.debug("+StatusHistoryUtils(createStatusHistorySchema) Starting at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
@@ -638,7 +658,14 @@ class StatusHistoryUtils(MyConnectionBase):
         )
         return ok
 
-    def updateEntryStatusHistory(self, entryIdList, statusCode, annotatorInitials, details="Update by status module", statusCodePrior=None):
+    def updateEntryStatusHistory(
+        self,
+        entryIdList: Optional[List[str]],
+        statusCode: Optional[str],
+        annotatorInitials: Optional[str],
+        details: str = "Update by status module",
+        statusCodePrior: Optional[str] = None,
+    ) -> bool:
         """Update status history files from the input entry list obtained from the current file source (e.g. archive)
         with the input (statusCode, annotatorInitials, and details).
 
