@@ -29,7 +29,7 @@ from mmcif.api.PdbxContainers import DataContainer
 from mmcif.io.IoAdapterPy import IoAdapterPy
 
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDefDict
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDefDict  # pylint: disable=unused-import
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -88,7 +88,7 @@ _SCHEMA: SchemaDictType = {
     },
     # No INDICES - not needed for loading
     "PDBX_CHEM_COMP_DESCRIPTOR": cast(
-        TableDefDict,
+        "TableDefDict",
         {
             "TABLE_ID": "PDBX_CHEM_COMP_DESCRIPTOR",
             "TABLE_NAME": "pdbx_chem_comp_descriptor",
@@ -107,7 +107,7 @@ _SCHEMA: SchemaDictType = {
     ),
     # No TABLE_TYPE or INDICES - not needed for loading
     "UNMAPPED": cast(
-        TableDefDict,
+        "TableDefDict",
         {
             "TABLE_ID": "UNMAPPED",
             "TABLE_NAME": "unmapped",

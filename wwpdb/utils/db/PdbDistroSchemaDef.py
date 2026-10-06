@@ -19,7 +19,7 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from typing import ClassVar
+from typing import ClassVar, TextIO
 
 from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
@@ -27,7 +27,7 @@ from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 class PdbDistroSchemaDef(SchemaDefBase):
     """A data class containing schema definitions chemical component definitions."""
 
-    _databaseName = "stat"
+    _databaseName: ClassVar[str] = "stat"
     # fmt: off
     _schemaDefDict: ClassVar[SchemaDictType] = {
         'DIFFRN_RADIATION_WAVELENGTH': {'ATTRIBUTES': {'ID': 'id',
@@ -6343,7 +6343,7 @@ class PdbDistroSchemaDef(SchemaDefBase):
     }
     # fmt: on
 
-    def __init__(self, verbose=True, log=sys.stderr):
+    def __init__(self, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         super(PdbDistroSchemaDef, self).__init__(
             databaseName=PdbDistroSchemaDef._databaseName, schemaDefDict=PdbDistroSchemaDef._schemaDefDict, verbose=verbose, log=log
         )

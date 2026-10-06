@@ -28,6 +28,9 @@ __version__ = "V0.001"
 import copy
 import itertools
 import sys
+from typing import Any, Iterable, Iterator, List, Optional, Sequence, TextIO, Tuple, Union, cast
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, TableDef
 
 try:
     # Python 3
@@ -37,21 +40,33 @@ except ImportError:  # pragma: no cover
     from itertools import izip_longest as zip_longest  # type: ignore
 
 
+# (tableId, attributeId)
+AttributeTupleType = Tuple[Optional[str], Optional[str]]
+# Condition list entries -- e.g. ('VALUE_CONDITION', lhsTuple, opCode, rhsTuple), ('LOG_OP', 'AND'), ('GROUPING', 'BEGIN')
+ConditionType = Tuple[Any, ...]
+
+
 class MyDbAdminSqlGen:
     """Builds SQL commands to create table schema from a schema definition derived from class SchemaDefBase.
 
     Note:
     """
 
-    def __init__(self, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, verbose: bool = False, log: TextIO = sys.stderr) -> None:  # pylint: disable=unused-argument
         self.__lfh = log
         self.__verbose = verbose
 
-    def truncateTableSQL(self, databaseName, tableName):
+    def truncateTableSQL(self, databaseName: Optional[str], tableName: Optional[str]) -> str:
         """Return the SQL string require to truncate (remove all rows) from the input table."""
         return "TRUNCATE TABLE %s.%s; " % (databaseName, tableName)
 
-    def idUpdateTemplateSQL(self, databaseName, tableDefObj, updateAttributeIdList=None, conditionAttributeIdList=None):
+    def idUpdateTemplateSQL(
+        self,
+        databaseName: Optional[str],
+        tableDefObj: TableDef,
+        updateAttributeIdList: Optional[List[str]] = None,
+        conditionAttributeIdList: Optional[List[str]] = None,
+    ) -> str:
         """Return the SQL string template for updating the input attributes into the named table subject
         to the constraining attributes.
 
@@ -85,7 +100,7 @@ class MyDbAdminSqlGen:
         #
         return tS
 
-    def idInsertTemplateSQL(self, databaseName, tableDefObj, insertAttributeIdList=None):
+    def idInsertTemplateSQL(self, databaseName: Optional[str], tableDefObj: TableDef, insertAttributeIdList: Optional[List[str]] = None) -> str:
         """Return the SQL string template for inserting the input attributes into the named table.
 
         The string provides formatting placeholders for updated values  as well as for constraining values.
@@ -96,7 +111,7 @@ class MyDbAdminSqlGen:
         if insertAttributeIdList is None:
             insertAttributeIdList = []
         tableName = tableDefObj.getName()
-        attributeNameList = []
+        attributeNameList: List[Optional[str]] = []
         #
         fL = []
         for atId in insertAttributeIdList:
@@ -106,11 +121,11 @@ class MyDbAdminSqlGen:
             else:
                 fL.append("%s")
         #
-        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))  # noqa: S608
+        tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(cast("List[str]", attributeNameList)), ",".join(fL))  # noqa: S608
         #
         return tS
 
-    def idDeleteTemplateSQL(self, databaseName, tableDefObj, conditionAttributeIdList=None):
+    def idDeleteTemplateSQL(self, databaseName: Optional[str], tableDefObj: TableDef, conditionAttributeIdList: Optional[List[str]] = None) -> str:
         """Return the SQL string template for deleting records in the named table subject
         to the constraining attributes.
 
@@ -137,7 +152,7 @@ class MyDbAdminSqlGen:
         #
         return tS
 
-    def insertTemplateSQL(self, databaseName, tableName, attributeNameList=None):
+    def insertTemplateSQL(self, databaseName: Optional[str], tableName: Optional[str], attributeNameList: Optional[List[str]] = None) -> str:
         """Return the SQL string template for inserting the input attributes into the named table.
 
         The string provides formatting placeholders for inserted values that are added when
@@ -153,7 +168,7 @@ class MyDbAdminSqlGen:
         tS = "INSERT INTO %s.%s (%s) VALUES (%s);" % (databaseName, tableName, ",".join(attributeNameList), ",".join(fL))  # noqa: S608
         return tS
 
-    def deleteTemplateSQL(self, databaseName, tableName, attributeNameList=None):
+    def deleteTemplateSQL(self, databaseName: Optional[str], tableName: Optional[str], attributeNameList: Optional[List[str]] = None) -> str:
         """Return the SQL string template for deleting table records constrained by the input attributes.
 
         The string provides formatting placeholders for the constraining values.
@@ -169,7 +184,9 @@ class MyDbAdminSqlGen:
         tS = "DELETE FROM %s.%s WHERE %s;" % (databaseName, tableName, " AND ".join(fL))  # noqa: S608
         return tS
 
-    def deleteFromListSQL(self, databaseName, tableName, attributeName, valueList, chunkSize=10):
+    def deleteFromListSQL(
+        self, databaseName: Optional[str], tableName: Optional[str], attributeName: Optional[str], valueList: Iterable[Any], chunkSize: int = 10
+    ) -> List[str]:
         """Return the SQL string for deleting table records for a list of string values of
         the input attribute.
 
@@ -184,11 +201,11 @@ class MyDbAdminSqlGen:
 
         return sqlList
 
-    def __makeSubLists(self, n, iterable):
+    def __makeSubLists(self, n: int, iterable: Iterable[Any]) -> Iterator[List[Any]]:
         args = [iter(iterable)] * n
         return ([e for e in t if e is not None] for t in zip_longest(*args))
 
-    def createDatabaseSQL(self, databaseName):
+    def createDatabaseSQL(self, databaseName: Optional[str]) -> List[str]:
         """Return a list of strings containing the SQL to drop and recreate the input database.
 
         DROP DATABASE IF EXISTS <databaseName>;
@@ -199,7 +216,7 @@ class MyDbAdminSqlGen:
         oL.append("CREATE DATABASE %s;" % databaseName)
         return oL
 
-    def createTableSQL(self, databaseName, tableDefObj):
+    def createTableSQL(self, databaseName: Optional[str], tableDefObj: TableDef) -> List[str]:
         """Return a list of strings containing the SQL commands to create the table and indices
         described by the input table definition.
 
@@ -211,27 +228,27 @@ class MyDbAdminSqlGen:
         oL.extend(self.__createTableIndices(tableDefObj))
         return oL
 
-    def __setDatabase(self, databaseName):
+    def __setDatabase(self, databaseName: Optional[str]) -> List[str]:
         """Return a list of strings containing database connection SQL command for the input database
 
         USE <databaseName>;
         """
         return ["USE %s;" % databaseName]
 
-    def __dropTable(self, tableName):
+    def __dropTable(self, tableName: Optional[str]) -> List[str]:
         """Return a list of strings containing the SQL DROP TABLE command for the input table:
 
         DROP TABLE IF EXISTS <tableName>;
         """
         return ["DROP TABLE IF EXISTS %s;" % tableName]
 
-    def __createTable(self, tableDefObj):
+    def __createTable(self, tableDefObj: TableDef) -> List[str]:
         """Return a list of strings containing the SQL command to create the table described in
         input table schema definition object.
 
         """
         oL = []
-        pkL = []
+        pkL: List[Optional[str]] = []
         #
         attributeIdList = tableDefObj.getAttributeIdList()
         #
@@ -240,9 +257,9 @@ class MyDbAdminSqlGen:
             #
             name = tableDefObj.getAttributeName(attributeId)
 
-            sqlType = tableDefObj.getAttributeType(attributeId)
-            width = int(tableDefObj.getAttributeWidth(attributeId))
-            precision = int(tableDefObj.getAttributePrecision(attributeId))
+            sqlType = cast("str", tableDefObj.getAttributeType(attributeId))
+            width = int(cast("Union[int, str]", tableDefObj.getAttributeWidth(attributeId)))
+            precision = int(cast("int", tableDefObj.getAttributePrecision(attributeId)))
             notNull = "not null" if not tableDefObj.getAttributeNullable(attributeId) else "    null default null"
             if tableDefObj.getAttributeIsPrimaryKey(attributeId):
                 pkL.append(name)
@@ -272,7 +289,7 @@ class MyDbAdminSqlGen:
             oL.append(tS + ",")
 
         if len(pkL) > 0:
-            oL.append("PRIMARY KEY (%s)" % (",".join(pkL)))
+            oL.append("PRIMARY KEY (%s)" % (",".join(cast("List[str]", pkL))))
 
         if str(tableDefObj.getType()).upper() == "TRANSACTIONAL":
             oL.append(") ENGINE InnoDB;")
@@ -282,7 +299,7 @@ class MyDbAdminSqlGen:
         # return this as list containing a single string command.
         return ["\n".join(oL)]
 
-    def __createTableIndices(self, tableDefObj):
+    def __createTableIndices(self, tableDefObj: TableDef) -> List[str]:
         """Return a list of strings containing the SQL command to create any indices described in
         input table schema definition object.
 
@@ -310,7 +327,7 @@ class MyDbAdminSqlGen:
         #
         return oL
 
-    def exportTable(self, databaseName, tableDefObj, exportPath, withDoubleQuotes=False):
+    def exportTable(self, databaseName: Optional[str], tableDefObj: TableDef, exportPath: str, withDoubleQuotes: bool = False) -> str:
         """ """
         tableName = tableDefObj.getName()
         aNames = tableDefObj.getAttributeNameList()
@@ -326,7 +343,9 @@ class MyDbAdminSqlGen:
         oL.append(";")
         return "\n".join(oL)
 
-    def importTable(self, databaseName, tableDefObj, importPath, withTruncate=False, withDoubleQuotes=False):
+    def importTable(
+        self, databaseName: Optional[str], tableDefObj: TableDef, importPath: str, withTruncate: bool = False, withDoubleQuotes: bool = False
+    ) -> str:
         """Create the SQL commands to data files stored in charactore delimited data files into the
         in put database and table.    Input data may be optionally enclosed in double quotes.
 
@@ -358,21 +377,23 @@ class MyDbAdminSqlGen:
 class MyDbQuerySqlGen:
     """Builds an the SQL command string for a selection query."""
 
-    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
+    def __init__(self, schemaDefObj: SchemaDefBase, verbose: bool = False, log: TextIO = sys.stderr) -> None:  # noqa: ARG002 pylint: disable=unused-argument
         """Input:
 
         schemaDef is instance of class derived from SchemaDefBase().
         """
         self.__schemaDefObj = schemaDefObj
         #
-        self.__databaseName = None
-        self.__conditionObj = None
+        self.__databaseName: Optional[str] = None
+        self.__conditionObj: Optional[MyDbConditionSqlGen] = None
         self.__sortOrder = "DESC"
-        self.__limitStart = None
-        self.__limitLength = None
+        self.__limitStart: Optional[int] = None
+        self.__limitLength: Optional[int] = None
+        self.__selectList: List[AttributeTupleType] = []
+        self.__orderList: List[Tuple[AttributeTupleType, str]] = []
         self.__setup()
 
-    def __setup(self):
+    def __setup(self) -> None:
         self.__databaseName = self.__schemaDefObj.getDatabaseName()
         self.__selectList = []
         self.__orderList = []
@@ -382,21 +403,22 @@ class MyDbQuerySqlGen:
         self.__limitLength = None
         #
 
-    def setDatabase(self, databaseName):
+    def setDatabase(self, databaseName: Optional[str]) -> None:
         self.__databaseName = databaseName
 
-    def clear(self):
+    def clear(self) -> None:
         self.__setup()
 
-    def addSelectLimit(self, rowStart=None, rowLength=None):
+    def addSelectLimit(self, rowStart: Optional[Union[int, str]] = None, rowLength: Optional[Union[int, str]] = None) -> bool:
         try:
-            self.__limitStart = int(rowStart)
-            self.__limitLength = int(rowLength)
+            # int(None) raises TypeError, which is caught below and reported as False
+            self.__limitStart = int(cast("Union[int, str]", rowStart))
+            self.__limitLength = int(cast("Union[int, str]", rowLength))
             return True
         except:  # noqa: E722  pylint: disable=bare-except
             return False
 
-    def addSelectAttributeId(self, attributeTuple=(None, None)):
+    def addSelectAttributeId(self, attributeTuple: AttributeTupleType = (None, None)) -> bool:
         """Add the input attribute to the current attribute select list.
 
         where attributeTuple contains (tableId,attributeId)
@@ -405,11 +427,11 @@ class MyDbQuerySqlGen:
         self.__selectList.append(attributeTuple)
         return True
 
-    def setOrderBySortOrder(self, dir="ASC"):  # noqa: A002 pylint: disable=redefined-builtin
+    def setOrderBySortOrder(self, dir: str = "ASC") -> None:  # noqa: A002 pylint: disable=redefined-builtin
         """The default sort order applied to attributes in the ORDER BY clause. (ASC|DESC)"""
         self.__sortOrder = dir
 
-    def addOrderByAttributeId(self, attributeTuple=(None, None), sortFlag="DEFAULT"):
+    def addOrderByAttributeId(self, attributeTuple: AttributeTupleType = (None, None), sortFlag: str = "DEFAULT") -> bool:
         """Add the input attribute to the current orderBy list.
 
         where attributeTuple contains (tableId,attributeId)
@@ -419,16 +441,16 @@ class MyDbQuerySqlGen:
         self.__orderList.append((attributeTuple, sf))
         return True
 
-    def setCondition(self, conditionObj):
+    def setCondition(self, conditionObj: Optional["MyDbConditionSqlGen"]) -> bool:
         """Set an instance of the condition object from the MyDbConditionSqlGen() class."""
         self.__conditionObj = conditionObj
         return True
 
-    def getSql(self):
+    def getSql(self) -> Optional[str]:
         """ """
         return self.__makeSql()
 
-    def __makeSql(self):
+    def __makeSql(self) -> Optional[str]:
         """Builds SQL string for the query from the current list of attributes, list of
         ORDER BY attributes and the constrainObj.
         """
@@ -454,7 +476,7 @@ class MyDbQuerySqlGen:
             oNames = [self.__schemaDefObj.getQualifiedAttributeName(aTup) + " " + sortFlag for aTup, sortFlag in self.__orderList]
         #
         tIds = list(set(tIds))
-        tNames = [self.__databaseName + "." + self.__schemaDefObj.getTableName(tId) for tId in tIds]
+        tNames = [cast("str", self.__databaseName) + "." + self.__schemaDefObj.getTableName(cast("str", tId)) for tId in tIds]
         #
         oL = []
         oL.append("SELECT %s " % ",".join(aNames))
@@ -477,7 +499,7 @@ class MyDbQuerySqlGen:
 class MyDbConditionSqlGen:
     """Builds the Condition portion of an SQL selection or related query."""
 
-    def __init__(self, schemaDefObj, addKeyJoinFlag=True, verbose=False, log=sys.stderr):
+    def __init__(self, schemaDefObj: SchemaDefBase, addKeyJoinFlag: bool = True, verbose: bool = False, log: TextIO = sys.stderr) -> None:
         """Input:
 
         schemaDef is instance of class derived from SchemaDefBase().
@@ -501,19 +523,19 @@ class MyDbConditionSqlGen:
         # self.__logOps = ["AND", "OR", "NOT"]
         # self.__grpOps = ["BEGIN", "END"]
         #
-        self.__cList = []
-        self.__tableIdList = []
+        self.__cList: List[ConditionType] = []
+        self.__tableIdList: List[str] = []
         self.__numConditions = 0
         self.__addKeyJoinFlag = addKeyJoinFlag
         #
 
-    def clear(self):
+    def clear(self) -> bool:
         self.__cList = []
         self.__tableIdList = []
         self.__numConditions = 0
         return True
 
-    def set(self, conditionDefList=None):
+    def set(self, conditionDefList: Optional[List[ConditionType]] = None) -> bool:
         """Set/reset the current condition list --- The input is used verbatim and unmodified."""
         if conditionDefList is not None:
             self.__cList = conditionDefList
@@ -523,7 +545,7 @@ class MyDbConditionSqlGen:
             return True
         return False
 
-    def __updateTableList(self, cObj):
+    def __updateTableList(self, cObj: ConditionType) -> bool:
         """Add the tables included in the input condition to the internal table list."""
         cType = cObj[0]
         if cType in ["VALUE_CONDITION", "VALUE_LIST_CONDITION"]:
@@ -540,24 +562,24 @@ class MyDbConditionSqlGen:
             return True
         return False
 
-    def __addTable(self, tableId):
+    def __addTable(self, tableId: str) -> bool:
         if tableId not in self.__tableIdList:
             self.__tableIdList.append(tableId)
             return True
         return False
 
-    def get(self):
+    def get(self) -> List[ConditionType]:
         return self.__cList
 
-    def getSql(self):
+    def getSql(self) -> str:
         if self.__addKeyJoinFlag:
             self.addKeyAttributeEquiJoinConditions()
         return self.__makeSql()
 
-    def getTableIdList(self):
+    def getTableIdList(self) -> List[str]:
         return self.__tableIdList
 
-    def addTables(self, tableIdList):
+    def addTables(self, tableIdList: Iterable[str]) -> bool:
         """Add the tables from the input tableIdList to the internal list of tables.
 
         The internal list of tables is used to materialize join contraints between
@@ -567,7 +589,9 @@ class MyDbConditionSqlGen:
             self.__addTable(tableId)
         return True
 
-    def addValueCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp="AND"):
+    def addValueCondition(
+        self, lhsTuple: Optional[Tuple[Any, ...]] = None, opCode: Optional[str] = None, rhsTuple: Optional[Tuple[Any, ...]] = None, preOp: Optional[str] = "AND"
+    ) -> int:
         """Adds a condition to the current contraint list -
 
          lhsTuple = (TableId,AttributeId)
@@ -591,7 +615,7 @@ class MyDbConditionSqlGen:
             self.__numConditions += 1
         return self.__numConditions
 
-    def addGroupValueConditionList(self, cDefList, preOp="AND"):
+    def addGroupValueConditionList(self, cDefList: Sequence[Tuple[Any, ...]], preOp: Optional[str] = "AND") -> int:
         """Add a value alternative condition to the current contraint list
          using the input list of value condition definitions defined as -
 
@@ -629,7 +653,9 @@ class MyDbConditionSqlGen:
         self.addEndGroup()
         return self.__numConditions
 
-    def addJoinCondition(self, lhsTuple=None, opCode=None, rhsTuple=None, preOp="AND"):
+    def addJoinCondition(
+        self, lhsTuple: Optional[Tuple[Any, ...]] = None, opCode: Optional[str] = None, rhsTuple: Optional[Tuple[Any, ...]] = None, preOp: Optional[str] = "AND"
+    ) -> int:
         """Adds a join condition to the current contraint list -
 
         lhsTuple = (TableId,AttributeId)
@@ -657,22 +683,22 @@ class MyDbConditionSqlGen:
             self.__numConditions += 1
         return self.__numConditions
 
-    def addLogicalOp(self, lOp):
+    def addLogicalOp(self, lOp: Optional[str]) -> None:
         """Adds a logical operation into the current condition list.
 
         lOp  =  one of 'AND','OR', 'NOT'
         """
         self.__cList.append(("LOG_OP", lOp))
 
-    def addBeginGroup(self):
+    def addBeginGroup(self) -> None:
         """Inserts the beginning of a parenthetical group in the current condition list."""
         self.__cList.append(("GROUPING", "BEGIN"))
 
-    def addEndGroup(self):
+    def addEndGroup(self) -> None:
         """Inserts the ending of a parenthetical group in the current condition list."""
         self.__cList.append(("GROUPING", "END"))
 
-    def addKeyAttributeEquiJoinConditions(self):
+    def addKeyAttributeEquiJoinConditions(self) -> int:
         """Auto add equi-join contraints between tables in the current table list -"""
         if len(self.__tableIdList) < 2:
             return 0
@@ -688,7 +714,7 @@ class MyDbConditionSqlGen:
 
         return len(tablePairList)
 
-    def __makeSql(self):
+    def __makeSql(self) -> str:
         """Builds SQL string for the query condition encoded in the input contraint command list.
 
         The condition command list is a sequence of tuples with the following syntax:
@@ -771,7 +797,7 @@ class MyDbConditionSqlGen:
 
         return "\n".join(cSqlL)
 
-    def __addInterTableJoinContraints(self, lTableId, rTableId):
+    def __addInterTableJoinContraints(self, lTableId: str, rTableId: str) -> int:
         """The ..."""
         lTdef = self.__schemaDefObj.getTable(lTableId)
         lKeyAttributeIdL = lTdef.getPrimaryKeyAttributeIdList()

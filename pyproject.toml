@@ -22,14 +22,14 @@ classifiers = [
 ]
 dependencies = [
     "mmcif",
-    "mmcif_utils",
+    "mmcif_utils >= 1.0",
     "mysqlclient",
     "rcsb.utils.multiproc",
     "scandir",
     "sqlalchemy >= 2.0",
     "sqlparse",
     "typing_extensions",
-    "wwpdb.io",
+    "wwpdb.io >= 1.3",
     "wwpdb.utils.config",
 ]
 
@@ -131,7 +131,8 @@ ignore = [
 # -------------------- default environment scripts ------------------
 [tool.hatch.envs.default]
 skip-install = true
-dependencies = ["mypy", "ruff >=0.6.9", "wwpdb.utils.testing", "scandir", "mysqlclient", "sqlalchemy", "scandir", "rcsb.utils.multiproc"]
+dependencies = ["mypy", "ruff >=0.6.9", "wwpdb.utils.testing", "scandir", "mysqlclient", "sqlalchemy", 
+    "scandir", "rcsb.utils.multiproc", "typing_extensions", "wwpdb.utils.dp", "wwpdb.io", "wwpdb.utils.session"]
 
 
 [tool.hatch.envs.default.scripts]
@@ -146,13 +147,13 @@ format = [
 format-python = ["ruff format", "ruff check --fix-only"]
 
 # 'check' only checks but never fixes
-check = ["ruff check --no-fix .", "mypy --non-interactive --install-types -p wwpdb -p tests"]
+check = ["ruff check --no-fix .", "mypy --non-interactive --install-types --strict -p wwpdb -p tests"]
 
 # only checks with ruff (mypy has a lot of false positives)
 check-ruff = "ruff check --no-fix . {args}"
 
 # to complement 'check-ruff'
-check-mypy = "mypy --non-interactive --install-types -p wwpdb -p tests {args}"
+check-mypy = "mypy --non-interactive --install-types --strict -p wwpdb -p tests {args}"
 
 # only check security via Bandit; we require these rules to pass
 check-security = "ruff check --select S --no-fix ."
@@ -167,8 +168,7 @@ run = ["tox"]
 
 # -------------------------  Mypy disable ---------
 [[tool.mypy.overrides]]
-# XXXXXX UPDATE
-module = ["mmcif_utils.*", "mmcif.*", "wwpdb.*", "rcsb.utils.multiproc.*", "sqlalchemy.*", "scandir", "sqlparse", "typing_extensions"]
+module = ["mmcif.*", "wwpdb.utils.dp.*", "rcsb.utils.multiproc.*", "scandir"]
 ignore_missing_imports = true
 
 [tool.mypy]

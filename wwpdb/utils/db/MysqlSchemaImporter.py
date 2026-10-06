@@ -8,18 +8,29 @@
 import os
 import pprint
 import sys
+from typing import Any, Dict, List, Optional, TextIO, Tuple, Union, cast
+
+from wwpdb.utils.db.SchemaDefBase import SchemaDictType, TableDefDict
 
 
 class MysqlSchemaImporter:
-    def __init__(self, dbUser, dbPw, dbHost, mysqlPath="/opt/local/bin/mysql", verbose=True, log=sys.stderr):  # noqa: ARG002 pylint:  disable=unused-argument
+    def __init__(
+        self,
+        dbUser: Optional[str],
+        dbPw: Optional[str],
+        dbHost: Optional[str],
+        mysqlPath: str = "/opt/local/bin/mysql",
+        verbose: bool = True,  # noqa: ARG002 pylint: disable=unused-argument
+        log: TextIO = sys.stderr,
+    ) -> None:
         self.__lfh = log
         self.__mysqlPath = mysqlPath
         self.__dbUser = dbUser
         self.__dbPw = dbPw
         self.__dbHost = dbHost
 
-    def __import(self, filePath):
-        colDataList = []
+    def __import(self, filePath: str) -> List[List[str]]:
+        colDataList: List[List[str]] = []
         ifh = open(filePath)
         for line in ifh:
             if line is not None and len(line) > 0:
@@ -33,24 +44,25 @@ class MysqlSchemaImporter:
         #
         return colDataList[1:]
 
-    def __export(self, filePath, db, tableName):
+    def __export(self, filePath: str, db: str, tableName: str) -> int:
         cmdDetail = ' --user=%s --password=%s --host=%s %s -e "describe %s;" ' % (self.__dbUser, self.__dbPw, self.__dbHost, db, tableName)
         cmd = self.__mysqlPath + cmdDetail + " > %s" % filePath
         return os.system(cmd)  # noqa: S605
 
-    def __buildDef(self, dbName, tableName, colDataList):  # noqa: ARG002 pylint: disable=unused-argument
-        defD = {}
+    def __buildDef(self, dbName: str, tableName: str, colDataList: List[List[str]]) -> Tuple[str, TableDefDict]:  # noqa: ARG002 pylint: disable=unused-argument
+        defD: Dict[str, Any] = {}
         tableId = str(tableName).upper()
-        attIdKeyList = []
-        attMap = {}
-        indD = {}
-        attInfo = {}
-        attD = {}
+        attIdKeyList: List[str] = []
+        attMap: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]] = {}
+        indD: Dict[str, Dict[str, Any]] = {}
+        attInfo: Dict[str, Dict[str, Any]] = {}
+        attD: Dict[str, str] = {}
         for ii, ff in enumerate(colDataList, start=1):
             attName = str(ff[0])
             attId = str(attName).upper()
             nullFlag = bool(ff[2] == "YES")
             impType = ff[1]
+            width: Union[int, str]
             if "(" in impType:
                 width = impType[impType.find("(") + 1 : -1]
                 sqlType = impType[: impType.find("(")]
@@ -67,7 +79,7 @@ class MysqlSchemaImporter:
             attMap[attId] = (tableName, attName, None, None)
             attInfo[attId] = {"NULLABLE": nullFlag, "ORDER": ii, "PRECISION": precision, "PRIMARY_KEY": keyFlag, "SQL_TYPE": sqlType.upper(), "WIDTH": width}
         #
-        d = {}
+        d: Dict[str, Any] = {}
         d["ATTRIBUTES"] = tuple(attIdKeyList)
         d["TYPE"] = "UNIQUE"
         indD["p1"] = d
@@ -81,16 +93,16 @@ class MysqlSchemaImporter:
         defD["TABLE_NAME"] = tableName
         defD["TABLE_TYPE"] = "transactional"
         # 'MAP_MERGE_INDICES': {'valence_ref': {'ATTRIBUTES': ('id',), 'TYPE': 'EQUI-JOIN'}},
-        tD = {}
+        tD: Dict[str, Any] = {}
         tD["ATTRIBUTES"] = tuple(attIdKeyList)
         tD["TYPE"] = "EQUI-JOIN"
         defD["MAP_MERGE_INDICES"] = {}
         defD["MAP_MERGE_INDICES"][tableName] = tD
         #
-        return tableId, defD
+        return tableId, cast("TableDefDict", defD)
 
-    def create(self, dbName, tableNameList):
-        schemaDef = {}
+    def create(self, dbName: str, tableNameList: List[str]) -> None:
+        schemaDef: SchemaDictType = {}
         for tableName in tableNameList:
             fn = "mysql-schema-" + tableName + ".txt"
             self.__export(fn, dbName, tableName)
@@ -103,7 +115,7 @@ class MysqlSchemaImporter:
         pprint.pprint(schemaDef, stream=sys.stdout, width=120, indent=3)  # noqa: T203
 
 
-def __main():
+def __main() -> None:
     tableNameList = [
         "PDB_status_information",
         "audit_author",

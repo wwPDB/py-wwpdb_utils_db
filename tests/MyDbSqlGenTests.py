@@ -22,7 +22,7 @@ import sys
 import time
 import traceback
 import unittest
-from typing import List
+from typing import List, cast
 
 from wwpdb.utils.db.BirdSchemaDef import BirdSchemaDef
 from wwpdb.utils.db.MessageSchemaDef import MessageSchemaDef
@@ -82,7 +82,7 @@ class MyDbSqlGenTests(unittest.TestCase):
 
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
-                exportPath = os.path.join(TESTOUTPUT, tableDefObj.getName() + ".tdd")
+                exportPath = os.path.join(TESTOUTPUT, cast("str", tableDefObj.getName()) + ".tdd")
                 sqlExport = myAd.exportTable(databaseName, tableDefObj, exportPath=exportPath)
                 if self.__verbose:  # pragma: no cover
                     self.__lfh.write("\n\n+MyDbSqlGenTests table export SQL string\n %s\n\n" % sqlExport)
@@ -165,7 +165,7 @@ class MyDbSqlGenTests(unittest.TestCase):
 
             for tableId in tableIdList:
                 tableDefObj = msd.getTable(tableId)
-                exportPath = os.path.join(TESTOUTPUT, tableDefObj.getName() + ".tdd")
+                exportPath = os.path.join(TESTOUTPUT, cast("str", tableDefObj.getName()) + ".tdd")
                 sqlExport = myAd.exportTable(databaseName, tableDefObj, exportPath=exportPath)
                 if self.__verbose:  # pragma: no cover
                     self.__lfh.write("\n\n+MyDbSqlGenTests table export SQL string\n %s\n\n" % sqlExport)

@@ -25,7 +25,7 @@ import sys
 import time
 import traceback
 import unittest
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from wwpdb.utils.testing.Features import Features
 
@@ -305,7 +305,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
                 self.__lfh.write("\n\n+testDirectiveWithDistroQuery SQL\n %s\n\n" % sqlS)
             self.__lfh.flush()
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
-            rowList = myQ.selectRows(queryString=sqlS)
+            rowList = myQ.selectRows(queryString=cast("str", sqlS))
             if self.__verbose:
                 self.__lfh.write("\n+testDirectiveWithDistroQuery mysql server returns row length %d\n" % len(rowList))
                 self.__lfh.flush()
@@ -336,7 +336,7 @@ class MyQueryDirectivesTests(unittest.TestCase):
                 self.__lfh.write("\n\n+testDirectiveWithHistoryQuery SQL\n %s\n\n" % sqlS)
             self.__lfh.flush()
             myQ = MyDbQuery(dbcon=self.__dbCon, verbose=self.__verbose, log=self.__lfh)
-            rowList = myQ.selectRows(queryString=sqlS)
+            rowList = myQ.selectRows(queryString=cast("str", sqlS))
             if self.__verbose:
                 self.__lfh.write("\n+testDirectiveWithHistoryQuery mysql server returns row length %d\n" % len(rowList))
                 self.__lfh.flush()

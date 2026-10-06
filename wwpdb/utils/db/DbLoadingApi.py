@@ -18,6 +18,7 @@ Updates:
 import os
 import sys
 import traceback
+from typing import Any, Optional, TextIO
 
 #
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
@@ -32,7 +33,7 @@ from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 class DbLoadingApi:
     """ """
 
-    def __init__(self, log=sys.stderr, verbose=False):
+    def __init__(self, log: TextIO = sys.stderr, verbose: bool = False) -> None:
         """ """
         self.__lfh = log
         self.__verbose = verbose
@@ -56,9 +57,9 @@ class DbLoadingApi:
         self.__mapping = self.__schemaPath
 
         self.__workDir = "dbdata"
-        self._dbCon = None
+        self._dbCon: Optional[Any] = None
 
-    def doDataLoading(self, depId, sessionDir):
+    def doDataLoading(self, depId: str, sessionDir: str) -> None:
         """
         Take deposition id and session directory as input
 
@@ -159,7 +160,7 @@ class DbLoadingApi:
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")  # noqa: T201
 
-    def __generateLoadDb(self, tmpPath, filePath, sql_file, logFile):
+    def __generateLoadDb(self, tmpPath: str, filePath: str, sql_file: str, logFile: str) -> None:
         try:
             dp = RcsbDpUtility(tmpPath=tmpPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(filePath)
@@ -230,7 +231,7 @@ class DbLoadingApi:
     #         traceback.print_exc(file=self.__lfh)
     #         return False
 
-    def doLoadStatus(self, pdbxFilePath, sessionDir):
+    def doLoadStatus(self, pdbxFilePath: str, sessionDir: str) -> bool:
         """
         Load the input file into the status database and session directory as input
 
@@ -331,7 +332,7 @@ class DbLoadingApi:
             traceback.print_exc(file=self.__lfh)
             return False
 
-    def doDataLoadingBcp(self, depId, sessionDir):
+    def doDataLoadingBcp(self, depId: str, sessionDir: str) -> None:
         """
         Similar as doDataLoading(), Run db-loader with the option to
         get bcp data files, not sql commands.
@@ -470,7 +471,7 @@ class DbLoadingApi:
         else:
             print("DbLoadingApi::doDataLoading(): No any cif file found.")  # noqa: T201
 
-    def doDataLoadingByMapping(self, depId, sessionDir, mappingFile, dbName):
+    def doDataLoadingByMapping(self, depId: str, sessionDir: str, mappingFile: str, dbName: str) -> None:
         """
         Similar as doDataLoading(), Run db-loader with the option to
         get bcp data files using the giving mapping file and dbname.

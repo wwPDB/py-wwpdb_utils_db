@@ -24,7 +24,7 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
 import sys
-from typing import ClassVar
+from typing import ClassVar, TextIO
 
 from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 
@@ -32,7 +32,7 @@ from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType
 class PdbxSchemaDef(SchemaDefBase):
     """A data class containing schema definitions PDBx data categories populated in model files."""
 
-    _databaseName = "pdbxv4"
+    _databaseName: ClassVar[str] = "pdbxv4"
     # fmt: off
     _schemaDefDict: ClassVar[SchemaDictType] = {
         'ATOM_SITE': {'ATTRIBUTES': {'ADP_TYPE': 'adp_type',
@@ -42563,7 +42563,7 @@ class PdbxSchemaDef(SchemaDefBase):
     }
     # fmt: on
 
-    def __init__(self, verbose=True, log=sys.stderr):
+    def __init__(self, verbose: bool = True, log: TextIO = sys.stderr) -> None:
         super(PdbxSchemaDef, self).__init__(databaseName=PdbxSchemaDef._databaseName, schemaDefDict=PdbxSchemaDef._schemaDefDict, verbose=verbose, log=log)
 
 

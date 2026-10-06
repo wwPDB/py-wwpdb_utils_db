@@ -20,7 +20,7 @@ import io
 import unittest
 from typing import cast
 
-from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDef, TableDefDict
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase, SchemaDictType, TableDef, TableDefDict  # pylint: disable=unused-import
 
 _SCHEMA: SchemaDictType = {
     "SAMPLE_TABLE": {
@@ -57,7 +57,7 @@ _SCHEMA: SchemaDictType = {
     },
     # Deliberately incomplete (no TABLE_TYPE or INDICES) to exercise the accessor fallbacks
     "OTHER": cast(
-        TableDefDict,
+        "TableDefDict",
         {
             "TABLE_ID": "OTHER",
             "TABLE_NAME": "other",

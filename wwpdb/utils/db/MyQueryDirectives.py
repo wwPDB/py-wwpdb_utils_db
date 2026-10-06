@@ -24,8 +24,10 @@ __version__ = "V0.001"
 
 import logging
 import sys
+from typing import Any, Dict, List, Optional, TextIO, Tuple, Union
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbConditionSqlGen, MyDbQuerySqlGen
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +129,7 @@ class MyQueryDirectives:
 
     """
 
-    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):
+    def __init__(self, schemaDefObj: SchemaDefBase, verbose: bool = False, log: TextIO = sys.stderr) -> None:
         """Input:
 
         schemaDefObj =  is instance of class derived from SchemaDefBase().
@@ -138,10 +140,17 @@ class MyQueryDirectives:
         self.__verbose = verbose
         self.__debug = True
         #
-        self.__selectTupList = []
+        self.__selectTupList: List[Tuple[str, str]] = []
         self.__orgSelectCount = 0
 
-    def build(self, queryDirL=None, domD=None, appendValueConditonsToSelect=False, queryDirSeparator=":", domRefSeparator="|"):
+    def build(
+        self,
+        queryDirL: Optional[List[str]] = None,
+        domD: Optional[Dict[str, Any]] = None,
+        appendValueConditonsToSelect: bool = False,
+        queryDirSeparator: str = ":",
+        domRefSeparator: str = "|",
+    ) -> Optional[str]:
         """Build SQL instructure from the input list of query directives and dictionary or dom references."""
         if queryDirL is None:
             queryDirL = []
@@ -149,8 +158,8 @@ class MyQueryDirectives:
             domD = {}
         if self.__verbose:
             logger.info("dom dictionary length domD %d", len(domD))
-        tL = []
-        qL = []
+        tL: List[str] = []
+        qL: List[Any] = []
         self.__selectTupList = []
         #
         #
@@ -172,13 +181,13 @@ class MyQueryDirectives:
         sqlS = self.__sqlGen(selectD, orderD, conditionD)
         return sqlS
 
-    def getAttributeSelectList(self):
+    def getAttributeSelectList(self) -> Tuple[List[Tuple[str, str]], int]:
         """Return the current list of [(tableId,attributeId),...] in query order -"""
         return self.__selectTupList, self.__orgSelectCount
 
-    def __getTokenD(self, tL, index, nPairs):
+    def __getTokenD(self, tL: List[Any], index: int, nPairs: int) -> Dict[Any, Any]:
         """Return a dictionary of token and value pairs in the input list starting at tL[index]."""
-        tD = {}
+        tD: Dict[Any, Any] = {}
         try:
             i1 = index
             i2 = index + nPairs * 2
@@ -194,19 +203,21 @@ class MyQueryDirectives:
         #
         #
 
-    def __parseTokenList(self, qdL, appendValueConditonsToSelect=False):
+    def __parseTokenList(
+        self, qdL: List[Any], appendValueConditonsToSelect: bool = False
+    ) -> Tuple[Dict[int, Tuple[str, str]], Dict[int, Tuple[Tuple[str, str], str]], Dict[int, Dict[str, Any]], int]:
         """
         Parse input list of tokens and return dictionaries of instructions (selections, conditions, sorting order)
         for input to the SQL query generator.
         """
         try:
-            selectD = {}
-            conditionD = {}
-            keyCondD = {}
-            condListD = {}
-            orderD = {}
+            selectD: Dict[int, Tuple[str, str]] = {}
+            conditionD: Dict[int, Dict[str, Any]] = {}
+            keyCondD: Dict[int, Tuple[int, Any, Any]] = {}
+            condListD: Dict[int, Dict[str, List[Tuple[Any, ...]]]] = {}
+            orderD: Dict[int, Tuple[Tuple[str, str], str]] = {}
             #
-            tD = {}
+            tD: Dict[Any, Any] = {}
             #
             i = 0
             while i < len(qdL):
@@ -407,11 +418,13 @@ class MyQueryDirectives:
         #
         return selectD, orderD, conditionD, orgSelectCount
 
-    def __sqlGen(self, selectD, orderD, conditionD):
+    def __sqlGen(
+        self, selectD: Dict[int, Tuple[str, str]], orderD: Dict[int, Tuple[Tuple[str, str], str]], conditionD: Dict[int, Dict[str, Any]]
+    ) -> Optional[str]:
         #
         sqlGen = MyDbQuerySqlGen(schemaDefObj=self.__sd, verbose=self.__verbose, log=self.__lfh)
 
-        sTableIdList = []
+        sTableIdList: List[str] = []
         #        for sTup in sList:
         for k in sorted(selectD.keys()):
             sTup = selectD[k]
@@ -441,7 +454,7 @@ class MyQueryDirectives:
                     vOp = cObj[2]
                     lhsTuple = cObj[0]
                     cOp = cObj[1]
-                    cDefList = []
+                    cDefList: List[Tuple[Any, ...]] = []
                     for v in vL:
                         cDefList.append((vOp, lhsTuple, cOp, (v, vType)))
                     sqlCondition.addGroupValueConditionList(cDefList, preOp=lOp)
@@ -462,7 +475,7 @@ class MyQueryDirectives:
         #
         return sqlS
 
-    def __queryDirSub(self, inpQueryDirList, domD=None, domRefSeparator="|"):
+    def __queryDirSub(self, inpQueryDirList: List[str], domD: Optional[Dict[str, Any]] = None, domRefSeparator: str = "|") -> List[Any]:
         """Substitute DOM references into the input query directive list -
 
         Substitions:
@@ -475,7 +488,7 @@ class MyQueryDirectives:
         """
         if domD is None:
             domD = {}
-        qL = []
+        qL: List[Any] = []
         try:
             i = 0
             while i < len(inpQueryDirList):
@@ -484,7 +497,7 @@ class MyQueryDirectives:
                     indx = int(str(t.upper()).split("_")[2])
                     if inpQueryDirList[i + 1] in domD and domD[inpQueryDirList[i + 1]] is not None and len(domD[inpQueryDirList[i + 1]]) > 0:
                         if isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) > 1):
-                            tV = [str(tt).split(domRefSeparator)[indx] for tt in domD[inpQueryDirList[i + 1]]]
+                            tV: Union[str, List[str]] = [str(tt).split(domRefSeparator)[indx] for tt in domD[inpQueryDirList[i + 1]]]
                         elif isinstance(domD[inpQueryDirList[i + 1]], list) and (len(domD[inpQueryDirList[i + 1]]) == 1):
                             tV = str(domD[inpQueryDirList[i + 1]][0]).split(domRefSeparator)[indx]
                         else:

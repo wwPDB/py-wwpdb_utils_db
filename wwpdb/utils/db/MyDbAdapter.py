@@ -35,11 +35,13 @@ import copy
 import logging
 import sys
 import time
+from typing import Any, Dict, List, Optional, TextIO, Tuple, Union, cast
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen, MyDbConditionSqlGen, MyDbQuerySqlGen
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
+from wwpdb.utils.db.SchemaDefBase import SchemaDefBase
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,7 @@ logger = logging.getLogger(__name__)
 class MyDbAdapter:
     """Database adapter for managing simple access and persistance queries using a relational database store."""
 
-    def __init__(self, schemaDefObj, verbose=False, log=sys.stderr):
+    def __init__(self, schemaDefObj: SchemaDefBase, verbose: bool = False, log: TextIO = sys.stderr) -> None:
         self.__verbose = verbose
         self.__lfh = log
         self.__debug = False
@@ -57,24 +59,24 @@ class MyDbAdapter:
         #
         self.__sd = schemaDefObj
         self.__databaseName = self.__sd.getDatabaseName()
-        self.__dbCon = None
-        self.__defaultD = {}
-        self.__attributeParameterMap = {}
-        self.__attributeConstraintParameterMap = {}
+        self.__dbCon: Optional[Any] = None
+        self.__defaultD: Dict[Optional[str], Dict[str, Any]] = {}
+        self.__attributeParameterMap: Dict[str, List[Tuple[str, str]]] = {}
+        self.__attributeConstraintParameterMap: Dict[str, List[Tuple[str, str]]] = {}
 
-    def _setDebug(self, flag=True):
+    def _setDebug(self, flag: bool = True) -> None:
         self.__debug = flag
 
-    def _setDataStore(self, dataStoreName):
+    def _setDataStore(self, dataStoreName: Optional[str]) -> None:
         """Set/reassign the database for all subsequent transactions."""
         self.__databaseName = dataStoreName
 
-    def _getParameterDefaultValues(self, contextId):
+    def _getParameterDefaultValues(self, contextId: Optional[str]) -> Dict[str, Any]:
         if contextId is not None and contextId in self.__defaultD:
             return self.__defaultD[contextId]
         return {}
 
-    def _setParameterDefaultValues(self, contextId, valueD):
+    def _setParameterDefaultValues(self, contextId: Optional[str], valueD: Dict[str, Any]) -> bool:
         """Set the optional lookup dictionary of default values for unspecified parameters...
 
         valueD = { 'paramName1': <default value1>,  'paramName2' : <default value2>, ...  }
@@ -82,7 +84,7 @@ class MyDbAdapter:
         self.__defaultD[contextId] = copy.deepcopy(valueD)
         return True
 
-    def _setAttributeParameterMap(self, tableId, mapL):
+    def _setAttributeParameterMap(self, tableId: str, mapL: List[Tuple[str, str]]) -> bool:
         """Set list of correspondences between method parameters and table attribute IDs.
 
         These correspondences are used to map key-value parameter pairs to their associated table attribute values.
@@ -92,14 +94,14 @@ class MyDbAdapter:
         self.__attributeParameterMap[tableId] = mapL
         return True
 
-    def _getDefaultAttributeParameterMap(self, tableId):
+    def _getDefaultAttributeParameterMap(self, tableId: str) -> List[Tuple[str, str]]:
         """Return default attributeId parameter name mappings for the input tableId.
 
         mapL=[ (atId1,paramName1),(atId2,paramName2),... ]
         """
         return self.__sd.getDefaultAttributeParameterMap(tableId)
 
-    def _getAttributeParameterMap(self, tableId):
+    def _getAttributeParameterMap(self, tableId: Optional[str]) -> List[Tuple[str, str]]:
         """
         For the input table return the method keyword argument name to table attribute mapping -
         """
@@ -107,7 +109,7 @@ class MyDbAdapter:
             return self.__attributeParameterMap[tableId]
         return []
 
-    def _getConstraintParameterMap(self, tableId):
+    def _getConstraintParameterMap(self, tableId: Optional[str]) -> List[Tuple[str, str]]:
         """
         For the input table return the method keyword argument name to table attribute mapping for
         those attributes that serve as constraints for update transactions -
@@ -117,7 +119,7 @@ class MyDbAdapter:
             return self.__attributeConstraintParameterMap[tableId]
         return []
 
-    def _setConstraintParameterMap(self, tableId, mapL):
+    def _setConstraintParameterMap(self, tableId: str, mapL: List[Tuple[str, str]]) -> bool:
         """Set list of correspondences between method parameters and table attribute IDs to be used as
         contraints in update operations.
 
@@ -128,7 +130,16 @@ class MyDbAdapter:
         self.__attributeConstraintParameterMap[tableId] = mapL
         return True
 
-    def _open(self, dbServer=None, dbHost=None, dbName=None, dbUser=None, dbPw=None, dbSocket=None, dbPort=None):
+    def _open(
+        self,
+        dbServer: Optional[str] = None,
+        dbHost: Optional[str] = None,
+        dbName: Optional[str] = None,
+        dbUser: Optional[str] = None,
+        dbPw: Optional[str] = None,
+        dbSocket: Optional[str] = None,
+        dbPort: Optional[Union[int, str]] = None,
+    ) -> bool:
         """Open a connection to the data base server hosting WF status and tracking data -
 
         Internal configuration details will be used if these are not externally supplied.
@@ -160,13 +171,13 @@ class MyDbAdapter:
             return True
         return False
 
-    def _close(self):
+    def _close(self) -> None:
         """Close connection to the data base server hosting WF status and tracking data -"""
         if self.__dbCon is not None:
             self.__dbCon.close()
             self.__dbCon = None
 
-    def _createSchema(self):
+    def _createSchema(self) -> bool:
         """Create table schema using the current class schema definition"""
         if self.__debug:
             startTime = time.time()
@@ -183,7 +194,7 @@ class MyDbAdapter:
             myAd = MyDbAdminSqlGen(self.__verbose, self.__lfh)
 
             for tableId in tableIdList:
-                sqlL = []
+                sqlL: List[str] = []
                 tableDefObj = self.__sd.getTable(tableId)
                 sqlL.extend(myAd.createTableSQL(databaseName=self.__databaseName, tableDefObj=tableDefObj))
 
@@ -205,7 +216,7 @@ class MyDbAdapter:
             logger.debug("Completed at %s (%.3f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         return ret
 
-    def _getSecondsSinceEpoch(self):
+    def _getSecondsSinceEpoch(self) -> float:
         """Return number of seconds since the epoch at the precision of the local installation.
         Typically a floating point value with microsecond precision.
 
@@ -213,7 +224,7 @@ class MyDbAdapter:
         """
         return time.time()
 
-    def _insertRequest(self, tableId, contextId, **kwargs):
+    def _insertRequest(self, tableId: str, contextId: Optional[str], **kwargs: Any) -> bool:
         """Insert into the input table using the keyword value pairs provided as input arguments -
 
         The contextId controls the handling default values for unspecified parameters.
@@ -237,8 +248,8 @@ class MyDbAdapter:
             #
             # Create the attribute and value list for template --
             #
-            vList = []
-            aList = []
+            vList: List[Any] = []
+            aList: List[str] = []
             for atId, kwId in self._getAttributeParameterMap(tableId=tableId):
                 if kwId in kwargs and kwargs[kwId] is not None:
                     vList.append(kwargs[kwId])
@@ -273,7 +284,7 @@ class MyDbAdapter:
 
         return ret
 
-    def _updateRequest(self, tableId, contextId, **kwargs):
+    def _updateRequest(self, tableId: str, contextId: Optional[str], **kwargs: Any) -> bool:
         """Update the input table using the keyword value pairs provided as input arguments -
 
         The contextId controls the handling default values for unspecified parameters.
@@ -300,9 +311,9 @@ class MyDbAdapter:
             #
             # create the value list for template --
             #
-            vList = []
-            aList = []
-            cList = []
+            vList: List[Any] = []
+            aList: List[str] = []
+            cList: List[str] = []
             for atId, kwId in self._getAttributeParameterMap(tableId):
                 if (atId, kwId) in cIdList:
                     continue
@@ -336,14 +347,14 @@ class MyDbAdapter:
             logger.debug("Completed _updateRequest %s (%.3f seconds)\n", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         return ret
 
-    def _select(self, tableId, **kwargs):
+    def _select(self, tableId: str, **kwargs: Any) -> List[Dict[str, Any]]:
         """Construct a selection query for input table and optional constraints provided as keyword value pairs in the
         input arguments.  Return a list of dictionaries of these query details including all table attributes.
         """
         startTime = time.time()
         if self.__debug:
             logger.debug("Starting _select at %s", time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
-        rdList = []
+        rdList: List[Dict[str, Any]] = []
         try:
             iOpened = False
             if self.__dbCon is None:
@@ -382,13 +393,13 @@ class MyDbAdapter:
             if self.__debug:
                 logger.debug("_select selection sql: %s", sqlS)
 
-            rowList = myQ.selectRows(queryString=sqlS)
+            rowList = myQ.selectRows(queryString=cast("str", sqlS))
             sqlGen.clear()
             #
             # return the result set as a list of dictionaries
             #
             for iRow, row in enumerate(rowList):
-                rD = {}
+                rD: Dict[str, Any] = {}
                 for colVal, atId in zip(row, atIdList):
                     rD[atId] = colVal
                 if self.__debug:
@@ -407,7 +418,7 @@ class MyDbAdapter:
             logger.debug("Completed _select at %s (%.3f seconds)", time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         return rdList
 
-    def _deleteRequest(self, tableId, **kwargs):
+    def _deleteRequest(self, tableId: str, **kwargs: Any) -> bool:
         """Delete from input table records identified by the keyword value pairs provided as input arguments -"""
         startTime = time.time()
         if self.__debug:
@@ -428,8 +439,8 @@ class MyDbAdapter:
             #
             # Create the attribute and value list for template --
             #
-            vList = []
-            aList = []
+            vList: List[Any] = []
+            aList: List[str] = []
             for atId, kwId in self._getAttributeParameterMap(tableId):
                 if kwId in kwargs and kwargs[kwId] is not None:
                     vList.append(kwargs[kwId])
