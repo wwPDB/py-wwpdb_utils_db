@@ -168,7 +168,7 @@ run = ["tox"]
 
 # -------------------------  Mypy disable ---------
 [[tool.mypy.overrides]]
-module = ["mmcif.*", "wwpdb.utils.dp.*", "rcsb.utils.multiproc.*", "scandir"]
+module = ["mmcif.*", "rcsb.utils.multiproc.*", "scandir"]
 ignore_missing_imports = true
 
 [tool.mypy]
@@ -178,8 +178,5 @@ exclude = [
 
 # ------------------------ ruff disable per file
 [tool.ruff.lint.per-file-ignores]
-#"wwpdb/utils/dp/electron_density/*" = ["G004", "G001"]  #  Logging statement uses f-string
-
-#"tests/*" = ["TID252", "PLC1901", "S311", "T201"]
 "tests/*.py" = ["ARG005", "PT027", "DTZ001", "S101", "S108"]
 "tests/FileActivityDbMockTests.py" = ["S608"]
